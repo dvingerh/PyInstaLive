@@ -9,6 +9,7 @@ import codecs
 from socket import timeout, error as SocketError
 from ssl import SSLError
 from urllib2 import URLError
+
 from httplib import HTTPException
 from instagram_private_api_extensions import live
 import sys, os, time, json
@@ -72,7 +73,7 @@ def getBroadcast(user_id):
         else:
         	recordStream(broadcast)
     except NoBroadcastException as e:
-        cLogger.log('[W] Could not get broadcast info: ' + str(e), "YELLOW")
+        cLogger.log('[W] ' + str(e), "YELLOW")
         cLogger.seperator("GREEN")
         exit()
     except Exception as e:
