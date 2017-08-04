@@ -1,18 +1,18 @@
-import codecs
-import datetime
-import os.path
-import logging
 import argparse
 import codecs
+import datetime
+import logging
+import os.path
 import sys, os, time, json
 
-import cAuthCookie, cLogger, cDownloader
+import cAuthCookie, cLogger, cDownloader, cComments
 
-from socket import timeout, error as SocketError
-from ssl import SSLError
-from urllib2 import URLError
 from httplib import HTTPException
 from instagram_private_api_extensions import live
+from socket import error as SocketError
+from socket import timeout
+from ssl import SSLError
+from urllib2 import URLError
 
 # "naxunaw" "pyinstalive" "credentials.json"
 

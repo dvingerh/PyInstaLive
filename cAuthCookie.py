@@ -1,6 +1,6 @@
-import json
 import codecs
 import datetime
+import json
 import os.path
 
 import cLogger
@@ -46,7 +46,7 @@ def login(username, password):
 
     device_id = None
     try:
-
+        
         settings_file = "credentials.json"
         if not os.path.isfile(settings_file):
             # settings file does not exist
