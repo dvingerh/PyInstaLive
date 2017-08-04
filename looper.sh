@@ -1,5 +1,5 @@
 while true
 do
-python pyinstalive.py -u "naxunaw" -p "pyinstalive" -r "cen" -settings "credentials.json"
+python cMain.py -u "naxunaw" -p "pyinstalive" -r "simplerealistic"
 sleep 10
 done
