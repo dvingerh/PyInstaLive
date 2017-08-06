@@ -14,8 +14,6 @@ from socket import timeout
 from ssl import SSLError
 from urllib2 import URLError
 
-# "naxunaw" "pyinstalive" "credentials.json"
-
 global api, args, seperator
 parser = argparse.ArgumentParser(description='Login')
 parser.add_argument('-u', '--username', dest='username', type=str, required=True)

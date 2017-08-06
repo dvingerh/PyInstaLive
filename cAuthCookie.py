@@ -55,7 +55,7 @@ def login(username, password):
             # login new
             api = Client(
                 username, password,
-                on_login=lambda x: onlogin_callback(x, settings))
+                on_login=lambda x: onlogin_callback(x, settings_file))
         else:
             with open(settings_file) as file_data:
                 cached_settings = json.load(file_data, object_hook=from_json)
@@ -78,13 +78,13 @@ def login(username, password):
             on_login=lambda x: onlogin_callback(x, settings))
 
     except ClientLoginError as e:
-        print('[E] ClientLoginError {0!s}'.format(e), "RED")
+        cLogger.log('[E] ClientLoginError: {0!s}'.format(e), "RED")
         exit(9)
     except ClientError as e:
-        print('[E] ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response), "RED")
+        cLogger.log('[E] ClientError: {0!s}'.format(e), "RED")
         exit(9)
     except Exception as e:
-        print('[E] Unexpected Exception: {0!s}'.format(e), "RED")
+        cLogger.log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
         exit(99)
 
     # Show when login expires
