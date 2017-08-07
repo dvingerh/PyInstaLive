@@ -25,7 +25,9 @@ def main(apiArg, recordArg):
 	global record
 	global isRecording
 	global currentDate
-	currentDate = getDate()
+	global currentTime
+	currentTime = str(int(time.time()))
+	currentDate = time.strftime("%Y%m%d")
 	isRecording = False
 	api = apiArg
 	record = recordArg
@@ -42,9 +44,11 @@ def recordStream(broadcast):
 				   or broadcast.get('dash_abr_playback_url')
 				   or broadcast['dash_playback_url'])
 
+		outputDir = '{}_{}_{}_{}_downloads/'.format(currentDate ,record, broadcast['id'], currentTime)
+
 		dl = live.Downloader(
 			mpd=mpd_url,
-			output_dir='{}_{}_{}_downloads/'.format(currentDate ,record, broadcast['id']),
+			output_dir=outputDir,
 			user_agent=api.user_agent,
 			max_connection_error_retry=2,
 			duplicate_etag_retry=60,
@@ -63,8 +67,15 @@ def recordStream(broadcast):
 		if started_secs:
 			started_label += '%d seconds' % started_secs
 		cLogger.log('[I] Starting broadcast recording:', "GREEN")
-		cLogger.log('[I] Viewers: ' + str(int(viewers)) + " watching", "GREEN")
-		cLogger.log('[I] Missing: ' + started_label, "GREEN")
+		last_stream = open("last_stream.html", "w")
+		last_stream.write('<b>Username:</b> {}<br><b>MPD URL:</b> <a href="{}">LINK</a><br><b>Viewers:</b> {}<br><b>Missing:</b> {}'
+			.format(record, mpd_url, str(int(viewers)), started_label))
+		last_stream.close()
+		cLogger.log('[I] Username : ' + record, "GREEN")
+		cLogger.log('[I] MPD URL  : ' + mpd_url, "GREEN")
+		cLogger.log('[I] Viewers  : ' + str(int(viewers)) + " watching", "GREEN")
+		cLogger.log('[I] Missing  : ' + started_label, "GREEN")
+		cLogger.log('[I] Recording broadcast...', "GREEN")
 		dl.run()
 		stitchVideo(dl, broadcast)
 	except KeyboardInterrupt:
@@ -77,7 +88,7 @@ def recordStream(broadcast):
 def stitchVideo(dl, broadcast):
 		isRecording = False
 		cLogger.log('[I] Stitching downloaded files into video...', "GREEN")
-		output_file = currentDate + "_" + record + "_" + str(broadcast['id']) + ".mp4"
+		output_file = '{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
 		dl.stitch(output_file, cleartempfiles=False)
 		cLogger.log('[I] Successfully stitched downloaded files!', "GREEN")
 		cLogger.seperator("GREEN")
@@ -111,6 +122,3 @@ def getBroadcast(user_id):
 			cLogger.log('[E] Could not get broadcast info: ' + str(e), "RED")
 			cLogger.seperator("GREEN")
 			sys.exit(0)
-
-def getDate():
-	return time.strftime("%Y%m%d")
