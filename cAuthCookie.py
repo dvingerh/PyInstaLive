@@ -79,13 +79,13 @@ def login(username, password):
 
     except ClientLoginError as e:
         cLogger.log('[E] ClientLoginError: {0!s}'.format(e), "RED")
-        exit(9)
+        sys.exit(9)
     except ClientError as e:
         cLogger.log('[E] ClientError: {0!s}'.format(e), "RED")
-        exit(9)
+        sys.exit(9)
     except Exception as e:
         cLogger.log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
-        exit(99)
+        sys.exit(99)
 
     # Show when login expires
     # cookie_expiry = api.cookie_jar.expires_earliest

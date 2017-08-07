@@ -38,7 +38,7 @@ def recordStream(broadcast):
 	except Exception as e:
 		cLogger.log('[E] Could not start recording broadcast: ' + str(e), "RED")
 		cLogger.seperator("GREEN")
-		exit()
+		sys.exit(0)
 
 	try:
 		cLogger.log('[I] Starting broadcast recording.', "GREEN")
@@ -55,7 +55,7 @@ def recordStream(broadcast):
 		dl.stitch(record + "_" + str(broadcast['id']) + "_" + str(int(t)) + '.mp4')
 		cLogger.log('[I] Successfully stitched downloaded files.', "GREEN")
 		cLogger.seperator("GREEN")
-		exit()
+		sys.exit(0)
 
 
 def getUserInfo(record):
@@ -66,7 +66,7 @@ def getUserInfo(record):
 	except Exception as e:
 		cLogger.log('[E] Could not get user info: ' + str(e), "RED")
 		cLogger.seperator("GREEN")
-		exit()
+		sys.exit(0)
 
 
 def getBroadcast(user_id):
@@ -80,9 +80,9 @@ def getBroadcast(user_id):
 	except NoBroadcastException as e:
 		cLogger.log('[W] ' + str(e), "YELLOW")
 		cLogger.seperator("GREEN")
-		exit()
+		sys.exit(0)
 	except Exception as e:
 		if (e.__name__ is not NoBroadcastException):
 			cLogger.log('[E] Could not get broadcast info: ' + str(e), "RED")
 			cLogger.seperator("GREEN")
-			exit()
+			sys.exit(0)
