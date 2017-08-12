@@ -100,7 +100,7 @@ def getUserInfo(record):
 		user_id = user_res['user']['pk']
 		getBroadcast(user_id)
 	except Exception as e:
-		cLogger.log('[E] Could not get user info: ' + str(e), "RED")
+		cLogger.log('[E] Could not get user info for "' + record + '" : ' + str(e), "RED")
 		cLogger.seperator("GREEN")
 		sys.exit(0)
 

@@ -14,7 +14,12 @@ from socket import timeout
 from ssl import SSLError
 from urllib2 import URLError
 
+logging.disable(logging.CRITICAL)
+
 global api, args, seperator
+
+scriptVersion = "2.1.0"
+
 parser = argparse.ArgumentParser(description='Login')
 parser.add_argument('-u', '--username', dest='username', type=str, required=True)
 parser.add_argument('-p', '--password', dest='password', type=str, required=True)
