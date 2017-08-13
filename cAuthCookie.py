@@ -40,8 +40,7 @@ def onlogin_callback(api, settings_file):
 
 
 def login(username, password):
-    from cMain import scriptVersion
-    cLogger.log('PYINSTALIVE DOWNLOADER (Script v{0!s})'.format(scriptVersion), "GREEN")
+    cLogger.log('PYINSTALIVE DOWNLOADER (Script v{0!s})'.format(client_version), "GREEN")
     cLogger.seperator("GREEN")
 
     device_id = None
