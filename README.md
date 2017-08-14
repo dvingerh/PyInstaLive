@@ -1,5 +1,16 @@
 # PyInstaLive
 This script enables you to record Instagram livestreams. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
+
+## Dependencies
+You need to install these dependencies first before this script will work:
+
+[instagram_private_api](https://github.com/ping/instagram_private_api#install)
+
+[instagram_private_api_extensions](https://github.com/ping/instagram_private_api_extensions#install)
+
+#### Note
+You need [Git](https://git-scm.com/downloads) and [Python 2.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install these dependencies.
+
 ## Usage
 ```bash
 python cMain.py -u "<username>" -p "<password>" -r "<live-username>"
