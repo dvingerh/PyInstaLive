@@ -9,7 +9,7 @@ You need to install these dependencies first before this script will work:
 [instagram_private_api_extensions](https://github.com/ping/instagram_private_api_extensions#install)
 
 #### Note
-You need [Git](https://git-scm.com/downloads) and [Python 2.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install these dependencies.
+You need [Git](https://git-scm.com/downloads) and [Python 2.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install these dependencies and use this script.
 
 ## Usage
 ```bash
