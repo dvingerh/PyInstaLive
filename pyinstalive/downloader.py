@@ -1,28 +1,18 @@
-import argparse
 import codecs
-import datetime
-import json
 import logging
-import os.path
-import threading
-
-from socket import error as SocketError
+import sys, time
 from socket import timeout
-from ssl import SSLError
-from urllib2 import URLError
-
-import cLogger, cComments
-import sys, os, time
-
-from httplib import HTTPException
 from instagram_private_api_extensions import live
+
+import logger
 
 class NoBroadcastException(Exception):
 	pass
 
-def main(apiArg, recordArg):
+def main(apiArg, recordArg, savePathArg):
 	global api
 	global record
+	global savePath
 	global isRecording
 	global currentDate
 	global currentTime
@@ -33,6 +23,7 @@ def main(apiArg, recordArg):
 	isRecording = False
 	api = apiArg
 	record = recordArg
+	savePath = savePathArg
 	getUserInfo(record)
 
 def recordStream(broadcast):
@@ -45,7 +36,7 @@ def recordStream(broadcast):
 				   or broadcast.get('dash_abr_playback_url')
 				   or broadcast['dash_playback_url'])
 
-		outputDir = '{}_{}_{}_{}_downloads/'.format(currentDate ,record, broadcast['id'], currentTime)
+		outputDir = savePath + '\{}_{}_{}_{}_downloads'.format(currentDate ,record, broadcast['id'], currentTime)
 
 		dl = live.Downloader(
 			mpd=mpd_url,
@@ -57,8 +48,8 @@ def recordStream(broadcast):
 			mpd_download_timeout=10,
 			download_timeout=10)
 	except Exception as e:
-		cLogger.log('[E] Could not start recording broadcast: ' + str(e), "RED")
-		cLogger.seperator("GREEN")
+		logger.log('[E] Could not start recording broadcast: ' + str(e), "RED")
+		logger.seperator("GREEN")
 		sys.exit(0)
 
 	try:
@@ -67,31 +58,31 @@ def recordStream(broadcast):
 		started_label = '%d minutes and ' % started_mins
 		if started_secs:
 			started_label += '%d seconds' % started_secs
-		cLogger.log('[I] Starting broadcast recording:', "GREEN")
+		logger.log('[I] Starting broadcast recording:', "GREEN")
 		last_stream = open("last_stream.html", "w")
 		last_stream.write('<b>Username:</b> {}<br><b>MPD URL:</b> <a href="{}">LINK</a><br><b>Viewers:</b> {}<br><b>Missing:</b> {}'
 			.format(record, mpd_url, str(int(viewers)), started_label))
 		last_stream.close()
-		cLogger.log('[I] Username    : ' + record, "GREEN")
-		cLogger.log('[I] MPD URL     : ' + mpd_url, "GREEN")
+		logger.log('[I] Username    : ' + record, "GREEN")
+		logger.log('[I] MPD URL     : ' + mpd_url, "GREEN")
 		printStatus(api, broadcast)
-		cLogger.log('[I] Recording broadcast...', "GREEN")
+		logger.log('[I] Recording broadcast...', "GREEN")
 		dl.run()
 		stitchVideo(dl, broadcast)
 	except KeyboardInterrupt:
-		cLogger.log('', "GREEN")
-		cLogger.log('[I] Aborting broadcast recording...', "GREEN")
+		logger.log('', "GREEN")
+		logger.log('[I] Aborting broadcast recording...', "GREEN")
 		if not dl.is_aborted:
 			dl.stop()
 			stitchVideo(dl, broadcast)
 
 def stitchVideo(dl, broadcast):
 		isRecording = False
-		cLogger.log('[I] Stitching downloaded files into video...', "GREEN")
-		output_file = '{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
+		logger.log('[I] Stitching downloaded files into video...', "GREEN")
+		output_file = savePath + '\{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
 		dl.stitch(output_file, cleartempfiles=False)
-		cLogger.log('[I] Successfully stitched downloaded files!', "GREEN")
-		cLogger.seperator("GREEN")
+		logger.log('[I] Successfully stitched downloaded files!', "GREEN")
+		logger.seperator("GREEN")
 		sys.exit(0)
 
 def getUserInfo(record):
@@ -100,27 +91,27 @@ def getUserInfo(record):
 		user_id = user_res['user']['pk']
 		getBroadcast(user_id)
 	except Exception as e:
-		cLogger.log('[E] Could not get user info for "' + record + '" : ' + str(e), "RED")
-		cLogger.seperator("GREEN")
+		logger.log('[E] Could not get user info for "' + record + '" : ' + str(e), "RED")
+		logger.seperator("GREEN")
 		sys.exit(0)
 
 
 def getBroadcast(user_id):
 	try:
-		cLogger.log('[I] Checking broadcast for "' + record + '"...', "GREEN")
+		logger.log('[I] Checking broadcast for "' + record + '"...', "GREEN")
 		broadcast = api.user_broadcast(user_id)
 		if (broadcast is None):
 			raise NoBroadcastException('No broadcast available.')
 		else:
 			recordStream(broadcast)
 	except NoBroadcastException as e:
-		cLogger.log('[W] ' + str(e), "YELLOW")
-		cLogger.seperator("GREEN")
+		logger.log('[W] ' + str(e), "YELLOW")
+		logger.seperator("GREEN")
 		sys.exit(0)
 	except Exception as e:
 		if (e.__name__ is not NoBroadcastException):
-			cLogger.log('[E] Could not get broadcast info: ' + str(e), "RED")
-			cLogger.seperator("GREEN")
+			logger.log('[E] Could not get broadcast info: ' + str(e), "RED")
+			logger.seperator("GREEN")
 			sys.exit(0)
 
 def printStatus(api, broadcast):
@@ -130,7 +121,7 @@ def printStatus(api, broadcast):
 	started_label = '%d minutes and ' % started_mins
 	if started_secs:
 		started_label += '%d seconds' % started_secs
-	cLogger.log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
-	cLogger.log('[I] Airing time : ' + started_label, "GREEN")
-	cLogger.log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
-	cLogger.log('', "GREEN")
+	logger.log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
+	logger.log('[I] Airing time : ' + started_label, "GREEN")
+	logger.log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
+	logger.log('', "GREEN")
