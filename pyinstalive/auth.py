@@ -18,7 +18,7 @@ except ImportError:
         __version__ as client_version)
 
 
-scriptVersion = "2.1.1"
+scriptVersion = "2.1.2"
 
 
 def to_json(python_object):
@@ -38,7 +38,7 @@ def onlogin_callback(api, settings_file):
     cache_settings = api.settings
     with open(settings_file, 'w') as outfile:
         json.dump(cache_settings, outfile, default=to_json)
-        logger.log('[I] New settings file was made: {0!s}'.format(settings_file), "GREEN")
+        logger.log('[I] New auth cookie file was made: {0!s}'.format(settings_file), "GREEN")
 
 
 def login(username, password):
@@ -51,7 +51,7 @@ def login(username, password):
         settings_file = "credentials.json"
         if not os.path.isfile(settings_file):
             # settings file does not exist
-            logger.log('[W] Unable to find settings file: {0!s}'.format(settings_file), "YELLOW")
+            logger.log('[W] Unable to find auth cookie file: {0!s}'.format(settings_file), "YELLOW")
 
             # login new
             api = Client(

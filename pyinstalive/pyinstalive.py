@@ -32,4 +32,8 @@ def run():
 	else:
 		api = auth.login(config['pyinstalive']['username'], config['pyinstalive']['password'])
 
-	downloader.main(api, args.record, config['pyinstalive']['save_path'])
+	if (os.path.exists(config['pyinstalive']['save_path'])):
+		downloader.main(api, args.record, config['pyinstalive']['save_path'])
+	else:
+		logger.log("[W] Invalid save path was specified! Falling back to location: " + os.getcwd(), "RED")
+		downloader.main(api, args.record, os.getcwd())
