@@ -43,7 +43,7 @@ the `username` and `password` parameters are not required when you have specifie
 ```bash
 python -m pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
 ```
-Or (see [installation](https://github.com/notcammy/PyInstaLive#installation))
+Or (see [note](https://github.com/notcammy/PyInstaLive#note-1))
 ```bash
 python -m pyinstalive -r "janedoe"
 ```
