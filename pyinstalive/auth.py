@@ -18,7 +18,7 @@ except ImportError:
         __version__ as client_version)
 
 
-scriptVersion = "2.1.2"
+scriptVersion = "2.1.3"
 
 
 def to_json(python_object):
