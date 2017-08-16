@@ -36,7 +36,7 @@ def recordStream(broadcast):
 				   or broadcast.get('dash_abr_playback_url')
 				   or broadcast['dash_playback_url'])
 
-		outputDir = savePath + '\{}_{}_{}_{}_downloads'.format(currentDate ,record, broadcast['id'], currentTime)
+		outputDir = savePath + '{}_{}_{}_{}_downloads'.format(currentDate ,record, broadcast['id'], currentTime)
 
 		dl = live.Downloader(
 			mpd=mpd_url,
@@ -79,7 +79,7 @@ def recordStream(broadcast):
 def stitchVideo(dl, broadcast):
 		isRecording = False
 		logger.log('[I] Stitching downloaded files into video...', "GREEN")
-		output_file = savePath + '\{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
+		output_file = savePath + '{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
 		dl.stitch(output_file, cleartempfiles=False)
 		logger.log('[I] Successfully stitched downloaded files!', "GREEN")
 		logger.seperator("GREEN")
