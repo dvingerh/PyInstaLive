@@ -10,8 +10,8 @@ def run():
 
 	scriptVersion = "2.1.4"
 
-    logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(scriptVersion), "GREEN")
-    logger.seperator("GREEN")
+	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(scriptVersion), "GREEN")
+	logger.seperator("GREEN")
 
 	logging.disable(logging.CRITICAL)
 	config = configparser.ConfigParser()
