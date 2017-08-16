@@ -8,7 +8,7 @@ import auth, downloader, logger
 
 def run():
 
-	scriptVersion = "2.1.4"
+	scriptVersion = "2.1.5"
 
 	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(scriptVersion), "GREEN")
 	logger.seperator("GREEN")
