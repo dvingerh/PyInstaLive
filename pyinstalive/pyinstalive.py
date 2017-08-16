@@ -31,10 +31,10 @@ def run():
 		api = auth.login(args.username, args.password)
 	else:
 		api = auth.login(config['pyinstalive']['username'], config['pyinstalive']['password'])
-    
-    savePath = config['pyinstalive']['save_path']
-    if not savePath.endswith('/'):
-    	savePath = savePath + '/'
+	
+	savePath = config['pyinstalive']['save_path']
+	if not savePath.endswith('/'):
+		savePath = savePath + '/'
 
 	if (os.path.exists(savePath)):
 		downloader.main(api, args.record, savePath)
