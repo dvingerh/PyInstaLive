@@ -1,9 +1,9 @@
 # PyInstaLive
-This script enables you to record Instagram livestreams. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
+This script enables you to record Instagram livestreams. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 ## Installation
 
-Run the following command in command line / terminal:
+Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
 pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency-links
 ```
@@ -51,7 +51,7 @@ python -m pyinstalive -r "janedoe"
 If a livestream is currently ongoing, the terminal output should be something like this:
 
 ```
-PYINSTALIVE DOWNLOADER (Script v1.0)
+PYINSTALIVE DOWNLOADER (SCRIPT v1.0)
 --------------------------------------------------
 [I] Login to "johndoe" OK!
 [I] Checking broadcast for "janedoe"...
@@ -62,7 +62,10 @@ PYINSTALIVE DOWNLOADER (Script v1.0)
 [I] Airing time : 37 minutes and 20 seconds
 [I] Status      : Active
 
-[I] Recording broadcast...
+[I] Recording broadcast... press [CTRL+C] to abort.
+
+[I] Stitching downloaded files into video...
+[I] Successfully stitched downloaded files!
 ```
 
 ## Help
