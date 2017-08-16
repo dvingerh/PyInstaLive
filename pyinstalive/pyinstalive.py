@@ -7,6 +7,12 @@ import auth, downloader, logger
 
 
 def run():
+
+	scriptVersion = "2.1.3"
+
+    logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(scriptVersion), "GREEN")
+    logger.seperator("GREEN")
+
 	logging.disable(logging.CRITICAL)
 	config = configparser.ConfigParser()
 
@@ -15,8 +21,10 @@ def run():
 			config.read('pyinstalive.ini')
 		except Exception as e:
 			logger.log("[E] Could not read configuration file! Try passing the required arguments manually.", "RED")
+			logger.seperator("GREEN")
 	else:
-		logger.log("[E] Could not find configuration file! Exiting...", "RED")
+		logger.log("[E] Could not find configuration file!", "RED")
+		logger.seperator("GREEN")
 		sys.exit(0)
 
 

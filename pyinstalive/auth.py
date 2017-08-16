@@ -18,9 +18,6 @@ except ImportError:
         __version__ as client_version)
 
 
-scriptVersion = "2.1.3"
-
-
 def to_json(python_object):
     if isinstance(python_object, bytes):
         return {'__class__': 'bytes',
@@ -42,9 +39,6 @@ def onlogin_callback(api, settings_file):
 
 
 def login(username, password):
-    logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(scriptVersion), "GREEN")
-    logger.seperator("GREEN")
-
     device_id = None
     try:
         

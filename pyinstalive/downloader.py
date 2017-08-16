@@ -66,7 +66,7 @@ def recordStream(broadcast):
 		logger.log('[I] Username    : ' + record, "GREEN")
 		logger.log('[I] MPD URL     : ' + mpd_url, "GREEN")
 		printStatus(api, broadcast)
-		logger.log('[I] Recording broadcast...', "GREEN")
+		logger.log('[I] Recording broadcast... press [CTRL+C] to abort.', "GREEN")
 		dl.run()
 		stitchVideo(dl, broadcast)
 	except KeyboardInterrupt:
@@ -80,10 +80,15 @@ def stitchVideo(dl, broadcast):
 		isRecording = False
 		logger.log('[I] Stitching downloaded files into video...', "GREEN")
 		output_file = savePath + '{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
-		dl.stitch(output_file, cleartempfiles=False)
-		logger.log('[I] Successfully stitched downloaded files!', "GREEN")
-		logger.seperator("GREEN")
-		sys.exit(0)
+		try:
+			dl.stitch(output_file, cleartempfiles=False)
+			logger.log('[I] Successfully stitched downloaded files!', "GREEN")
+			logger.seperator("GREEN")
+			sys.exit(0)
+		except Exception as e:
+			logger.log('[E] Could not stitch downloaded files: ' + str(e), "RED")
+			logger.seperator("GREEN")
+			sys.exit(0)
 
 def getUserInfo(record):
 	try:
