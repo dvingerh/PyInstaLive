@@ -13,14 +13,12 @@ def main(apiArg, recordArg, savePathArg):
 	global api
 	global record
 	global savePath
-	global isRecording
 	global currentDate
 	global currentTime
 	global broadcast
 	global mpd_url
 	currentTime = str(int(time.time()))
 	currentDate = time.strftime("%Y%m%d")
-	isRecording = False
 	api = apiArg
 	record = recordArg
 	savePath = savePathArg
@@ -77,7 +75,6 @@ def recordStream(broadcast):
 			stitchVideo(dl, broadcast)
 
 def stitchVideo(dl, broadcast):
-		isRecording = False
 		logger.log('[I] Stitching downloaded files into video...', "GREEN")
 		output_file = savePath + '{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
 		try:
