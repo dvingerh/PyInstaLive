@@ -1,9 +1,5 @@
 *.pyc
 
-pyinstalive/credentials\.json
-
 last_stream\.html
 
 looper\.sh
-
-pyinstalive/pyinstalive\.ini

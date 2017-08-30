@@ -19,7 +19,7 @@ setup(
 	packages=['pyinstalive'],
 	entry_points={
 		'console_scripts': [
-			'pyinstalive = pyinstalive.main:run',
+			'pyinstalive = pyinstalive.__main__:run',
 		]
 	},
 	install_requires=[ 

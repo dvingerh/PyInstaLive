@@ -1,9 +1,9 @@
-import pyinstalive
+from .initialize import run
 
 
 def main():
-    pyinstalive.run()
+    run()
 
 
 if __name__ == '__main__':
-    pyinstalive.run()
+    run()
