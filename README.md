@@ -31,7 +31,7 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 ## Usage
 ```bash
-python -m pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
+pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
 ```
 
 Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream you want to record.
@@ -41,11 +41,11 @@ the `username` and `password` parameters are not required when you have specifie
 
 ## Example
 ```bash
-python -m pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
+pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
 ```
 Or (see [note](https://github.com/notcammy/PyInstaLive#note-1))
 ```bash
-python -m pyinstalive -r "janedoe"
+pyinstalive -r "janedoe"
 ```
 
 If a livestream is currently ongoing, the terminal output should be something like this:
