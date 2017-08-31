@@ -24,9 +24,7 @@ setup(
 	},
 	install_requires=[ 
 		'instagram_private_api==%(api)s' % {'api': _api_version},
-		'instagram_private_api_extensions==%(ext)s' % {'ext': _api_extensions_version},
-		'argparse',
-		'configparser'
+		'instagram_private_api_extensions==%(ext)s' % {'ext': _api_extensions_version}
 	],
 	dependency_links=[
 		'https://github.com/ping/instagram_private_api/archive/%(api)s.tar.gz'
@@ -37,7 +35,7 @@ setup(
 	include_package_data=True,
 	platforms='any',
 	long_description=long_description,
-	keywords='instagram livestream downloader pyinstalive',
+	keywords='instagram-livestream-recorder record-instagram-livestreams live instagram record livestream video recorder downloader download save',
 	description='This script enables you to record Instagram livestreams.',
 	classifiers=[
 		'Environment :: Console',

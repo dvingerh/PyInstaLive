@@ -1,7 +1,7 @@
 import codecs
 import json
 import os.path
-
+import datetime
 import logger
 
 try:
@@ -38,7 +38,7 @@ def onlogin_callback(api, settings_file):
 		logger.log('[I] New auth cookie file was made: {0!s}'.format(settings_file), "GREEN")
 
 
-def login(username, password):
+def login(username, password, show_cookie_expiry):
 	device_id = None
 	try:
 		
@@ -82,8 +82,9 @@ def login(username, password):
 		logger.log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
 		sys.exit(99)
 
-	# Show when login expires
-	# cookie_expiry = api.cookie_jar.expires_earliest
-	# print('[I] Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%S')), "WHITE")
 	logger.log('[I] Login to "' + username + '" OK!', "GREEN")
+	if show_cookie_expiry == 'True':
+		cookie_expiry = api.cookie_jar.expires_earliest
+		logger.log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %H:%M:%S')), "GREEN")
+
 	return api

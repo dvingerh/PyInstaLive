@@ -16,6 +16,7 @@ Here is an example of a valid configuration file:
 username = johndoe
 password = grapefruits
 save_path = C:\Instagram_Livestream_Downloads
+show_cookie_expiry = true
 ```
 
 #### Updating

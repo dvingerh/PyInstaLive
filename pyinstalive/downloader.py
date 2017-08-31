@@ -9,32 +9,32 @@ import logger
 class NoBroadcastException(Exception):
 	pass
 
-def main(apiArg, recordArg, savePathArg):
+def main(api_arg, record_arg, save_path_arg):
 	global api
 	global record
-	global savePath
-	global currentDate
-	global currentTime
+	global save_path
+	global current_date
+	global current_time
 	global broadcast
 	global mpd_url
-	currentTime = str(int(time.time()))
-	currentDate = time.strftime("%Y%m%d")
-	api = apiArg
-	record = recordArg
-	savePath = savePathArg
-	getUserInfo(record)
+	current_time = str(int(time.time()))
+	current_date = time.strftime("%Y%m%d")
+	api = api_arg
+	record = record_arg
+	save_path = save_path_arg
+	get_user_info(record)
 
-def recordStream(broadcast):
+def record_stream(broadcast):
 	try:
 		def check_status():
-			printStatus()
+			print_status()
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted']
 
 		mpd_url = (broadcast.get('dash_manifest')
 				   or broadcast.get('dash_abr_playback_url')
 				   or broadcast['dash_playback_url'])
 
-		outputDir = savePath + '{}_{}_{}_{}_downloads'.format(currentDate ,record, broadcast['id'], currentTime)
+		outputDir = save_path + '{}_{}_{}_{}_downloads'.format(current_date, record, broadcast['id'], current_time)
 
 		dl = live.Downloader(
 			mpd=mpd_url,
@@ -63,20 +63,20 @@ def recordStream(broadcast):
 		last_stream.close()
 		logger.log('[I] Username    : ' + record, "GREEN")
 		logger.log('[I] MPD URL     : ' + mpd_url, "GREEN")
-		printStatus(api, broadcast)
+		print_status(api, broadcast)
 		logger.log('[I] Recording broadcast... press [CTRL+C] to abort.', "GREEN")
 		dl.run()
-		stitchVideo(dl, broadcast)
+		stitch_video(dl, broadcast)
 	except KeyboardInterrupt:
 		logger.log('', "GREEN")
 		logger.log('[I] Aborting broadcast recording...', "GREEN")
 		if not dl.is_aborted:
 			dl.stop()
-			stitchVideo(dl, broadcast)
+			stitch_video(dl, broadcast)
 
-def stitchVideo(dl, broadcast):
+def stitch_video(dl, broadcast):
 		logger.log('[I] Stitching downloaded files into video...', "GREEN")
-		output_file = savePath + '{}_{}_{}_{}.mp4'.format(currentDate ,record, broadcast['id'], currentTime)
+		output_file = save_path + '{}_{}_{}_{}.mp4'.format(current_date, record, broadcast['id'], current_time)
 		try:
 			dl.stitch(output_file, cleartempfiles=False)
 			logger.log('[I] Successfully stitched downloaded files!', "GREEN")
@@ -87,25 +87,25 @@ def stitchVideo(dl, broadcast):
 			logger.seperator("GREEN")
 			sys.exit(0)
 
-def getUserInfo(record):
+def get_user_info(record):
 	try:
 		user_res = api.username_info(record)
 		user_id = user_res['user']['pk']
-		getBroadcast(user_id)
+		get_broadcast(user_id)
 	except Exception as e:
 		logger.log('[E] Could not get user info for "' + record + '" : ' + str(e), "RED")
 		logger.seperator("GREEN")
 		sys.exit(0)
 
 
-def getBroadcast(user_id):
+def get_broadcast(user_id):
 	try:
 		logger.log('[I] Checking broadcast for "' + record + '"...', "GREEN")
 		broadcast = api.user_broadcast(user_id)
 		if (broadcast is None):
 			raise NoBroadcastException('No broadcast available.')
 		else:
-			recordStream(broadcast)
+			record_stream(broadcast)
 	except NoBroadcastException as e:
 		logger.log('[W] ' + str(e), "YELLOW")
 		logger.seperator("GREEN")
@@ -116,7 +116,7 @@ def getBroadcast(user_id):
 			logger.seperator("GREEN")
 			sys.exit(0)
 
-def printStatus(api, broadcast):
+def print_status(api, broadcast):
 	heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
 	viewers = broadcast.get('viewer_count', 0)
 	started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)

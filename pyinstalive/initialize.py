@@ -8,9 +8,9 @@ import auth, downloader, logger
 
 def run():
 
-	scriptVersion = "2.1.5"
+	script_version = "2.1.5"
 
-	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(scriptVersion), "GREEN")
+	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(script_version), "GREEN")
 	logger.seperator("GREEN")
 
 	logging.disable(logging.CRITICAL)
@@ -36,16 +36,16 @@ def run():
 	args = parser.parse_args()
 
 	if (args.username is not None) and (args.password is not None):
-		api = auth.login(args.username, args.password)
+		api = auth.login(args.username, args.password, config['pyinstalive']['show_cookie_expiry'].title())
 	else:
-		api = auth.login(config['pyinstalive']['username'], config['pyinstalive']['password'])
+		api = auth.login(config['pyinstalive']['username'], config['pyinstalive']['password'], config['pyinstalive']['show_cookie_expiry'].title())
 	
-	savePath = config['pyinstalive']['save_path']
-	if not savePath.endswith('/'):
-		savePath = savePath + '/'
+	save_path = config['pyinstalive']['save_path']
+	if not save_path.endswith('/'):
+		save_path = save_path + '/'
 
-	if (os.path.exists(savePath)):
-		downloader.main(api, args.record, savePath)
+	if (os.path.exists(save_path)):
+		downloader.main(api, args.record, save_path)
 	else:
 		logger.log("[W] Invalid save path was specified! Falling back to location: " + os.getcwd(), "RED")
 		downloader.main(api, args.record, os.getcwd())
