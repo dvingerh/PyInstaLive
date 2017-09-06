@@ -10,8 +10,12 @@ def check_config_validity(config):
 	username = config['pyinstalive']['username']
 	password = config['pyinstalive']['password']
 
-	if not ((len(username) > 0) or (len(password) > 0)):
-		logger.log("[E] Username or password are not entered correct in config file!", "RED")
+	if not (len(username) > 0):
+		logger.log("[E] Invalid setting detected for 'username'.", "RED")
+		return False
+
+	if not (len(password) > 0):
+		logger.log("[E] Invalid setting detected for 'password'.", "RED")
 		return False
 
 	return True
@@ -32,10 +36,10 @@ def run():
 		try:
 			config.read('pyinstalive.ini')
 		except Exception:
-			logger.log("[E] Could not read configuration file! Try passing the required arguments manually.", "RED")
+			logger.log("[E] Could not read configuration file. Try passing the required arguments manually.", "RED")
 			logger.seperator("GREEN")
 	else:
-		logger.log("[E] Could not find configuration file!", "RED")
+		logger.log("[E] Could not find configuration file.", "RED")
 		logger.seperator("GREEN")
 		sys.exit(0)
 
@@ -55,10 +59,10 @@ def run():
 		try:
 			show_cookie_expiry = config['pyinstalive']['show_cookie_expiry']
 			if not config['pyinstalive']['show_cookie_expiry'].title() in bool_values:
-				logger.log("[W] Invalid setting detected for show_cookie_expiry, falling back to default value (True)", "YELLOW")
+				logger.log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
 				show_cookie_expiry = 'True'
 		except:
-			logger.log("[W] Invalid setting detected for show_cookie_expiry, falling back to default value (True)", "YELLOW")
+			logger.log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
 			show_cookie_expiry = 'True'
 
 		try:
@@ -67,13 +71,13 @@ def run():
 			if (os.path.exists(save_path)):
 				pass
 			else:
-				logger.log("[W] Invalid setting detected for save_path, falling back to location: " + os.getcwd(), "YELLOW")
+				logger.log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
 				save_path = os.getcwd()
 
 			if not save_path.endswith('/'):
 				save_path = save_path + '/'
 		except:
-			logger.log("[W] Invalid setting detected for save_path, falling back to location: " + os.getcwd(), "YELLOW")
+			logger.log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
 			save_path = os.getcwd()
 
 		if (args.username is not None) and (args.password is not None):
