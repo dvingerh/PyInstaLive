@@ -4,7 +4,7 @@ __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
 __version__ = '2.1.6'
 
-_api_version = '1.3.6'
+_api_version = '1.3.5'
 _api_extensions_version = '0.3.6'
 
 long_description = 'This script enables you to record Instagram livestreams. It is based on another script that has now been discontinued.'
@@ -22,8 +22,8 @@ setup(
 		]
 	},
 	install_requires=[ 
-		'instagram_private_api==%(api)s' % {'api': _api_version},
-		'instagram_private_api_extensions==%(ext)s' % {'ext': _api_extensions_version},
+		'instagram_private_api>=%(api)s' % {'api': _api_version},
+		'instagram_private_api_extensions>=%(ext)s' % {'ext': _api_extensions_version},
 		'argparse',
 		'configparser'
 	],
