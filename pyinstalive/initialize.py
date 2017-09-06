@@ -6,10 +6,21 @@ import sys
 
 import auth, downloader, logger
 
+def check_config_validity(config):
+	username = config['pyinstalive']['username']
+	password = config['pyinstalive']['password']
+
+	if not ((len(username) > 0) or (len(password) > 0)):
+		logger.log("[E] Username or password are not entered correct in config file!", "RED")
+		return False
+
+	return True
+
 
 def run():
 
 	script_version = "2.1.7"
+	bool_values = {'True', 'False'}
 
 	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(script_version), "GREEN")
 	logger.seperator("GREEN")
@@ -36,17 +47,42 @@ def run():
 
 	args = parser.parse_args()
 
-	if (args.username is not None) and (args.password is not None):
-		api = auth.login(args.username, args.password, config['pyinstalive']['show_cookie_expiry'].title())
-	else:
-		api = auth.login(config['pyinstalive']['username'], config['pyinstalive']['password'], config['pyinstalive']['show_cookie_expiry'].title())
-	
-	save_path = config['pyinstalive']['save_path']
-	if not save_path.endswith('/'):
-		save_path = save_path + '/'
+	if check_config_validity(config):
 
-	if (os.path.exists(save_path)):
+		username = config['pyinstalive']['username']
+		password = config['pyinstalive']['password']
+
+		try:
+			show_cookie_expiry = config['pyinstalive']['show_cookie_expiry']
+			if not config['pyinstalive']['show_cookie_expiry'].title() in bool_values:
+				logger.log("[W] Invalid setting detected for show_cookie_expiry, falling back to default value (True)", "YELLOW")
+				show_cookie_expiry = 'True'
+		except:
+			logger.log("[W] Invalid setting detected for show_cookie_expiry, falling back to default value (True)", "YELLOW")
+			show_cookie_expiry = 'True'
+
+		try:
+			save_path = config['pyinstalive']['save_path']
+
+			if (os.path.exists(save_path)):
+				pass
+			else:
+				logger.log("[W] Invalid setting detected for save_path, falling back to location: " + os.getcwd(), "YELLOW")
+				save_path = os.getcwd()
+
+			if not save_path.endswith('/'):
+				save_path = save_path + '/'
+		except:
+			logger.log("[W] Invalid setting detected for save_path, falling back to location: " + os.getcwd(), "YELLOW")
+			save_path = os.getcwd()
+
+		if (args.username is not None) and (args.password is not None):
+			api = auth.login(args.username, args.password, show_cookie_expiry)
+		else:
+			api = auth.login(username, password, show_cookie_expiry)
+		
 		downloader.main(api, args.record, save_path)
 	else:
-		logger.log("[W] Invalid save path was specified! Falling back to location: " + os.getcwd(), "RED")
-		downloader.main(api, args.record, os.getcwd())
+		logger.log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
+		logger.seperator("GREEN")
+		sys.exit(0)

@@ -83,7 +83,7 @@ def login(username, password, show_cookie_expiry):
 		logger.log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
 		sys.exit(99)
 
-	logger.log('[I] Login to "' + username + '" OK!', "GREEN")
+	logger.log('[I] Login to "' + api.authenticated_user_name + '" OK!', "GREEN")
 	if show_cookie_expiry == 'True':
 		cookie_expiry = api.cookie_jar.expires_earliest
 		logger.log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %H:%M:%S')), "GREEN")
