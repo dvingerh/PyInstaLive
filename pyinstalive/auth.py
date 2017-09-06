@@ -1,21 +1,22 @@
 import codecs
+import datetime
 import json
 import os.path
-import datetime
+
 import logger
+
+
 
 try:
 	from instagram_private_api import (
 		Client, ClientError, ClientLoginError,
-		ClientCookieExpiredError, ClientLoginRequiredError,
-		__version__ as client_version)
+		ClientCookieExpiredError, ClientLoginRequiredError)
 except ImportError:
 	import sys
 	sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 	from instagram_private_api import (
 		Client, ClientError, ClientLoginError,
-		ClientCookieExpiredError, ClientLoginRequiredError,
-		__version__ as client_version)
+		ClientCookieExpiredError, ClientLoginRequiredError)
 
 
 def to_json(python_object):
@@ -70,7 +71,7 @@ def login(username, password, show_cookie_expiry):
 		api = Client(
 			username, password,
 			device_id=device_id,
-			on_login=lambda x: onlogin_callback(x, settings))
+			on_login=lambda x: onlogin_callback(x, settings_file))
 
 	except ClientLoginError as e:
 		logger.log('[E] ClientLoginError: {0!s}'.format(e), "RED")

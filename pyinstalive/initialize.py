@@ -1,8 +1,9 @@
 import argparse
+import configparser
 import logging
 import os.path
-import configparser
 import sys
+
 import auth, downloader, logger
 
 
@@ -19,7 +20,7 @@ def run():
 	if os.path.exists('pyinstalive.ini'):
 		try:
 			config.read('pyinstalive.ini')
-		except Exception as e:
+		except Exception:
 			logger.log("[E] Could not read configuration file! Try passing the required arguments manually.", "RED")
 			logger.seperator("GREEN")
 	else:

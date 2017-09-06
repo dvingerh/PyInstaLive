@@ -1,10 +1,10 @@
-import codecs
-import logging
-import sys, time
-from socket import timeout
+import sys
+import time
+
 from instagram_private_api_extensions import live
 
 import logger
+
 
 class NoBroadcastException(Exception):
 	pass
@@ -28,17 +28,16 @@ def record_stream(broadcast):
 	try:
 		def check_status():
 			print_status()
-			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted']
 
 		mpd_url = (broadcast.get('dash_manifest')
 				   or broadcast.get('dash_abr_playback_url')
 				   or broadcast['dash_playback_url'])
 
-		outputDir = save_path + '{}_{}_{}_{}_downloads'.format(current_date, record, broadcast['id'], current_time)
+		output_dir = save_path + '{}_{}_{}_{}_downloads'.format(current_date, record, broadcast['id'], current_time)
 
 		dl = live.Downloader(
 			mpd=mpd_url,
-			output_dir=outputDir,
+			output_dir=output_dir,
 			user_agent=api.user_agent,
 			max_connection_error_retry=2,
 			duplicate_etag_retry=60,
