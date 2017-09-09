@@ -1,5 +1,5 @@
 # PyInstaLive
-This script enables you to record Instagram livestreams. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
+This script enables you to record Instagram livestreams as well as download available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 ## Installation
 
