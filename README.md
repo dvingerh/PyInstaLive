@@ -37,8 +37,10 @@ pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
 
 Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream you want to record.
 
-#### Note
-the `username` and `password` parameters are not required when you have specified these in the configuration file.
+#### Notes
+The `username` and `password` parameters are not required when you have specified these in the configuration file.
+
+If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
 
 ## Example
 ```bash
