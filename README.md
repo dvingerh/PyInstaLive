@@ -8,17 +8,6 @@ Run the following command in command line (as administrator in Windows) / termin
 pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency-links
 ```
 
-Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
-
-Here is an example of a valid configuration file:
-```bash
-[pyinstalive]
-username = johndoe
-password = grapefruits
-save_path = C:\Instagram_Livestream_Downloads
-show_cookie_expiry = true
-```
-
 #### Updating
 
 To update PyInstaLive run the following command:
@@ -31,6 +20,18 @@ pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency
 You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install and use this script.
 
 ## Usage
+Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
+
+Here is an example of a valid configuration file:
+```bash
+[pyinstalive]
+username = johndoe
+password = grapefruits
+save_path = C:\Instagram_Livestream_Downloads
+show_cookie_expiry = true
+```
+
+
 ```bash
 pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
 ```
