@@ -41,7 +41,7 @@ def run():
 	else:
 		logger.log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
 		try:
-			config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = \\\nshow_cookie_expiry = true"
+			config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = /\nshow_cookie_expiry = true"
 			config_file = open("pyinstalive.ini", "w")
 			config_file.write(config_template)
 			config_file.close()
