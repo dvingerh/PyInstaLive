@@ -16,6 +16,16 @@ To update PyInstaLive run the following command:
 pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency-links --upgrade
 ```
 
+#### Specific versions
+
+If you want to install a specific version of PyInstaLive, you can specify the version tag in the install command:
+
+```bash
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links
+```
+
+Use the version number you want after the **@** symbol (e.g 2.2.0).
+
 #### Note
 You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install and use this script.
 
@@ -27,10 +37,11 @@ Here is an example of a valid configuration file:
 [pyinstalive]
 username = johndoe
 password = grapefruits
-save_path = C:\Instagram_Livestream_Downloads
+save_path = /
 show_cookie_expiry = true
 ```
 
+Use to following command to run PyInstaLive:
 
 ```bash
 pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
