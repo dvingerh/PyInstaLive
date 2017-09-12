@@ -1,5 +1,5 @@
 # PyInstaLive
-This script enables you to record Instagram livestreams as well as download available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
+This script enables you to record Instagram livestreams as well as download any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 ## Installation
 
@@ -41,13 +41,13 @@ save_path = /
 show_cookie_expiry = true
 ```
 
-Use to following command to run PyInstaLive:
+Use the following command to run PyInstaLive:
 
 ```bash
 pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
 ```
 
-Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream you want to record.
+Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream or replay you want to record or save.
 
 #### Notes
 The `username` and `password` parameters are not required when you have specified these in the configuration file.
