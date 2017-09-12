@@ -58,7 +58,7 @@ If the script is ran and there are available replays as well as an ongoing Insta
 ```bash
 pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
 ```
-Or (see [note](https://github.com/notcammy/PyInstaLive#note-1))
+Or (see [note](https://github.com/notcammy/PyInstaLive#notes))
 ```bash
 pyinstalive -r "janedoe"
 ```
