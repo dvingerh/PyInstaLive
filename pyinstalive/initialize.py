@@ -39,9 +39,24 @@ def run():
 			logger.log("[E] Could not read configuration file. Try passing the required arguments manually.", "RED")
 			logger.seperator("GREEN")
 	else:
-		logger.log("[E] Could not find configuration file.", "RED")
-		logger.seperator("GREEN")
-		sys.exit(0)
+		logger.log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
+		try:
+			config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = \\\nshow_cookie_expiry = true"
+			config_file = open("pyinstalive.ini", "w")
+			config_file.write(config_template)
+			config_file.close()
+			logger.log("[W] Edit the created 'pyinstalive.ini' file and run this script again.", "YELLOW")
+			logger.seperator("GREEN")
+			sys.exit(0)
+		except Exception as e:
+			logger.log("[E] Could not create default config file: " + str(e), "RED")
+			logger.log("[W] You must manually create and edit it with the following template: ", "YELLOW")
+			logger.log("", "GREEN")
+			logger.log(config_template, "BLUE")
+			logger.log("", "GREEN")
+			logger.log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
+			logger.log("", "GREEN")
+			sys.exit(1)
 
 
 	parser = argparse.ArgumentParser(description='Login')
