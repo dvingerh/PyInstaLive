@@ -24,7 +24,7 @@ If you want to install a specific version of PyInstaLive, you can specify the ve
 pip install git+https://github.com/notcammy/PyInstaLive.git@2.1.0 --process-dependency-links
 ```
 
-Use the version number you want after the **@** symbol (e.g 2.1.0).
+Use the version number you want after the **@** symbol (e.g **2.1.0**).
 
 #### Note
 You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install and use this script.
