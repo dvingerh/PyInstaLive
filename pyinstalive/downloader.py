@@ -52,18 +52,8 @@ def record_stream(broadcast):
 		logger.log('[E] Could not start recording livestream: ' + str(e), "RED")
 		logger.seperator("GREEN")
 		sys.exit(0)
-
 	try:
-		viewers = broadcast.get('viewer_count', 0)
-		started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
-		started_label = '%d minutes and ' % started_mins
-		if started_secs:
-			started_label += '%d seconds' % started_secs
 		logger.log('[I] Starting livestream recording:', "GREEN")
-		last_stream = open("last_stream.html", "w")
-		last_stream.write('<b>Username:</b> {}<br><b>MPD URL:</b> <a href="{}">LINK</a><br><b>Viewers:</b> {}<br><b>Missing:</b> {}'
-			.format(record, mpd_url, str(int(viewers)), started_label))
-		last_stream.close()
 		logger.log('[I] Username    : ' + record, "GREEN")
 		logger.log('[I] MPD URL     : ' + mpd_url, "GREEN")
 		print_status(api, broadcast)
@@ -127,22 +117,22 @@ def get_replays(user_id):
 		else:
 			for index, broadcast in enumerate(broadcasts):
 				exists = False
-				for directory in filter(os.path.isdir, os.listdir(os.getcwd())):
-    					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
-    						logger.log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
-						exists = True
-						return
+				for directory in (os.walk(save_path).next()[1]):
+					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
+						logger.log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
+					exists = True
+					return
 				if exists is False:
 					current = index + 1
 					logger.log("[I] Starting replay download " + str(current) + " of "  + str(len(broadcasts)) + "...", "GREEN")
 					current_time = str(int(time.time()))
 					output_dir = save_path + '{}_{}_{}_{}_replay_downloads'.format(current_date, record, broadcast['id'], current_time)
 					dl = replay.Downloader(
-				       	mpd=broadcast['dash_manifest'],
-				       	output_dir=output_dir,
-				       	user_agent=api.user_agent)
-	    			    	dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time))
-    			logger.log("[I] Finished downloading available replays.", "GREEN")
+						mpd=broadcast['dash_manifest'],
+						output_dir=output_dir,
+						user_agent=api.user_agent)
+				dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time), cleartempfiles=False)
+			logger.log("[I] Finished downloading available replays.", "GREEN")
 			logger.seperator("GREEN")
 			sys.exit(0)
 	except NoReplayException as e:
@@ -159,9 +149,9 @@ def print_status(api, broadcast):
 	heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
 	viewers = broadcast.get('viewer_count', 0)
 	started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
-	started_label = '%d minutes and ' % started_mins
+	started_label = '%d minutes' % started_mins
 	if started_secs:
-		started_label += '%d seconds' % started_secs
+		started_label += ' and %d seconds' % started_secs
 	logger.log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
 	logger.log('[I] Airing time : ' + started_label, "GREEN")
 	logger.log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
