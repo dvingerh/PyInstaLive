@@ -5,15 +5,15 @@ This script enables you to record Instagram livestreams as well as download any 
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive run the following command:
+To update PyInstaLive to the latest version (currently **2.2.0**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -21,10 +21,10 @@ pip install git+https://github.com/notcammy/PyInstaLive.git --process-dependency
 If you want to install a specific version of PyInstaLive, you can specify the version tag in the install command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.1.0 --process-dependency-links
 ```
 
-Use the version number you want after the **@** symbol (e.g 2.2.0).
+Use the version number you want after the **@** symbol (e.g 2.1.0).
 
 #### Note
 You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install and use this script.
