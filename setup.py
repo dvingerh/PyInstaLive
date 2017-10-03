@@ -2,12 +2,12 @@ from setuptools import setup
 
 __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
-__version__ = '2.2.0'
+__version__ = '2.2.1'
 
 _api_version = '1.3.5'
 _api_extensions_version = '0.3.6'
 
-long_description = 'This script enables you to record Instagram livestreams. It is based on another script that has now been discontinued.'
+long_description = 'This script enables you to record Instagram livestreams as well as download any available replays. It is based on another script that has now been discontinued.'
 
 setup(
 	name='pyinstalive',

@@ -5,15 +5,15 @@ This script enables you to record Instagram livestreams as well as download any 
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.1 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.2.0**) run the following command:
+To update PyInstaLive to the latest version (currently **2.2.1**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.1 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
