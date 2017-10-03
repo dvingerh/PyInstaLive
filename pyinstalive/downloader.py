@@ -51,7 +51,7 @@ def record_stream(broadcast):
 	except Exception as e:
 		logger.log('[E] Could not start recording livestream: ' + str(e), "RED")
 		logger.seperator("GREEN")
-		sys.exit(0)
+		sys.exit(1)
 	try:
 		logger.log('[I] Starting livestream recording:', "GREEN")
 		logger.log('[I] Username    : ' + record, "GREEN")
@@ -78,7 +78,7 @@ def stitch_video(dl, broadcast):
 		except Exception as e:
 			logger.log('[E] Could not stitch downloaded files: ' + str(e), "RED")
 			logger.seperator("GREEN")
-			sys.exit(0)
+			sys.exit(1)
 
 def get_user_info(record):
 	try:
@@ -88,32 +88,37 @@ def get_user_info(record):
 	except Exception as e:
 		logger.log('[E] Could not get livestream info for "' + record + '" : ' + str(e), "RED")
 		logger.seperator("GREEN")
-		sys.exit(0)
+		sys.exit(1)
 	get_replays(user_id)
 
 def get_livestreams(user_id):
 	try:
-		logger.log('[I] Checking livestreams for "' + record + '"...', "GREEN")
+		logger.log('[I] Checking livestreams and replays for "' + record + '"...', "GREEN")
 		broadcast = api.user_broadcast(user_id)
 		if (broadcast is None):
-			raise NoLivestreamException('No livestreams available.')
+			raise NoLivestreamException('There are no current livestreams.')
 		else:
 			record_stream(broadcast)
 	except NoLivestreamException as e:
 		logger.log('[W] ' + str(e), "YELLOW")
 	except Exception as e:
 		if (e.__class__.__name__ is not NoLivestreamException):
-			logger.log('[E] Could not get livestreams info: ' + str(e), "RED")
+			logger.log('[E] Could not get required info: ' + str(e), "RED")
 			logger.seperator("GREEN")
-			sys.exit(0)
+			sys.exit(1)
 
 
 def get_replays(user_id):
 	try:
 		user_story_feed = api.user_story_feed(user_id)
 		broadcasts = user_story_feed.get('post_live_item', {}).get('broadcasts', [])
+	except Exception as e:
+		logger.log('[E] Could not get replay: ' + str(e), "RED")
+		logger.seperator("GREEN")
+		sys.exit(1)
+	try:
 		if (len(broadcasts) == 0):
-			raise NoReplayException('No replays available.')
+			raise NoReplayException('There are no saved replays.')
 		else:
 			for index, broadcast in enumerate(broadcasts):
 				exists = False
@@ -131,19 +136,19 @@ def get_replays(user_id):
 						mpd=broadcast['dash_manifest'],
 						output_dir=output_dir,
 						user_agent=api.user_agent)
-				dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time), cleartempfiles=False)
+					dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time), cleartempfiles=False)
 			logger.log("[I] Finished downloading available replays.", "GREEN")
 			logger.seperator("GREEN")
 			sys.exit(0)
 	except NoReplayException as e:
 		logger.log('[W] ' + str(e), "YELLOW")
 		logger.seperator("GREEN")
-		sys.exit(0)
+		sys.exit(1)
 	except Exception as e:
 		if (e.__class__.__name__ is not NoReplayException):
-			logger.log('[E] Could not get replay info: ' + str(e), "RED")
+			logger.log('[E] Could not get replay: ' + str(e), "RED")
 			logger.seperator("GREEN")
-			sys.exit(0)
+			sys.exit(1)
 
 def print_status(api, broadcast):
 	heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
