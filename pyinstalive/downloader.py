@@ -82,34 +82,36 @@ def stitch_video(dl, broadcast):
 
 def get_user_info(record):
 	try:
+		logger.log('[I] Getting required user info for user "' + record + '"...', "GREEN")
 		user_res = api.username_info(record)
 		user_id = user_res['user']['pk']
-		get_livestreams(user_id)
 	except Exception as e:
-		logger.log('[E] Could not get livestream info for "' + record + '" : ' + str(e), "RED")
+		logger.log('[E] Could not get user info: ' + str(e), "RED")
 		logger.seperator("GREEN")
 		sys.exit(1)
+	get_livestreams(user_id)
 	get_replays(user_id)
 
 def get_livestreams(user_id):
 	try:
-		logger.log('[I] Checking livestreams and replays for "' + record + '"...', "GREEN")
+		logger.log('[I] Checking for ongoing livestreams...', "GREEN")
 		broadcast = api.user_broadcast(user_id)
 		if (broadcast is None):
-			raise NoLivestreamException('There are no current livestreams.')
+			raise NoLivestreamException('There are no livestreams available.')
 		else:
 			record_stream(broadcast)
 	except NoLivestreamException as e:
 		logger.log('[W] ' + str(e), "YELLOW")
 	except Exception as e:
 		if (e.__class__.__name__ is not NoLivestreamException):
-			logger.log('[E] Could not get required info: ' + str(e), "RED")
+			logger.log('[E] Could not get livestreams info: ' + str(e), "RED")
 			logger.seperator("GREEN")
 			sys.exit(1)
 
 
 def get_replays(user_id):
 	try:
+		logger.log('[I] Checking for available replays...', "GREEN")
 		user_story_feed = api.user_story_feed(user_id)
 		broadcasts = user_story_feed.get('post_live_item', {}).get('broadcasts', [])
 	except Exception as e:
@@ -118,7 +120,7 @@ def get_replays(user_id):
 		sys.exit(1)
 	try:
 		if (len(broadcasts) == 0):
-			raise NoReplayException('There are no saved replays.')
+			raise NoReplayException('There are no replays available.')
 		else:
 			for index, broadcast in enumerate(broadcasts):
 				exists = False

@@ -7,18 +7,21 @@ import sys
 import auth, downloader, logger
 
 def check_config_validity(config):
-	username = config['pyinstalive']['username']
-	password = config['pyinstalive']['password']
+	try:
+		username = config['pyinstalive']['username']
+		password = config['pyinstalive']['password']
 
-	if not (len(username) > 0):
-		logger.log("[E] Invalid setting detected for 'username'.", "RED")
+		if not (len(username) > 0):
+			logger.log("[E] Invalid setting detected for 'username'.", "RED")
+			return False
+
+		if not (len(password) > 0):
+			logger.log("[E] Invalid setting detected for 'password'.", "RED")
+			return False
+
+		return True
+	except KeyError as e:
 		return False
-
-	if not (len(password) > 0):
-		logger.log("[E] Invalid setting detected for 'password'.", "RED")
-		return False
-
-	return True
 
 
 def run():

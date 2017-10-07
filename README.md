@@ -1,7 +1,13 @@
 # PyInstaLive
 This script enables you to record Instagram livestreams as well as download any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
+
 ## Installation
+
+#### Prerequisites
+You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x](https://www.python.org/downloads/release/python-2713/) with [pip](https://pip.pypa.io/en/stable/installing/) and [setuptools](https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel) installed before you can install and use this script.
+
+#### Installing
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
@@ -26,8 +32,6 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@2.1.0 --process-depe
 
 Use the version number you want after the **@** symbol (e.g **2.1.0**).
 
-#### Note
-You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x](https://www.python.org/downloads/release/python-2713/) with [Pip](https://pip.pypa.io/en/stable/installing/) installed before you can install and use this script.
 
 ## Usage
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
@@ -53,6 +57,7 @@ Where ``<username>`` is your account's username, ``<password>`` is your password
 The `username` and `password` parameters are not required when you have specified these in the configuration file.
 
 If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
+
 
 ## Example
 ```bash
@@ -82,6 +87,7 @@ PYINSTALIVE DOWNLOADER (SCRIPT v1.0)
 [I] Stitching downloaded files into video...
 [I] Successfully stitched downloaded files!
 ```
+
 
 ## Help
 If you have a bug to report please open [an issue](https://github.com/notcammy/PyInstaLive/issues) in the appropriate format:
