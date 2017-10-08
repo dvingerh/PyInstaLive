@@ -3,8 +3,18 @@ import configparser
 import logging
 import os.path
 import sys
+import subprocess
 
 import auth, downloader, logger
+
+def check_ffmpeg():
+	try:
+		FNULL = open(os.devnull, 'w')
+		subprocess.call(["ffmpeg"], stdout=FNULL, stderr=subprocess.STDOUT)
+		return True
+	except OSError as e:
+		return False
+
 
 def check_config_validity(config):
 	try:
@@ -73,6 +83,11 @@ def run():
 
 		username = config['pyinstalive']['username']
 		password = config['pyinstalive']['password']
+
+		if check_ffmpeg() == False:
+			logger.log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
+			logger.seperator("GREEN")
+			sys.exit(1)
 
 		try:
 			show_cookie_expiry = config['pyinstalive']['show_cookie_expiry']

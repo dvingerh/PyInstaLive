@@ -1,6 +1,7 @@
 import sys
 import time
 import os
+import shutil
 
 from instagram_private_api_extensions import live, replay
 
@@ -61,8 +62,9 @@ def record_stream(broadcast):
 		dl.run()
 		stitch_video(dl, broadcast)
 	except KeyboardInterrupt:
-		logger.log('', "GREEN")
-		logger.log('[I] Aborting livestream recording...', "GREEN")
+		logger.log("", "GREEN")
+		logger.log('[W] Download has been aborted.', "YELLOW")
+		logger.log("", "GREEN")
 		if not dl.is_aborted:
 			dl.stop()
 			stitch_video(dl, broadcast)
@@ -72,7 +74,7 @@ def stitch_video(dl, broadcast):
 		output_file = save_path + '{}_{}_{}_{}_live.mp4'.format(current_date, record, broadcast['id'], current_time)
 		try:
 			dl.stitch(output_file, cleartempfiles=False)
-			logger.log('[I] Successfully stitched downloaded files!', "GREEN")
+			logger.log('[I] Successfully stitched downloaded files.', "GREEN")
 			logger.seperator("GREEN")
 			sys.exit(0)
 		except Exception as e:
@@ -115,42 +117,58 @@ def get_replays(user_id):
 		user_story_feed = api.user_story_feed(user_id)
 		broadcasts = user_story_feed.get('post_live_item', {}).get('broadcasts', [])
 	except Exception as e:
-		logger.log('[E] Could not get replay: ' + str(e), "RED")
+		logger.log('[E] Could not get replay info: ' + str(e), "RED")
 		logger.seperator("GREEN")
 		sys.exit(1)
 	try:
 		if (len(broadcasts) == 0):
 			raise NoReplayException('There are no replays available.')
 		else:
+			logger.log("[I] Available replays have been found to download, press [CTRL+C] to abort.", "GREEN")
+			logger.log("", "GREEN")
 			for index, broadcast in enumerate(broadcasts):
 				exists = False
 				for directory in (os.walk(save_path).next()[1]):
 					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
 						logger.log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
 						exists = True
-						return
 				if exists is False:
 					current = index + 1
-					logger.log("[I] Starting replay download " + str(current) + " of "  + str(len(broadcasts)) + "...", "GREEN")
+					logger.log("[I] Downloading replay " + str(current) + " of "  + str(len(broadcasts)) + " with ID '" + str(broadcast['id']) + "'...", "GREEN")
 					current_time = str(int(time.time()))
 					output_dir = save_path + '{}_{}_{}_{}_replay_downloads'.format(current_date, record, broadcast['id'], current_time)
 					dl = replay.Downloader(
 						mpd=broadcast['dash_manifest'],
 						output_dir=output_dir,
 						user_agent=api.user_agent)
-					dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time), cleartempfiles=False)
-			logger.log("[I] Finished downloading available replays.", "GREEN")
-			logger.seperator("GREEN")
-			sys.exit(0)
+					replay_saved = dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time), cleartempfiles=False)
+					if (len(replay_saved) == 1):
+						logger.log("[I] Finished downloading replay " + str(current) + " of "  + str(len(broadcasts)) + ".", "GREEN")
+						logger.log("", "GREEN")
+					else:
+						logger.log("[W] No output video file was made, please merge the files manually.", "RED")
+						logger.log("[W] Check if ffmpeg is available by running ffmpeg in your terminal.", "RED")
+						logger.log("", "GREEN")
+		logger.log("[I] Finished downloading available replays.", "GREEN")
+		logger.seperator("GREEN")
+		sys.exit(0)
 	except NoReplayException as e:
 		logger.log('[W] ' + str(e), "YELLOW")
 		logger.seperator("GREEN")
-		sys.exit(1)
+		sys.exit(0)
 	except Exception as e:
-		if (e.__class__.__name__ is not NoReplayException):
-			logger.log('[E] Could not get replay: ' + str(e), "RED")
-			logger.seperator("GREEN")
+		logger.log('[E] Could not save replay: ' + str(e), "RED")
+		logger.seperator("GREEN")
+		sys.exit(1)
+	except KeyboardInterrupt:
+		logger.log("", "GREEN")
+		logger.log('[W] Download has been aborted.', "YELLOW")
+		try:
+			shutil.rmtree(output_dir)
+		except Exception as e:
+			logger.log("[E] Could not remove temp folder: " + str(e), "RED")
 			sys.exit(1)
+		sys.exit(0)
 
 def print_status(api, broadcast):
 	heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
@@ -162,4 +180,4 @@ def print_status(api, broadcast):
 	logger.log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
 	logger.log('[I] Airing time : ' + started_label, "GREEN")
 	logger.log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
-	logger.log('', "GREEN")
+	logger.log("", "GREEN")
