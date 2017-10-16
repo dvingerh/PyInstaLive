@@ -36,7 +36,7 @@ def check_config_validity(config):
 
 def run():
 
-	script_version = "2.2.2rc0"
+	script_version = "2.2.2"
 	bool_values = {'True', 'False'}
 
 	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(script_version), "GREEN")
