@@ -31,8 +31,18 @@ def main(api_arg, record_arg, save_path_arg):
 
 def record_stream(broadcast):
 	try:
-		def check_status():
-			print_status()
+		def print_status():
+			heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
+			viewers = broadcast.get('viewer_count', 0)
+			started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
+			started_label = '%d minutes' % started_mins
+			if started_secs:
+				started_label += ' and %d seconds' % started_secs
+			logger.log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
+			logger.log('[I] Airing time : ' + started_label, "GREEN")
+			logger.log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
+			logger.seperator("GREEN")
+			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted'] 
 
 		mpd_url = (broadcast.get('dash_manifest')
 				   or broadcast.get('dash_abr_playback_url')
@@ -44,10 +54,10 @@ def record_stream(broadcast):
 			mpd=mpd_url,
 			output_dir=output_dir,
 			user_agent=api.user_agent,
-			max_connection_error_retry=2,
-			duplicate_etag_retry=60,
-			callback_check=check_status,
-			mpd_download_timeout=10,
+			max_connection_error_retry=3,
+			duplicate_etag_retry=30,
+			callback_check=print_status,
+			mpd_download_timeout=5,
 			download_timeout=10)
 	except Exception as e:
 		logger.log('[E] Could not start recording livestream: ' + str(e), "RED")
@@ -57,7 +67,7 @@ def record_stream(broadcast):
 		logger.log('[I] Starting livestream recording:', "GREEN")
 		logger.log('[I] Username    : ' + record, "GREEN")
 		logger.log('[I] MPD URL     : ' + mpd_url, "GREEN")
-		print_status(api, broadcast)
+		print_status()
 		logger.log('[I] Recording livestream... press [CTRL+C] to abort.', "GREEN")
 		dl.run()
 		stitch_video(dl, broadcast)
@@ -169,15 +179,3 @@ def get_replays(user_id):
 			logger.log("[E] Could not remove temp folder: " + str(e), "RED")
 			sys.exit(1)
 		sys.exit(0)
-
-def print_status(api, broadcast):
-	heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
-	viewers = broadcast.get('viewer_count', 0)
-	started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
-	started_label = '%d minutes' % started_mins
-	if started_secs:
-		started_label += ' and %d seconds' % started_secs
-	logger.log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
-	logger.log('[I] Airing time : ' + started_label, "GREEN")
-	logger.log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
-	logger.log("", "GREEN")
