@@ -3,7 +3,7 @@ import datetime
 import json
 import os.path
 import sys
-import logger
+from .logger import log, seperator
 
 
 
@@ -36,7 +36,7 @@ def onlogin_callback(api, settings_file):
 	cache_settings = api.settings
 	with open(settings_file, 'w') as outfile:
 		json.dump(cache_settings, outfile, default=to_json)
-		logger.log('[I] New auth cookie file was made: {0!s}'.format(settings_file), "GREEN")
+		log('[I] New auth cookie file was made: {0!s}'.format(settings_file), "GREEN")
 
 
 def login(username, password, show_cookie_expiry):
@@ -46,7 +46,7 @@ def login(username, password, show_cookie_expiry):
 		settings_file = "credentials.json"
 		if not os.path.isfile(settings_file):
 			# settings file does not exist
-			logger.log('[W] Unable to find auth cookie file: {0!s}'.format(settings_file), "YELLOW")
+			log('[W] Unable to find auth cookie file: {0!s}'.format(settings_file), "YELLOW")
 
 			# login new
 			api = Client(
@@ -55,7 +55,7 @@ def login(username, password, show_cookie_expiry):
 		else:
 			with open(settings_file) as file_data:
 				cached_settings = json.load(file_data, object_hook=from_json)
-			# logger.log('[I] Using settings file: {0!s}'.format(settings_file), "GREEN")
+			# log('[I] Using settings file: {0!s}'.format(settings_file), "GREEN")
 
 			device_id = cached_settings.get('device_id')
 			# reuse auth settings
@@ -64,7 +64,7 @@ def login(username, password, show_cookie_expiry):
 				settings=cached_settings)
 
 	except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
-		logger.log('[E] ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e), "RED")
+		log('[E] ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e), "RED")
 
 		# Login expired
 		# Do relogin but use default ua, keys and such
@@ -74,18 +74,18 @@ def login(username, password, show_cookie_expiry):
 			on_login=lambda x: onlogin_callback(x, settings_file))
 
 	except ClientLoginError as e:
-		logger.log('[E] ClientLoginError: {0!s}'.format(e), "RED")
+		log('[E] ClientLoginError: {0!s}'.format(e), "RED")
 		sys.exit(9)
 	except ClientError as e:
-		logger.log('[E] ClientError: {0!s}'.format(e), "RED")
+		log('[E] ClientError: {0!s}'.format(e), "RED")
 		sys.exit(9)
 	except Exception as e:
-		logger.log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
+		log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
 		sys.exit(99)
 
-	logger.log('[I] Login to "' + api.authenticated_user_name + '" OK!', "GREEN")
+	log('[I] Login to "' + api.authenticated_user_name + '" OK!', "GREEN")
 	if show_cookie_expiry == 'True':
 		cookie_expiry = api.cookie_jar.expires_earliest
-		logger.log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %H:%M:%S')), "GREEN")
+		log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %H:%M:%S')), "GREEN")
 
 	return api

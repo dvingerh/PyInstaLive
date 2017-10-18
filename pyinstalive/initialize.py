@@ -5,7 +5,9 @@ import os.path
 import sys
 import subprocess
 
-import auth, downloader, logger
+from .auth import login
+from .logger import log, seperator
+from .downloader import main
 
 def check_ffmpeg():
 	try:
@@ -22,11 +24,11 @@ def check_config_validity(config):
 		password = config['pyinstalive']['password']
 
 		if not (len(username) > 0):
-			logger.log("[E] Invalid setting detected for 'username'.", "RED")
+			log("[E] Invalid setting detected for 'username'.", "RED")
 			return False
 
 		if not (len(password) > 0):
-			logger.log("[E] Invalid setting detected for 'password'.", "RED")
+			log("[E] Invalid setting detected for 'password'.", "RED")
 			return False
 
 		return True
@@ -39,8 +41,8 @@ def run():
 	script_version = "2.2.2"
 	bool_values = {'True', 'False'}
 
-	logger.log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(script_version), "GREEN")
-	logger.seperator("GREEN")
+	log('PYINSTALIVE DOWNLOADER (SCRIPT v{0!s})'.format(script_version), "GREEN")
+	seperator("GREEN")
 
 	logging.disable(logging.CRITICAL)
 	config = configparser.ConfigParser()
@@ -49,26 +51,26 @@ def run():
 		try:
 			config.read('pyinstalive.ini')
 		except Exception:
-			logger.log("[E] Could not read configuration file. Try passing the required arguments manually.", "RED")
-			logger.seperator("GREEN")
+			log("[E] Could not read configuration file. Try passing the required arguments manually.", "RED")
+			seperator("GREEN")
 	else:
-		logger.log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
+		log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
 		try:
 			config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = /\nshow_cookie_expiry = true"
 			config_file = open("pyinstalive.ini", "w")
 			config_file.write(config_template)
 			config_file.close()
-			logger.log("[W] Edit the created 'pyinstalive.ini' file and run this script again.", "YELLOW")
-			logger.seperator("GREEN")
+			log("[W] Edit the created 'pyinstalive.ini' file and run this script again.", "YELLOW")
+			seperator("GREEN")
 			sys.exit(0)
 		except Exception as e:
-			logger.log("[E] Could not create default config file: " + str(e), "RED")
-			logger.log("[W] You must manually create and edit it with the following template: ", "YELLOW")
-			logger.log("", "GREEN")
-			logger.log(config_template, "BLUE")
-			logger.log("", "GREEN")
-			logger.log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
-			logger.log("", "GREEN")
+			log("[E] Could not create default config file: " + str(e), "RED")
+			log("[W] You must manually create and edit it with the following template: ", "YELLOW")
+			log("", "GREEN")
+			log(config_template, "BLUE")
+			log("", "GREEN")
+			log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
+			log("", "GREEN")
 			sys.exit(1)
 
 
@@ -85,17 +87,17 @@ def run():
 		password = config['pyinstalive']['password']
 
 		if check_ffmpeg() == False:
-			logger.log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
-			logger.seperator("GREEN")
+			log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
+			seperator("GREEN")
 			sys.exit(1)
 
 		try:
 			show_cookie_expiry = config['pyinstalive']['show_cookie_expiry']
 			if not config['pyinstalive']['show_cookie_expiry'].title() in bool_values:
-				logger.log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
+				log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
 				show_cookie_expiry = 'True'
 		except:
-			logger.log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
+			log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
 			show_cookie_expiry = 'True'
 
 		try:
@@ -104,22 +106,22 @@ def run():
 			if (os.path.exists(save_path)):
 				pass
 			else:
-				logger.log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
+				log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
 				save_path = os.getcwd()
 
 			if not save_path.endswith('/'):
 				save_path = save_path + '/'
 		except:
-			logger.log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
+			log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
 			save_path = os.getcwd()
 
 		if (args.username is not None) and (args.password is not None):
-			api = auth.login(args.username, args.password, show_cookie_expiry)
+			api = login(args.username, args.password, show_cookie_expiry)
 		else:
-			api = auth.login(username, password, show_cookie_expiry)
+			api = login(username, password, show_cookie_expiry)
 		
-		downloader.main(api, args.record, save_path)
+		main(api, args.record, save_path)
 	else:
-		logger.log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
-		logger.seperator("GREEN")
+		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
+		seperator("GREEN")
 		sys.exit(0)
