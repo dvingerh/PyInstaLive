@@ -94,7 +94,7 @@ def stitch_video(dl, broadcast):
 
 def get_user_info(record):
 	try:
-		log('[I] Getting required user info for user "' + record + '"...', "GREEN")
+		log("[I] Checking user: '"+ record + "'", "GREEN")
 		user_res = api.username_info(record)
 		user_id = user_res['user']['pk']
 	except Exception as e:
