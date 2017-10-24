@@ -10,7 +10,7 @@ from .logger import log, seperator, supports_color
 from .downloader import main
 
 
-script_version = "2.2.2"
+script_version = "2.2.3"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
 
