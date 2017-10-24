@@ -111,7 +111,6 @@ def run():
 				for line in f:
 					log("    " + line.rstrip(), "YELLOW")
 			log("", "GREEN")
-			log("Usage: ", "GREEN")
 			log("[I] End of PyInstaLive information screen.", "GREEN")
 			seperator("GREEN")
 
