@@ -138,7 +138,13 @@ def get_replays(user_id):
 			log("", "GREEN")
 			for index, broadcast in enumerate(broadcasts):
 				exists = False
-				for directory in (os.walk(save_path).next()[1]):
+
+				if sys.version.split(' ')[0].startswith('2'):
+					directories = (os.walk(save_path).next()[1])
+				else:
+					directories = (os.walk(save_path).__next__()[1])
+
+				for directory in directories:
 					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
 						log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
 						exists = True
