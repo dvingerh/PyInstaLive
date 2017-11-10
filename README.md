@@ -11,15 +11,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.4 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.5 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.2.4**) run the following command:
+To update PyInstaLive to the latest version (currently **2.2.5**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.4 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.5 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
