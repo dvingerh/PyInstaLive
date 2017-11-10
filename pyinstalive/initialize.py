@@ -26,8 +26,8 @@ def check_ffmpeg():
 
 def check_config_validity(config):
 	try:
-		username = config['pyinstalive']['username']
-		password = config['pyinstalive']['password']
+		username = config.get('pyinstalive', 'username')
+		password = config.get('pyinstalive', 'password')
 
 		if not (len(username) > 0):
 			log("[E] Invalid setting detected for 'username'.", "RED")
@@ -88,8 +88,8 @@ def run():
 
 	if check_config_validity(config):
 
-		username = config['pyinstalive']['username']
-		password = config['pyinstalive']['password']
+		username = config.get('pyinstalive', 'username')
+		password = config.get('pyinstalive', 'password')
 
 		def show_info():
 			log("[I] To see all the available flags, use the -h flag.", "BLUE")
@@ -125,8 +125,8 @@ def run():
 			sys.exit(1)
 
 		try:
-			show_cookie_expiry = config['pyinstalive']['show_cookie_expiry']
-			if not config['pyinstalive']['show_cookie_expiry'].title() in bool_values:
+			show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
+			if not show_cookie_expiry in bool_values:
 				log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
 				show_cookie_expiry = 'True'
 		except:
@@ -134,7 +134,7 @@ def run():
 			show_cookie_expiry = 'True'
 
 		try:
-			save_path = config['pyinstalive']['save_path']
+			save_path = config.get('pyinstalive', 'save_path')
 
 			if (os.path.exists(save_path)):
 				pass
