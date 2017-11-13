@@ -8,12 +8,11 @@ import subprocess
 from .auth import login
 from .logger import log, seperator, supports_color
 from .downloader import main
-
+from .settings import settings
 
 script_version = "2.2.5"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
-
 
 def check_ffmpeg():
 	try:
@@ -26,14 +25,53 @@ def check_ffmpeg():
 
 def check_config_validity(config):
 	try:
-		username = config.get('pyinstalive', 'username')
-		password = config.get('pyinstalive', 'password')
+		settings.username = config.get('pyinstalive', 'username')
+		settings.password = config.get('pyinstalive', 'password')
 
-		if not (len(username) > 0):
+
+
+		try:
+			settings.show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
+			if not settings.show_cookie_expiry in bool_values:
+				log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
+				settings.show_cookie_expiry = 'true'
+		except:
+			log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
+			settings.show_cookie_expiry = 'true'
+
+
+
+		try:
+			settings.clear_temp_files = config.get('pyinstalive', 'clear_temp_files').title()
+			if not settings.show_cookie_expiry in bool_values:
+				log("[W] Invalid setting detected for 'clear_temp_files', falling back to default value (True)", "YELLOW")
+				settings.show_cookie_expiry = 'true'
+		except:
+			log("[W] Invalid setting detected for 'clear_temp_files', falling back to default value (True)", "YELLOW")
+			settings.show_cookie_expiry = 'true'
+
+
+
+		try:
+			settings.save_path = config.get('pyinstalive', 'save_path')
+
+			if (os.path.exists(settings.save_path)):
+				pass
+			else:
+				log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
+				settings.save_path = os.getcwd()
+
+			if not settings.save_path.endswith('/'):
+				settings.save_path = settings.save_path + '/'
+		except:
+			log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
+			settings.save_path = os.getcwd()
+
+		if not (len(settings.username) > 0):
 			log("[E] Invalid setting detected for 'username'.", "RED")
 			return False
 
-		if not (len(password) > 0):
+		if not (len(settings.password) > 0):
 			log("[E] Invalid setting detected for 'password'.", "RED")
 			return False
 
@@ -88,9 +126,6 @@ def run():
 
 	if check_config_validity(config):
 
-		username = config.get('pyinstalive', 'username')
-		password = config.get('pyinstalive', 'password')
-
 		def show_info():
 			log("[I] To see all the available flags, use the -h flag.", "BLUE")
 			log("", "GREEN")
@@ -124,36 +159,12 @@ def run():
 			seperator("GREEN")
 			sys.exit(1)
 
-		try:
-			show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
-			if not show_cookie_expiry in bool_values:
-				log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
-				show_cookie_expiry = 'True'
-		except:
-			log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
-			show_cookie_expiry = 'True'
-
-		try:
-			save_path = config.get('pyinstalive', 'save_path')
-
-			if (os.path.exists(save_path)):
-				pass
-			else:
-				log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
-				save_path = os.getcwd()
-
-			if not save_path.endswith('/'):
-				save_path = save_path + '/'
-		except:
-			log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
-			save_path = os.getcwd()
-
 		if (args.username is not None) and (args.password is not None):
-			api = login(args.username, args.password, show_cookie_expiry)
+			api = login(args.username, args.password, settings.show_cookie_expiry)
 		else:
-			api = login(username, password, show_cookie_expiry)
-		
-		main(api, args.record, save_path)
+			api = login(settings.username, settings.password, settings.show_cookie_expiry)
+
+		main(api, args.record, settings)
 	else:
 		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
 		seperator("GREEN")

@@ -4,9 +4,7 @@ import os
 import shutil
 
 from instagram_private_api_extensions import live, replay
-
 from .logger import log, seperator
-
 
 class NoLivestreamException(Exception):
 	pass
@@ -14,19 +12,15 @@ class NoLivestreamException(Exception):
 class NoReplayException(Exception):
 	pass
 
-def main(api_arg, record_arg, save_path_arg):
+def main(api_arg, record_arg, settings_arg):
 	global api
 	global record
-	global save_path
-	global current_date
-	global current_time
 	global broadcast
 	global mpd_url
-	current_time = str(int(time.time()))
-	current_date = time.strftime("%Y%m%d")
+	global settings
+	settings = settings_arg
 	api = api_arg
 	record = record_arg
-	save_path = save_path_arg
 	get_user_info(record)
 
 def record_stream(broadcast):
@@ -48,7 +42,7 @@ def record_stream(broadcast):
 				   or broadcast.get('dash_abr_playback_url')
 				   or broadcast['dash_playback_url'])
 
-		output_dir = save_path + '{}_{}_{}_{}_live_downloads'.format(current_date, record, broadcast['id'], current_time)
+		output_dir = settings.save_path + '{}_{}_{}_{}_live_downloads'.format(settings.current_date, record, broadcast['id'], settings.current_time)
 
 		dl = live.Downloader(
 			mpd=mpd_url,
@@ -81,9 +75,12 @@ def record_stream(broadcast):
 
 def stitch_video(dl, broadcast):
 		log('[I] Stitching downloaded files into video...', "GREEN")
-		output_file = save_path + '{}_{}_{}_{}_live.mp4'.format(current_date, record, broadcast['id'], current_time)
+		output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
 		try:
-			dl.stitch(output_file, cleartempfiles=False)
+			if settings.clear_temp_files.title() == "True":
+				dl.stitch(output_file, cleartempfiles=True)
+			else:
+				dl.stitch(output_file, cleartempfiles=False)
 			log('[I] Successfully stitched downloaded files.', "GREEN")
 			seperator("GREEN")
 			sys.exit(0)
@@ -140,9 +137,9 @@ def get_replays(user_id):
 				exists = False
 
 				if sys.version.split(' ')[0].startswith('2'):
-					directories = (os.walk(save_path).next()[1])
+					directories = (os.walk(settings.save_path).next()[1])
 				else:
-					directories = (os.walk(save_path).__next__()[1])
+					directories = (os.walk(settings.save_path).__next__()[1])
 
 				for directory in directories:
 					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
@@ -152,12 +149,15 @@ def get_replays(user_id):
 					current = index + 1
 					log("[I] Downloading replay " + str(current) + " of "  + str(len(broadcasts)) + " with ID '" + str(broadcast['id']) + "'...", "GREEN")
 					current_time = str(int(time.time()))
-					output_dir = save_path + '{}_{}_{}_{}_replay_downloads'.format(current_date, record, broadcast['id'], current_time)
+					output_dir = settings.save_path + '{}_{}_{}_{}_replay_downloads'.format(settings.current_date, record, broadcast['id'], settings.current_time)
 					dl = replay.Downloader(
 						mpd=broadcast['dash_manifest'],
 						output_dir=output_dir,
 						user_agent=api.user_agent)
-					replay_saved = dl.download(save_path + '{}_{}_{}_{}_replay.mp4'.format(current_date, record, broadcast['id'], current_time), cleartempfiles=False)
+					if settings.clear_temp_files.title() == "True":
+						replay_saved = dl.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time), cleartempfiles=True)
+					else:
+						replay_saved = dl.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time), cleartempfiles=False)
 					if (len(replay_saved) == 1):
 						log("[I] Finished downloading replay " + str(current) + " of "  + str(len(broadcasts)) + ".", "GREEN")
 						log("", "GREEN")
