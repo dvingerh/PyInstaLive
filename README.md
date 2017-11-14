@@ -13,7 +13,7 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.5 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.6 --process-dependency-links
 ```
 
 #### Updating
