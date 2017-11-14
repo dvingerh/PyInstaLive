@@ -1,4 +1,6 @@
 # PyInstaLive
+![Version 2.2.6](https://img.shields.io/badge/Version-2.2.6-pink.svg?style=for-the-badge)
+
 This script enables you to record Instagram livestreams as well as download any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 
@@ -16,10 +18,10 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.5 --process-depe
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.2.5**) run the following command:
+To update PyInstaLive to the latest version (currently **2.2.6**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.5 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.6 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
