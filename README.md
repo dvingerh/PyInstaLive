@@ -4,6 +4,14 @@
 This script enables you to record Instagram livestreams as well as download any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 
+## Quickstart
+
+- Install the prerequisites and then PyInstaLive.
+- Run `pyinstalive -c` to generate a configuration file.
+- Edit the configuration file using any text editor.
+- Run `pyinstalive -r "<live-username>"` to start recording a livestream.
+
+
 ## Installation
 
 #### Prerequisites
@@ -37,6 +45,7 @@ Use the version number you want after the **@** symbol (e.g **2.1.0**).
 
 ## Usage
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
+You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
 
 Here is an example of a valid configuration file:
 ```bash
@@ -45,6 +54,7 @@ username = johndoe
 password = grapefruits
 save_path = /
 show_cookie_expiry = true
+clear_temp_files = false
 ```
 
 Use the following command to run PyInstaLive:
@@ -73,21 +83,25 @@ pyinstalive -r "janedoe"
 If a livestream is currently ongoing, the terminal output should be something like this:
 
 ```
-PYINSTALIVE DOWNLOADER (SCRIPT v1.0)
---------------------------------------------------
-[I] Login to "johndoe" OK!
-[I] Checking broadcast for "janedoe"...
-[I] Starting broadcast recording:
-[I] Username    : janedoe
-[I] MPD URL     : https://scontent-ams3-1.cdninstagram.com/hvideo-frc1/v/rNAi8avEBU6f0EgB0oLu7/live-dash/dash-abr/17870846050136409.mpd?_nc_rl=AfCS41CMvXPH2xWa&oh=43d66cf045816a1c83310da05fac0949&oe=5992E01E
-[I] Viewers     : 1118 watching
-[I] Airing time : 37 minutes and 20 seconds
+----------------------------------------------------------------------
+PYINSTALIVE (SCRIPT V1.0 - PYTHON V2.7.14) - 12:00:01 PM
+----------------------------------------------------------------------
+[I] Login to "naxunaw" OK!
+[I] Login cookie expiry date: 2018-02-13 at 12:00:01
+[I] Checking user: 'justinbieber'
+[I] Checking for ongoing livestreams...
+[I] Starting livestream recording:
+[I] Username    : carendelano
+[I] MPD URL     : https://scontent-ams3-1.cdninstagram.com/hvideo-frc1/v/rflSWUsyCsuqE-GLYgvW4/live-dash/dash-abr/17880993205152831.mpd?_nc_rl=AfCujc4yG9bJLHVn&oh=87c4fb94668286125f1169e4441056d2&oe=5A0E8951
+[I] Viewers     : 2768 watching
+[I] Airing time : 5 minutes and 10 seconds
 [I] Status      : Active
-
-[I] Recording broadcast... press [CTRL+C] to abort.
+----------------------------------------------------------------------
+[I] Recording livestream... press [CTRL+C] to abort.
 
 [I] Stitching downloaded files into video...
-[I] Successfully stitched downloaded files!
+[I] Successfully stitched downloaded files.
+----------------------------------------------------------------------
 ```
 
 
