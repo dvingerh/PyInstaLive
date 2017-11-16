@@ -1,7 +1,7 @@
 # PyInstaLive
 ![Version 2.2.7](https://img.shields.io/badge/Version-2.2.7-pink.svg?style=for-the-badge)
 
-This script enables you to record Instagram livestreams as well as download any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
+This script enables you to download Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 
 ## Quickstart
