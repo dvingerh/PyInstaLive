@@ -86,12 +86,12 @@ If a livestream is currently ongoing, the terminal output should be something li
 ----------------------------------------------------------------------
 PYINSTALIVE (SCRIPT V1.0 - PYTHON V2.7.14) - 12:00:01 PM
 ----------------------------------------------------------------------
-[I] Login to "naxunaw" OK!
+[I] Login to "johndoe" OK!
 [I] Login cookie expiry date: 2018-02-13 at 12:00:01
 [I] Checking user: 'justinbieber'
 [I] Checking for ongoing livestreams...
 [I] Starting livestream recording:
-[I] Username    : carendelano
+[I] Username    : justinbieber
 [I] MPD URL     : https://scontent-ams3-1.cdninstagram.com/hvideo-frc1/v/rflSWUsyCsuqE-GLYgvW4/live-dash/dash-abr/17880993205152831.mpd?_nc_rl=AfCujc4yG9bJLHVn&oh=87c4fb94668286125f1169e4441056d2&oe=5A0E8951
 [I] Viewers     : 2768 watching
 [I] Airing time : 5 minutes and 10 seconds
