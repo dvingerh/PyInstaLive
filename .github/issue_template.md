@@ -1,4 +1,5 @@
-### Please check the boxes below by filling `[ ]` with an x like so: `[x]`
+### Please check the boxes below by filling [ ] with an x so it looks like [x].
+###### Remove all spaces already present in the box.
 
 - [ ] I have installed the latest version of PyInstaLive: 2.2.8.
 - [ ] I have installed either Python 2.7.x or 2.5>=.
