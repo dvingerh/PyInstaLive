@@ -34,22 +34,32 @@ def check_config_validity(config):
 		try:
 			settings.show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
 			if not settings.show_cookie_expiry in bool_values:
-				log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
+				log("[W] Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)", "YELLOW")
 				settings.show_cookie_expiry = 'true'
 		except:
-			log("[W] Invalid setting detected for 'show_cookie_expiry', falling back to default value (True)", "YELLOW")
+			log("[W] Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)", "YELLOW")
 			settings.show_cookie_expiry = 'true'
 
 
 
 		try:
 			settings.clear_temp_files = config.get('pyinstalive', 'clear_temp_files').title()
-			if not settings.show_cookie_expiry in bool_values:
-				log("[W] Invalid setting detected for 'clear_temp_files', falling back to default value (True)", "YELLOW")
-				settings.show_cookie_expiry = 'true'
+			if not settings.clear_temp_files in bool_values:
+				log("[W] Invalid or missing setting detected for 'clear_temp_files', using default value (True)", "YELLOW")
+				settings.clear_temp_files = 'true'
 		except:
-			log("[W] Invalid setting detected for 'clear_temp_files', falling back to default value (True)", "YELLOW")
-			settings.show_cookie_expiry = 'true'
+			log("[W] Invalid or missing setting detected for 'clear_temp_files', using default value (True)", "YELLOW")
+			settings.clear_temp_files = 'true'
+
+
+		try:
+			settings.save_replays = config.get('pyinstalive', 'save_replays').title()
+			if not settings.save_replays in bool_values:
+				log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
+				settings.save_replays = 'true'
+		except:
+			log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
+			settings.save_replays = 'true'
 
 
 
@@ -59,21 +69,21 @@ def check_config_validity(config):
 			if (os.path.exists(settings.save_path)):
 				pass
 			else:
-				log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
+				log("[W] Invalid or missing setting detected for 'save_path', falling back to path: " + os.getcwd(), "YELLOW")
 				settings.save_path = os.getcwd()
 
 			if not settings.save_path.endswith('/'):
 				settings.save_path = settings.save_path + '/'
 		except:
-			log("[W] Invalid setting detected for 'save_path', falling back to location: " + os.getcwd(), "YELLOW")
+			log("[W] Invalid or missing setting detected for 'save_path', falling back to path: " + os.getcwd(), "YELLOW")
 			settings.save_path = os.getcwd()
 
 		if not (len(settings.username) > 0):
-			log("[E] Invalid setting detected for 'username'.", "RED")
+			log("[E] Invalid or missing setting detected for 'username'.", "RED")
 			return False
 
 		if not (len(settings.password) > 0):
-			log("[E] Invalid setting detected for 'password'.", "RED")
+			log("[E] Invalid or missing setting detected for 'password'.", "RED")
 			return False
 
 		return True
@@ -122,7 +132,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = /\nshow_cookie_expiry = true\nclear_temp_files = false"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = /\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
@@ -139,8 +149,8 @@ def new_config():
 				log("", "GREEN")
 	except Exception as e:
 		log("[E] An error occurred: " + str(e), "RED")
-		log("[W] If you don't have a configuration file,", "YELLOW")
-		log("    you must manually create and edit it with the following template: ", "YELLOW")
+		log("[W] If you don't have a configuration file, you must", "YELLOW")
+		log("    manually create and edit it with the following template: ", "YELLOW")
 		log("", "GREEN")
 		log(config_template, "YELLOW")
 		log("", "GREEN")

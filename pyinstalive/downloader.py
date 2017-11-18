@@ -99,7 +99,13 @@ def get_user_info(record):
 		seperator("GREEN")
 		sys.exit(1)
 	get_livestreams(user_id)
-	get_replays(user_id)
+	if settings.save_replays.title() == "True": 
+		get_replays(user_id)
+	else:
+		log("", "BLUE")
+		log("[I] Replay saving is disabled in the config file.", "BLUE")
+		seperator("GREEN")
+		sys.exit(0)
 
 def get_livestreams(user_id):
 	try:

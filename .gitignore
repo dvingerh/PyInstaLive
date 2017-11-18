@@ -26,3 +26,4 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.json

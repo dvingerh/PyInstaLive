@@ -80,7 +80,11 @@ def login(username, password, show_cookie_expiry):
 		log('[E] ClientError: {0!s}'.format(e), "RED")
 		sys.exit(9)
 	except Exception as e:
-		log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
+		if (str(e).startswith("unsupported pickle protocol")):
+			log("[W] This cookie file is not compatible with Python {}.".format(sys.version.split(' ')[0][0]), "YELLOW")
+			log("[W] Please delete your cookie file 'credentials.json' and try again.", "YELLOW")
+		else:
+			log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
 		sys.exit(99)
 
 	log('[I] Login to "' + api.authenticated_user_name + '" OK!', "GREEN")
