@@ -11,6 +11,11 @@ from .logger import log, seperator, supports_color
 from .downloader import main
 from .settings import settings
 
+try:
+	from urllib.request import urlopen
+except ImportError:
+	from urllib2 import urlopen
+
 script_version = "2.2.8"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
@@ -155,7 +160,32 @@ def new_config():
 		log(config_template, "YELLOW")
 		log("", "GREEN")
 		log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
-		log("", "GREEN")	
+		log("", "GREEN")
+
+def upgrade():
+	log("[I] Checking for updates ...", "GREEN")
+	latest_version = urlopen("https://raw.githubusercontent.com/notcammy/PyInstaLive/master/VERSION").read().decode('utf-8')
+	if (script_version != latest_version):
+		try:
+			sys.stdout.write("\033[92m[I] Current version: {}\n[I] Latest version: {}\n[I] Do you want to update? [y/n]: ")
+			if python_version[0] == "2":
+				answer = raw_input()
+			else:
+				answer = input()
+			if not answer or answer[0].lower() != 'y' or answer[0].lower() != 'n':
+			   log("[E] Invalid answer provided, aborting ...", "RED")
+			   exit(1)
+			elif answer[0].lower() == 'y':
+			   subprocess.call(["pip", "install", "git+https://github.com/notcammy/PyInstaLive.git@" + latest_version, "--process-dependency-links", "--upgrade"])
+			elif answer[0].lower() == 'n':
+				log('[I] Aborting ...', "RED")
+				exit(0)
+		except Exception as e:
+			print(str(e))
+			sys.exit(0)	
+	else:
+		log("[I] You are already using the latest version.", "GREEN")
+		sys.exit(0)
 
 
 def run():
@@ -172,14 +202,19 @@ def run():
 	parser.add_argument('-r', '--record', dest='record', type=str, required=False, help="The username of the Instagram whose livestream or replay you want to save.")
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
+	parser.add_argument('--upgrade', dest="upgrade", action='store_true', help="Check for updates and prompt to install them if available.")
 	args = parser.parse_args()
 
-	if (args.username == None and args.password == None and args.record == None and args.info == False and args.config == False) or (args.info != False):
-		show_info()
+	if (args.upgrade == True):
+		upgrade()
 		sys.exit(0)
-	
+
 	if (args.config == True):
 		new_config()
+		sys.exit(0)
+
+	if (args.username == None and args.password == None and args.record == None and args.info == False and args.config == False and args.upgrade == False) or (args.info != False):
+		show_info()
 		sys.exit(0)
 
 	if os.path.exists('pyinstalive.ini'):
