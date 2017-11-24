@@ -162,27 +162,38 @@ def new_config():
 		log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
 		log("", "GREEN")
 
-def upgrade():
+def update():
 	log("[I] Checking for updates ...", "GREEN")
-	latest_version = urlopen("https://raw.githubusercontent.com/notcammy/PyInstaLive/master/VERSION").read().decode('utf-8')
-	if (script_version != latest_version):
+	latest_version = urlopen("https://raw.githubusercontent.com/notcammy/PyInstaLive/master/VERSION").read().decode('utf-8').rstrip()
+	if (str(script_version) != str(latest_version)):
 		try:
-			sys.stdout.write("\033[92m[I] Current version: {}\n[I] Latest version: {}\n[I] Do you want to update? [y/n]: ")
+			sys.stdout.write("\033[92m[I] Current version: {}\n[I] Latest version: {}\n[I] Do you want to update? [y/n]: ".format(script_version, latest_version))
 			if python_version[0] == "2":
 				answer = raw_input()
 			else:
 				answer = input()
-			if not answer or answer[0].lower() != 'y' or answer[0].lower() != 'n':
+			if not answer or answer[0].lower() not in {'y', 'n'}:
 			   log("[E] Invalid answer provided, aborting ...", "RED")
+			   seperator("GREEN")
 			   exit(1)
 			elif answer[0].lower() == 'y':
+			   log("", "ENDC")
+			   log("[I] In case update fails, manually run the following command (optionally with sudo):\n", "BLUE")
+			   log("    pip install git+https://github.com/notcammy/PyInstaLive.git@{} --process-dependency-links --upgrade\n".format(latest_version), "BLUE")
+			   log("[I] Starting update command in 3 seconds ...", "BLUE")
+			   time.sleep(3)
 			   subprocess.call(["pip", "install", "git+https://github.com/notcammy/PyInstaLive.git@" + latest_version, "--process-dependency-links", "--upgrade"])
 			elif answer[0].lower() == 'n':
-				log('[I] Aborting ...', "RED")
+				log('[I] Aborting ...', "GREEN")
+				seperator("GREEN")
 				exit(0)
 		except Exception as e:
 			print(str(e))
 			sys.exit(0)	
+		except KeyboardInterrupt:
+			log('\n[I] Aborting ...', "GREEN")
+			seperator("GREEN")
+			exit(0)
 	else:
 		log("[I] You are already using the latest version.", "GREEN")
 		sys.exit(0)
@@ -202,11 +213,11 @@ def run():
 	parser.add_argument('-r', '--record', dest='record', type=str, required=False, help="The username of the Instagram whose livestream or replay you want to save.")
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
-	parser.add_argument('--upgrade', dest="upgrade", action='store_true', help="Check for updates and prompt to install them if available.")
+	parser.add_argument('--update', dest="update", action='store_true', help="Check for updates and prompt to install them if available.")
 	args = parser.parse_args()
 
-	if (args.upgrade == True):
-		upgrade()
+	if (args.update == True):
+		update()
 		sys.exit(0)
 
 	if (args.config == True):
