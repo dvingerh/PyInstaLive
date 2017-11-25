@@ -39,29 +39,32 @@ def onlogin_callback(api, settings_file):
 		log('[I] New auth cookie file was made: {0!s}'.format(settings_file), "GREEN")
 
 
-def login(username, password, show_cookie_expiry):
+def login(username, password, show_cookie_expiry, ignore_existing_cookie):
 	device_id = None
 	try:
-		
-		settings_file = "credentials.json"
-		if not os.path.isfile(settings_file):
-			# settings file does not exist
-			log('[W] Unable to find auth cookie file: {0!s}'.format(settings_file), "YELLOW")
-
-			# login new
+		if ignore_existing_cookie:
 			api = Client(
-				username, password,
-				on_login=lambda x: onlogin_callback(x, settings_file))
+				username, password)
 		else:
-			with open(settings_file) as file_data:
-				cached_settings = json.load(file_data, object_hook=from_json)
-			# log('[I] Using settings file: {0!s}'.format(settings_file), "GREEN")
+			settings_file = username + ".json"
+			if not os.path.isfile(settings_file):
+				# settings file does not exist
+				log('[W] Unable to find auth cookie file: {0!s}'.format(settings_file), "YELLOW")
 
-			device_id = cached_settings.get('device_id')
-			# reuse auth settings
-			api = Client(
-				username, password,
-				settings=cached_settings)
+				# login new
+				api = Client(
+					username, password,
+					on_login=lambda x: onlogin_callback(x, settings_file))
+			else:
+				with open(settings_file) as file_data:
+					cached_settings = json.load(file_data, object_hook=from_json)
+				# log('[I] Using settings file: {0!s}'.format(settings_file), "GREEN")
+
+				device_id = cached_settings.get('device_id')
+				# reuse auth settings
+				api = Client(
+					username, password,
+					settings=cached_settings)
 
 	except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
 		log('[E] ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e), "RED")
@@ -82,13 +85,13 @@ def login(username, password, show_cookie_expiry):
 	except Exception as e:
 		if (str(e).startswith("unsupported pickle protocol")):
 			log("[W] This cookie file is not compatible with Python {}.".format(sys.version.split(' ')[0][0]), "YELLOW")
-			log("[W] Please delete your cookie file 'credentials.json' and try again.", "YELLOW")
+			log("[W] Please delete your cookie file '" + username + ".json' and try again.", "YELLOW")
 		else:
 			log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
 		sys.exit(99)
 
 	log('[I] Login to "' + api.authenticated_user_name + '" OK!', "GREEN")
-	if show_cookie_expiry.title() == 'True':
+	if show_cookie_expiry.title() == 'True' and ignore_existing_cookie == False:
 		cookie_expiry = api.cookie_jar.expires_earliest
 		log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %H:%M:%S')), "GREEN")
 

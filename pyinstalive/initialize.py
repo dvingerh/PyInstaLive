@@ -99,7 +99,7 @@ def show_info():
 		log("[E] FFmpeg framework:       	Not found", "RED")
 	else:
 		log("[I] FFmpeg framework:       	Available", "GREEN")
-	if not os.path.isfile('credentials.json'):
+	if not os.path.isfile(settings.username + '.json'):
 		log("[W] Cookie file:            	Not found", "YELLOW")
 	else:
 		log("[I] Cookie file:            	Available", "GREEN")
@@ -132,7 +132,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = /\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
@@ -200,9 +200,9 @@ def run():
 			sys.exit(1)
 
 		if (args.username is not None) and (args.password is not None):
-			api = login(args.username, args.password, settings.show_cookie_expiry)
+			api = login(args.username, args.password, settings.show_cookie_expiry, True)
 		else:
-			api = login(settings.username, settings.password, settings.show_cookie_expiry)
+			api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
 		main(api, args.record, settings)
 	else:
