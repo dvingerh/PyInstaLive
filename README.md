@@ -55,7 +55,7 @@ Here is an example of a valid configuration file:
 [pyinstalive]
 username = johndoe
 password = grapefruits
-save_path = /
+save_path = 
 show_cookie_expiry = true
 clear_temp_files = false
 save_replays = true
