@@ -186,13 +186,17 @@ def run():
 	try:
 		args = parser.parse_args()
 	except SystemExit as e:
-		CURSOR_UP_ONE = '\x1b[1A'
-		ERASE_LINE = '\x1b[2K'
-		log(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE + "[E] Invalid argument(s) were provided in command: " + ' ' * 50, "RED")
-		log("   pyinstalive " + ' '.join(sys.argv[1:]), "YELLOW")
-		log("\n[I] Usage for PyInstaLive is printed below.\n", "GREEN")
-		parser.print_help()
-		sys.exit(1)
+		args_raw = sys.argv[1:]
+		if "-h" not in args_raw and "--help" not in args_raw:
+			CURSOR_UP_ONE = '\x1b[1A'
+			ERASE_LINE = '\x1b[2K'
+			log(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE + "[E] Invalid argument(s) were provided in command: " + ' ' * 50, "RED")
+			log("   pyinstalive " + ' '.join(args_raw), "YELLOW")
+			log("\n[I] Usage for PyInstaLive is printed below.\n", "GREEN")
+			parser.print_help()
+			sys.exit(1)
+		else:
+			sys.exit(0)
 
 	if (args.username == None and args.password == None and args.record == None and args.info == False and args.config == False) or (args.info != False):
 		show_info()
