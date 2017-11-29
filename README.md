@@ -104,6 +104,8 @@ PYINSTALIVE (SCRIPT V1.0 - PYTHON V2.7.14) - 12:00:01 PM
 
 
 #### Notes
+- You can find a list of available commands [here](https://github.com/notcammy/PyInstaLive/blob/master/COMMANDS.md) or by running `pyinstalive -h`.
+
 - The `username` and `password` parameters are not required when you have specified these in the configuration file.
 
 - This script is also reported to work on Python 3.4.x but is not officially supported.
