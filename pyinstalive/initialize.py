@@ -131,7 +131,7 @@ def new_config():
 			seperator("GREEN")
 		else:
 			try:
-				log("[W] Could not find configuration file, creating a default one ...", "YELLOW")
+				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
 				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
@@ -146,7 +146,7 @@ def new_config():
 				log(config_template, "YELLOW")
 				log("", "GREEN")
 				log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
-				log("", "GREEN")
+				seperator("GREEN")
 	except Exception as e:
 		log("[E] An error occurred: " + str(e), "RED")
 		log("[W] If you don't have a configuration file, you must", "YELLOW")
@@ -155,7 +155,8 @@ def new_config():
 		log(config_template, "YELLOW")
 		log("", "GREEN")
 		log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
-		log("", "GREEN")	
+		seperator("GREEN")
+
 
 
 def run():
@@ -166,13 +167,32 @@ def run():
 	logging.disable(logging.CRITICAL)
 
 	config = configparser.ConfigParser()
-	parser = argparse.ArgumentParser(description='You are running PyInstaLive ' + script_version + " with Python " + python_version)
+	parser = argparse.ArgumentParser(description='You are running PyInstaLive ' + script_version + " using Python " + python_version)
 	parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
 	parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
-	parser.add_argument('-r', '--record', dest='record', type=str, required=False, help="The username of the Instagram whose livestream or replay you want to save.")
+	parser.add_argument('-r', '--record', dest='record', type=str, required=False, help="The username of the user whose livestream or replay you want to save.")
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
-	args = parser.parse_args()
+
+
+	# Workaround to 'disable' argument abbreviations
+	parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--recorx', default=argparse.SUPPRESS, help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--infx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
+
+	# Erase line that tells the user the error has to do with ambiguous arguments
+	try:
+		args = parser.parse_args()
+	except SystemExit as e:
+		CURSOR_UP_ONE = '\x1b[1A'
+		ERASE_LINE = '\x1b[2K'
+		log(CURSOR_UP_ONE + ERASE_LINE + CURSOR_UP_ONE + "[E] Invalid argument(s) were provided in command: " + ' ' * 50, "RED")
+		log("   pyinstalive " + ' '.join(sys.argv[1:]), "YELLOW")
+		log("\n[I] Usage for PyInstaLive is printed below.\n", "GREEN")
+		parser.print_help()
+		sys.exit(1)
 
 	if (args.username == None and args.password == None and args.record == None and args.info == False and args.config == False) or (args.info != False):
 		show_info()
@@ -199,12 +219,20 @@ def run():
 			seperator("GREEN")
 			sys.exit(1)
 
+		if (args.record == None):
+			log("[E] Missing --record argument. Please specify an Instagram username.", "RED")
+			seperator("GREEN")
+			sys.exit(1)
+
 		if (args.username is not None) and (args.password is not None):
 			api = login(args.username, args.password, settings.show_cookie_expiry, True)
 		else:
+			if (args.username is not None) or (args.password is not None):
+				log("[W] Missing -u or -p arguments, falling back to config login...", "YELLOW")
 			api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
 		main(api, args.record, settings)
+
 	else:
 		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
 		seperator("GREEN")
