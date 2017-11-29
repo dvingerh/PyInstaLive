@@ -33,6 +33,8 @@ To update PyInstaLive to the latest version (currently **2.2.9**) run the follow
 pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.9 --process-dependency-links --upgrade
 ```
 
+**Note**: From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
+
 #### Specific versions
 
 If you want to install a specific version of PyInstaLive, you can specify the version tag in the install command:
