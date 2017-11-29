@@ -19,7 +19,7 @@ I am using:
 
 ### To report a bug, fill in the information below.
 
-###### Command used:
+###### Command used
 Paste the command here that you are running. Remove any information like usernames and passwords.
 
 **Example:** ```pyinstalive -u "johndoe" -p "grapefruits" -r "justinbieber"```
