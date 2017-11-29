@@ -90,7 +90,29 @@ def check_config_validity(config):
 	except Exception as e:
 		return False
 
-def show_info():
+def show_info(config):
+	if os.path.exists('pyinstalive.ini'):
+		try:
+			config.read('pyinstalive.ini')
+		except Exception:
+			log("[E] Could not read configuration file.", "RED")
+			seperator("GREEN")
+	else:
+		new_config()
+		sys.exit(1)
+
+	cookie_files = []
+	cookie_from_config = ''
+	try:
+		settings.username = config.get('pyinstalive', 'username')
+		for file in os.listdir(os.getcwd()):
+		    if file.endswith(".json"):
+		        cookie_files.append(file)
+		    if settings.username == file.replace(".json", ''):
+		    	cookie_from_config = file
+	except Exception as e:
+		log("[W] Could not check for cookie files: " + str(e), "YELLOW")
+		log("", "ENDC")
 	log("[I] To see all the available flags, use the -h flag.", "BLUE")
 	log("", "GREEN")
 	log("[I] PyInstaLive version:    	" + script_version, "GREEN")
@@ -99,10 +121,14 @@ def show_info():
 		log("[E] FFmpeg framework:       	Not found", "RED")
 	else:
 		log("[I] FFmpeg framework:       	Available", "GREEN")
-	if not os.path.isfile(settings.username + '.json'):
-		log("[W] Cookie file:            	Not found", "YELLOW")
+
+	if (len(cookie_from_config) > 0):
+		log("[I] Cookie files:            	{} ({} matches config user)".format(str(len(cookie_files)), cookie_from_config), "GREEN")
+	elif len(cookie_files) > 0:
+		log("[I] Cookie files:            	{}".format(str(len(cookie_files))), "GREEN")
 	else:
-		log("[I] Cookie file:            	Available", "GREEN")
+		log("[W] Cookie files:            	None found", "YELLOW")
+
 	log("[I] CLI supports color:     	" + str(supports_color()), "GREEN")
 
 	if os.path.exists('pyinstalive.ini'):
@@ -199,7 +225,7 @@ def run():
 			sys.exit(0)
 
 	if (args.username == None and args.password == None and args.record == None and args.info == False and args.config == False) or (args.info != False):
-		show_info()
+		show_info(config)
 		sys.exit(0)
 	
 	if (args.config == True):
