@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.2.8](https://img.shields.io/badge/Version-2.2.8-pink.svg?style=for-the-badge)
+![Version 2.2.9](https://img.shields.io/badge/Version-2.2.9-pink.svg?style=for-the-badge)
 
 This script enables you to download Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
@@ -22,15 +22,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.8 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.9 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.2.8**) run the following command:
+To update PyInstaLive to the latest version (currently **2.2.9**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.8 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.9 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
