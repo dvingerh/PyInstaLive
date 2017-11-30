@@ -27,3 +27,4 @@ wheels/
 *.egg
 MANIFEST
 *.json
+.python-version
