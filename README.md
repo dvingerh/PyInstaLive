@@ -51,7 +51,7 @@ Make sure there is a configuration file called ``pyinstalive.ini`` in the direct
 You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
 
 Here is an example of a valid configuration file:
-```bash
+```ini
 [pyinstalive]
 username = johndoe
 password = grapefruits
@@ -104,7 +104,7 @@ PYINSTALIVE (SCRIPT V1.0 - PYTHON V2.7.14) - 12:00:01 PM
 
 
 #### Notes
-- You can find a list of available commands [here](https://github.com/notcammy/PyInstaLive/blob/master/COMMANDS.md) or by running `pyinstalive -h`.
+- You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md). You can also run `pyinstalive -h` to view all available commands. 
 
 - The `username` and `password` parameters are not required when you have specified these in the configuration file.
 
