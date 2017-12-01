@@ -103,7 +103,7 @@ def get_user_info(record):
 		get_replays(user_id)
 	else:
 		log("", "BLUE")
-		log("[I] Replay saving is disabled in the config file.", "BLUE")
+		log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
 		seperator("GREEN")
 		sys.exit(0)
 

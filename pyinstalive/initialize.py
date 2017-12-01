@@ -199,14 +199,16 @@ def run():
 	parser.add_argument('-r', '--record', dest='record', type=str, required=False, help="The username of the user whose livestream or replay you want to save.")
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
+	parser.add_argument('-nr', '--noreplays', dest='noreplays', action='store_true', help="When used, do not check for any available replays.")
 
 
 	# Workaround to 'disable' argument abbreviations
 	parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')
-	parser.add_argument('--recorx', default=argparse.SUPPRESS, help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--recorx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--infx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE')
 
 	# Erase line that tells the user the error has to do with ambiguous arguments
 	try:
@@ -224,7 +226,11 @@ def run():
 		else:
 			sys.exit(0)
 
-	if (args.username == None and args.password == None and args.record == None and args.info == False and args.config == False) or (args.info != False):
+	if (args.username == None 
+		and args.password == None 
+		and args.record == None 
+		and args.info == False 
+		and args.config == False) or (args.info != False):
 		show_info(config)
 		sys.exit(0)
 	
@@ -253,6 +259,9 @@ def run():
 			log("[E] Missing --record argument. Please specify an Instagram username.", "RED")
 			seperator("GREEN")
 			sys.exit(1)
+
+		if (args.noreplays == True):
+			settings.save_replays = "false"
 
 		if (args.username is not None) and (args.password is not None):
 			api = login(args.username, args.password, settings.show_cookie_expiry, True)
