@@ -1,7 +1,7 @@
 # Commands
 
 
-- ```-h``` or ```--help```  **—**  Show PyInstaLive's help message containing all available arguments.
+- ```-h``` or ```--help```  **—**  When this flagis passed, PyInstaLive's help message will be shown containing all available flags and arguments.
 
 - ```-u``` or ```--username```  **—**  Instagram username to login with. Requires:  ```--password```, ```--record```.
 
@@ -9,9 +9,9 @@
 
 - ```-r``` or ```--record```  **—**  The username of the user whose livestream or replay you want to save.
 
-- ```-i``` or ```--info```  **—**  View information related to PyInstaLive such as its current version, the configuration file contents, available cookie files and more.
+- ```-i``` or ```--info```  **—**  When this flag is passed, PyInstaLive will show information such as its current version, the configuration file contents, available cookie files and more.
 
-- ```-c``` or ```--config```  **—**  Create a default configuration file if it doesn't exist. If there is already a configuration file present, it'll show you its contents instead.
+- ```-nr``` or ```--noreplays```  **—**  When this flag is passed, PyInstaLive will not check for any available replays. Overrides the configuration file.
 
 
 # Configuration file
