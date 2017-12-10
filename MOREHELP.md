@@ -1,7 +1,7 @@
 # Commands
 
 
-- ```-h``` or ```--help```  **—**  When this flagis passed, PyInstaLive's help message will be shown containing all available commands.
+- ```-h``` or ```--help```  **—**  When this flag is passed, PyInstaLive's help message will be shown containing all available commands.
 
 - ```-u``` or ```--username```  **—**  Instagram username to login with. Requires:  ```--password```, ```--record```.
 
