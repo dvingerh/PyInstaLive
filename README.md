@@ -40,10 +40,10 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@2.3.1 --process-depe
 If you want to install a specific version of PyInstaLive, you can specify the version tag in the install command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.1.0 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links
 ```
 
-Use the version number you want after the **@** symbol (e.g **2.1.0**).
+Use the version number you want after the **@** symbol (e.g **2.2.0**).
 
 
 ## Usage
