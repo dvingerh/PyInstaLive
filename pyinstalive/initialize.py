@@ -61,7 +61,33 @@ def check_config_validity(config):
 			log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
 			settings.save_replays = 'true'
 
+		try:
+			settings.run_at_start = config.get('pyinstalive', 'run_at_start')
+			if (len(settings.run_at_start) > 0):
+				if not os.path.isfile(settings.run_at_start):
+					log("[W] Path to file given for 'run_at_start' does not exist, using default value (Empty)", "YELLOW")
+					settings.run_at_start = ""
+				else:
+					if not settings.run_at_start.split('.')[-1] == 'py':
+						log("[W] File given for 'run_at_start' is not a Python script, using default value (Empty)", "YELLOW")
+						settings.run_at_start = ""
+		except:
+			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (Empty)", "YELLOW")
+			settings.run_at_start = ""
 
+		try:
+			settings.run_at_finish = config.get('pyinstalive', 'run_at_finish')
+			if (len(settings.run_at_finish) > 0):
+				if not os.path.isfile(settings.run_at_finish):
+					log("[W] Path to file given for 'run_at_finish' does not exist, using default value (Empty)", "YELLOW")
+					settings.run_at_finish = ""
+				else:
+					if not settings.run_at_finish.split('.')[-1] == 'py':
+						log("[W] File given for 'run_at_finish' is not a Python script, using default value (Empty)", "YELLOW")
+						settings.run_at_finish = ""
+		except:
+			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (Empty)", "YELLOW")
+			settings.run_at_finish = ""
 
 		try:
 			settings.save_path = config.get('pyinstalive', 'save_path')
@@ -106,10 +132,10 @@ def show_info(config):
 	try:
 		settings.username = config.get('pyinstalive', 'username')
 		for file in os.listdir(os.getcwd()):
-		    if file.endswith(".json"):
-		        cookie_files.append(file)
-		    if settings.username == file.replace(".json", ''):
-		    	cookie_from_config = file
+			if file.endswith(".json"):
+				cookie_files.append(file)
+			if settings.username == file.replace(".json", ''):
+				cookie_from_config = file
 	except Exception as e:
 		log("[W] Could not check for cookie files: " + str(e), "YELLOW")
 		log("", "ENDC")
