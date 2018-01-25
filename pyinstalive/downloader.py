@@ -2,6 +2,8 @@ import sys
 import time
 import os
 import shutil
+import subprocess
+import threading
 
 from instagram_private_api_extensions import live, replay
 from .logger import log, seperator
@@ -22,6 +24,16 @@ def main(api_arg, record_arg, settings_arg):
 	api = api_arg
 	record = record_arg
 	get_user_info(record)
+
+def run_script(file):
+	try:
+		FNULL = open(os.devnull, 'w')
+		if sys.version.split(' ')[0].startswith('2'):
+			subprocess.call(["python", file], stdout=FNULL, stderr=subprocess.STDOUT)
+		else:
+			subprocess.call(["python3", file], stdout=FNULL, stderr=subprocess.STDOUT)
+	except OSError as e:
+		pass
 
 def record_stream(broadcast):
 	try:
@@ -63,6 +75,15 @@ def record_stream(broadcast):
 		log('[I] MPD URL     : ' + mpd_url, "GREEN")
 		print_status()
 		log('[I] Recording livestream... press [CTRL+C] to abort.', "GREEN")
+
+		if (settings.run_at_start is not ""):
+			try:
+				thread = threading.Thread(target=run_script, args=(settings.run_at_start,))
+				thread.daemon = True
+				thread.start()
+			except Exception as e:
+				log('[W] Could not run file: ' + str(e), "YELLOW")
+
 		dl.run()
 		stitch_video(dl, broadcast)
 	except KeyboardInterrupt:
@@ -75,6 +96,15 @@ def record_stream(broadcast):
 
 def stitch_video(dl, broadcast):
 		log('[I] Stitching downloaded files into video...', "GREEN")
+
+		if (settings.run_at_finish is not ""):
+			try:
+				thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
+				thread.daemon = True
+				thread.start()
+			except Exception as e:
+				log('[W] Could not run file: ' + str(e), "YELLOW")
+
 		output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
 		try:
 			if settings.clear_temp_files.title() == "True":

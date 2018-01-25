@@ -9,3 +9,5 @@ class settings:
 	current_time = str(int(time.time()))
 	current_date = time.strftime("%Y%m%d")
 	save_replays = "true"
+	run_at_start = ""
+	run_at_finish = ""
