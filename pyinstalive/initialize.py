@@ -29,8 +29,6 @@ def check_config_validity(config):
 		settings.username = config.get('pyinstalive', 'username')
 		settings.password = config.get('pyinstalive', 'password')
 
-
-
 		try:
 			settings.show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
 			if not settings.show_cookie_expiry in bool_values:
@@ -127,10 +125,13 @@ def show_info(config):
 		new_config()
 		sys.exit(1)
 
+	if not check_config_validity(config):
+		log("[W] Config file is not valid, some information may be inaccurate.", "YELLOW")
+		log("", "GREEN")
+
 	cookie_files = []
 	cookie_from_config = ''
 	try:
-		settings.username = config.get('pyinstalive', 'username')
 		for file in os.listdir(os.getcwd()):
 			if file.endswith(".json"):
 				cookie_files.append(file)
@@ -159,7 +160,6 @@ def show_info(config):
 	log("[I] File to run at start:       " + settings.run_at_start, "GREEN")
 	log("[I] File to run at finish:      " + settings.run_at_finish, "GREEN")
 	log("", "GREEN")
-
 
 
 	if os.path.exists('pyinstalive.ini'):
