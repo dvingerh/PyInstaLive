@@ -24,6 +24,8 @@ save_path =
 show_cookie_expiry = true
 clear_temp_files = false
 save_replays = true
+run_at_start =
+run_at_finish =
 ```
 
 ```username```  **—**  Instagram username to login with.
@@ -37,3 +39,7 @@ save_replays = true
 ```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded. Folders created by PyInstaLive will not be deleted.
 
 ```save_replays```  **—**  When set to True, PyInstaLive will check for and download any available replays.
+
+```run_at_start```  **—**  Python script to run when PyInstaLive starts recording a livestream. (Experimental, use at own risk.)
+
+```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. (Experimental, use at own risk.)
