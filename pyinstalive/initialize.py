@@ -65,29 +65,29 @@ def check_config_validity(config):
 			settings.run_at_start = config.get('pyinstalive', 'run_at_start')
 			if (len(settings.run_at_start) > 0):
 				if not os.path.isfile(settings.run_at_start):
-					log("[W] Path to file given for 'run_at_start' does not exist, using default value (Empty)", "YELLOW")
-					settings.run_at_start = ""
+					log("[W] Path to file given for 'run_at_start' does not exist, using default value (None)", "YELLOW")
+					settings.run_at_start = "None"
 				else:
 					if not settings.run_at_start.split('.')[-1] == 'py':
-						log("[W] File given for 'run_at_start' is not a Python script, using default value (Empty)", "YELLOW")
-						settings.run_at_start = ""
+						log("[W] File given for 'run_at_start' is not a Python script, using default value (None)", "YELLOW")
+						settings.run_at_start = "None"
 		except:
-			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (Empty)", "YELLOW")
-			settings.run_at_start = ""
+			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (None)", "YELLOW")
+			settings.run_at_start = "None"
 
 		try:
 			settings.run_at_finish = config.get('pyinstalive', 'run_at_finish')
 			if (len(settings.run_at_finish) > 0):
 				if not os.path.isfile(settings.run_at_finish):
-					log("[W] Path to file given for 'run_at_finish' does not exist, using default value (Empty)", "YELLOW")
-					settings.run_at_finish = ""
+					log("[W] Path to file given for 'run_at_finish' does not exist, using default value (None)", "YELLOW")
+					settings.run_at_finish = "None"
 				else:
 					if not settings.run_at_finish.split('.')[-1] == 'py':
-						log("[W] File given for 'run_at_finish' is not a Python script, using default value (Empty)", "YELLOW")
-						settings.run_at_finish = ""
+						log("[W] File given for 'run_at_finish' is not a Python script, using default value (None)", "YELLOW")
+						settings.run_at_finish = "None"
 		except:
-			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (Empty)", "YELLOW")
-			settings.run_at_finish = ""
+			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (None)", "YELLOW")
+			settings.run_at_finish = "None"
 
 		try:
 			settings.save_path = config.get('pyinstalive', 'save_path')
@@ -156,6 +156,11 @@ def show_info(config):
 		log("[W] Cookie files:            	None found", "YELLOW")
 
 	log("[I] CLI supports color:     	" + str(supports_color()), "GREEN")
+	log("[I] File to run at start:       " + settings.run_at_start, "GREEN")
+	log("[I] File to run at finish:      " + settings.run_at_finish, "GREEN")
+	log("", "GREEN")
+
+
 
 	if os.path.exists('pyinstalive.ini'):
 		log("[I] Config file:", "GREEN")
@@ -184,7 +189,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \n"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()

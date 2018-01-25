@@ -35,17 +35,23 @@ def run_script(file):
 	except OSError as e:
 		pass
 
+def get_stream_duration(broadcast):
+	try:
+		started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
+		started_label = '%d minutes' % started_mins
+		if started_secs:
+			started_label += ' and %d seconds' % started_secs
+		return started_label
+	except:
+		return "not available"
+
 def record_stream(broadcast):
 	try:
 		def print_status():
 			heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
 			viewers = broadcast.get('viewer_count', 0)
-			started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
-			started_label = '%d minutes' % started_mins
-			if started_secs:
-				started_label += ' and %d seconds' % started_secs
 			log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
-			log('[I] Airing time : ' + started_label, "GREEN")
+			log('[I] Airing time : ' + get_stream_duration(broadcast).title(), "GREEN")
 			log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
 			seperator("GREEN")
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted'] 
@@ -76,15 +82,17 @@ def record_stream(broadcast):
 		print_status()
 		log('[I] Recording livestream... press [CTRL+C] to abort.', "GREEN")
 
-		if (settings.run_at_start is not ""):
+		if (settings.run_at_start is not "None"):
 			try:
 				thread = threading.Thread(target=run_script, args=(settings.run_at_start,))
 				thread.daemon = True
 				thread.start()
+				log("[I] Executed file to run at start.", "GREEN")
 			except Exception as e:
 				log('[W] Could not run file: ' + str(e), "YELLOW")
 
 		dl.run()
+		log('[I] The livestream has ended. (Duration: ' + get_stream_duration(broadcast) + ")")
 		stitch_video(dl, broadcast)
 	except KeyboardInterrupt:
 		log("", "GREEN")
@@ -95,29 +103,29 @@ def record_stream(broadcast):
 			stitch_video(dl, broadcast)
 
 def stitch_video(dl, broadcast):
-		log('[I] Stitching downloaded files into video...', "GREEN")
-
-		if (settings.run_at_finish is not ""):
-			try:
-				thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
-				thread.daemon = True
-				thread.start()
-			except Exception as e:
-				log('[W] Could not run file: ' + str(e), "YELLOW")
-
-		output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+	if (settings.run_at_finish is not "None"):
 		try:
-			if settings.clear_temp_files.title() == "True":
-				dl.stitch(output_file, cleartempfiles=True)
-			else:
-				dl.stitch(output_file, cleartempfiles=False)
-			log('[I] Successfully stitched downloaded files.', "GREEN")
-			seperator("GREEN")
-			sys.exit(0)
+			thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
+			thread.daemon = True
+			thread.start()
+			log("[I] Executed file to run at finish.", "GREEN")
 		except Exception as e:
-			log('[E] Could not stitch downloaded files: ' + str(e), "RED")
-			seperator("GREEN")
-			sys.exit(1)
+			log('[W] Could not run file: ' + str(e), "YELLOW")
+
+	log('[I] Stitching downloaded files into video...', "GREEN")
+	output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+	try:
+		if settings.clear_temp_files.title() == "True":
+			dl.stitch(output_file, cleartempfiles=True)
+		else:
+			dl.stitch(output_file, cleartempfiles=False)
+		log('[I] Successfully stitched downloaded files.', "GREEN")
+		seperator("GREEN")
+		sys.exit(0)
+	except Exception as e:
+		log('[E] Could not stitch downloaded files: ' + str(e), "RED")
+		seperator("GREEN")
+		sys.exit(1)
 
 def get_user_info(record):
 	try:
