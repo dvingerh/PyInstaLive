@@ -118,4 +118,6 @@ PYINSTALIVE (SCRIPT V1.0 - PYTHON V2.7.14) - 12:00:01 PM
 
 
 ## Help
+You can find a FAQ [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.MD).
+
 If you would like to report a bug or ask a question please [open an issue](https://github.com/notcammy/PyInstaLive/issues/new).
