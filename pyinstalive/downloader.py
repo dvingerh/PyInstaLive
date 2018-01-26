@@ -92,7 +92,7 @@ def record_stream(broadcast):
 				log('[W] Could not run file: ' + str(e), "YELLOW")
 
 		dl.run()
-		log('[I] The livestream has ended. (Duration: ' + get_stream_duration(broadcast) + ")")
+		log('[I] The livestream has ended. (Duration: ' + get_stream_duration(broadcast) + ")", "GREEN")
 		stitch_video(dl, broadcast)
 	except KeyboardInterrupt:
 		log("", "GREEN")
