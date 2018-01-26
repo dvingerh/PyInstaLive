@@ -29,7 +29,7 @@ pyinstalive -u "username" -p "password" -r "live-username"
 timeout 10 > nul
 goto loop
 ```
-Make a new text file and copy the above contents. Make sure to save as a .bat file.
+Make a new text file and copy the above contents. Make sure to save as a .bat file. Do this for each user you want to record and run the scripts concurrently. Increase the timeout by 5 seconds for each user you want to record to lessen the chances of getting blocked by Instagram.
 
 Make sure there is a configuration file called pyinstalive.ini in the directory you want to run PyInstaLive from. (Use `cd` to navigate to that directory if you put this script in a different location.)
 
@@ -45,5 +45,10 @@ done
 ```
 Make a new text file and copy the above contents. Make sure to save as a .sh file.
 You must make the script executable with `chmod +x <filename>`. Use Google.
+Do this for each user you want to record and run the scripts concurrently. Increase the timeout by 5 seconds for each user you want to record to lessen the chances of getting blocked by Instagram.
 
 Make sure there is a configuration file called pyinstalive.ini in the directory you want to run PyInstaLive from. (Use `cd` to navigate to that directory if you put this script in a different location.)
+
+### How can I run PyInstaLive 24/7 so I won't miss a livestream?
+
+Use the scripts provided in the previous question, they'll infinitely run the PyInstaLive you entered there. You'll need to have a computer or other device running this script 24/7 for this to work, obviously.
