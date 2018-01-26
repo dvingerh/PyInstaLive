@@ -1,7 +1,7 @@
 ### Please check the boxes below by filling [ ] with an x so it looks like [x].
 ###### Remove all spaces already present in the box.
 
-- [ ] I have installed the latest version of PyInstaLive: 2.2.8.
+- [ ] I have installed the latest version of PyInstaLive: 2.3.4.
 - [ ] I have installed either Python 2.7.x or 2.5>=.
 - [ ] I have read the [README](https://github.com/notcammy/pyinstalive/blob/master/README.md).
 - [ ] I have checked all [existing issues](https://github.com/notcammy/PyInstaLive/issues?q=is%3Aissue), none of which could solve my issue.
