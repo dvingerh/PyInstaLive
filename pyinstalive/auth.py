@@ -77,11 +77,11 @@ def login(username, password, show_cookie_expiry, ignore_existing_cookie):
 			on_login=lambda x: onlogin_callback(x, settings_file))
 
 	except ClientLoginError as e:
-		log('[E] ClientLoginError: {0!s}'.format(e), "RED")
+		log('[E] ClientLoginError: {0!s}\n\n(Code: {1:d}, Response: {2!s})\n'.format(e.msg, e.code, e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(9)
 	except ClientError as e:
-		log('[E] ClientError: {0!s}'.format(e), "RED")
+		log('[E] ClientError: {0!s}\n\n(Code: {1:d}, Response: {2!s})\n'.format(e.msg, e.code, e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(9)
 	except Exception as e:
