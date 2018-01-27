@@ -11,3 +11,4 @@ class settings:
 	save_replays = "true"
 	run_at_start = "None"
 	run_at_finish = "None"
+	save_comments = "true"

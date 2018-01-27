@@ -50,6 +50,7 @@ def check_config_validity(config):
 			settings.clear_temp_files = 'true'
 
 
+
 		try:
 			settings.save_replays = config.get('pyinstalive', 'save_replays').title()
 			if not settings.save_replays in bool_values:
@@ -59,9 +60,11 @@ def check_config_validity(config):
 			log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
 			settings.save_replays = 'true'
 
+
+
 		try:
 			settings.run_at_start = config.get('pyinstalive', 'run_at_start')
-			if (len(settings.run_at_start) > 0):
+			if (settings.run_at_start):
 				if not os.path.isfile(settings.run_at_start):
 					log("[W] Path to file given for 'run_at_start' does not exist, using default value (None)", "YELLOW")
 					settings.run_at_start = "None"
@@ -69,13 +72,17 @@ def check_config_validity(config):
 					if not settings.run_at_start.split('.')[-1] == 'py':
 						log("[W] File given for 'run_at_start' is not a Python script, using default value (None)", "YELLOW")
 						settings.run_at_start = "None"
+			else:
+				settings.run_at_start = "None"
 		except:
 			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (None)", "YELLOW")
 			settings.run_at_start = "None"
 
+
+
 		try:
 			settings.run_at_finish = config.get('pyinstalive', 'run_at_finish')
-			if (len(settings.run_at_finish) > 0):
+			if (settings.run_at_finish):
 				if not os.path.isfile(settings.run_at_finish):
 					log("[W] Path to file given for 'run_at_finish' does not exist, using default value (None)", "YELLOW")
 					settings.run_at_finish = "None"
@@ -83,9 +90,23 @@ def check_config_validity(config):
 					if not settings.run_at_finish.split('.')[-1] == 'py':
 						log("[W] File given for 'run_at_finish' is not a Python script, using default value (None)", "YELLOW")
 						settings.run_at_finish = "None"
+			else:
+				settings.run_at_finish = "None"
+
 		except:
 			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (None)", "YELLOW")
 			settings.run_at_finish = "None"
+
+
+		try:
+			settings.save_comments = config.get('pyinstalive', 'save_comments').title()
+			if not settings.show_cookie_expiry in bool_values:
+				log("[W] Invalid or missing setting detected for 'save_comments', using default value (True)", "YELLOW")
+				settings.save_comments = 'true'
+		except:
+			log("[W] Invalid or missing setting detected for 'save_comments', using default value (True)", "YELLOW")
+			settings.save_comments = 'true'
+
 
 		try:
 			settings.save_path = config.get('pyinstalive', 'save_path')

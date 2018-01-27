@@ -6,7 +6,10 @@ import subprocess
 import threading
 
 from instagram_private_api_extensions import live, replay
+from instagram_private_api import ClientError
+
 from .logger import log, seperator
+from .comments import CommentsDownloader
 
 class NoLivestreamException(Exception):
 	pass
@@ -47,13 +50,14 @@ def get_stream_duration(broadcast):
 
 def record_stream(broadcast):
 	try:
-		def print_status():
+		def print_status(sep=True):
 			heartbeat_info = api.broadcast_heartbeat_and_viewercount(broadcast['id'])
 			viewers = broadcast.get('viewer_count', 0)
 			log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
 			log('[I] Airing time : ' + get_stream_duration(broadcast).title(), "GREEN")
 			log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
-			seperator("GREEN")
+			if sep:
+				seperator("GREEN")
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted'] 
 
 		mpd_url = (broadcast.get('dash_manifest')
@@ -72,15 +76,17 @@ def record_stream(broadcast):
 			mpd_download_timeout=5,
 			download_timeout=10)
 	except Exception as e:
-		log('[E] Could not start recording livestream: ' + str(e), "RED")
+		log('[E] Could not start downloading livestream: ' + str(e), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	try:
-		log('[I] Starting livestream recording:', "GREEN")
+		seperator("GREEN")
+		log('[I] Livestream downloading started...', "GREEN")
 		log('[I] Username    : ' + record, "GREEN")
+		print_status(False)
 		log('[I] MPD URL     : ' + mpd_url, "GREEN")
-		print_status()
-		log('[I] Recording livestream... press [CTRL+C] to abort.', "GREEN")
+		seperator("GREEN")
+		log('[I] Downloading livestream... press [CTRL+C] to abort.', "GREEN")
 
 		if (settings.run_at_start is not "None"):
 			try:
@@ -91,18 +97,35 @@ def record_stream(broadcast):
 			except Exception as e:
 				log('[W] Could not run file: ' + str(e), "YELLOW")
 
+
+
+		if settings.save_comments.title() == "True":
+			try:
+				comments_json_file = settings.save_path + '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+				comment_thread_worker = None
+				comment_thread_worker = threading.Thread(target=get_live_comments, args=(api, broadcast, comments_json_file, dl,))
+				comment_thread_worker.start()
+			except Exception as e:
+				log('[E] An error occurred while checking comments: ' + e, "RED")			
+
+
+
 		dl.run()
 		log('[I] The livestream has ended. (Duration: ' + get_stream_duration(broadcast) + ")", "GREEN")
-		stitch_video(dl, broadcast)
+
+		stitch_video(dl, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
-		log("", "GREEN")
+		seperator("GREEN")
 		log('[W] Download has been aborted.', "YELLOW")
-		log("", "GREEN")
+		seperator("GREEN")
 		if not dl.is_aborted:
 			dl.stop()
-			stitch_video(dl, broadcast)
+			stitch_video(dl, broadcast, comment_thread_worker)
 
-def stitch_video(dl, broadcast):
+def stitch_video(dl, broadcast, comment_thread_worker):
+	if comment_thread_worker and comment_thread_worker.is_alive():
+		log("[I] Ending comment saving process...", "GREEN")
+		comment_thread_worker.join()
 	if (settings.run_at_finish is not "None"):
 		try:
 			thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
@@ -110,7 +133,7 @@ def stitch_video(dl, broadcast):
 			thread.start()
 			log("[I] Executed file to run at finish.", "GREEN")
 		except Exception as e:
-			log('[W] Could not run file: ' + str(e), "YELLOW")
+			log('[W] Could not run file: ' + e, "YELLOW")
 
 	log('[I] Stitching downloaded files into video...', "GREEN")
 	output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
@@ -119,7 +142,7 @@ def stitch_video(dl, broadcast):
 			dl.stitch(output_file, cleartempfiles=True)
 		else:
 			dl.stitch(output_file, cleartempfiles=False)
-		log('[I] Successfully stitched downloaded files.', "GREEN")
+		log('[I] Successfully stitched downloaded files into video.', "GREEN")
 		seperator("GREEN")
 		sys.exit(0)
 	except Exception as e:
@@ -129,7 +152,7 @@ def stitch_video(dl, broadcast):
 
 def get_user_info(record):
 	try:
-		log("[I] Checking user: '"+ record + "'", "GREEN")
+		log('[I] Checking user "' + record + '"...', "GREEN")
 		user_res = api.username_info(record)
 		user_id = user_res['user']['pk']
 	except Exception as e:
@@ -147,6 +170,7 @@ def get_user_info(record):
 
 def get_livestreams(user_id):
 	try:
+		seperator("GREEN")
 		log('[I] Checking for ongoing livestreams...', "GREEN")
 		broadcast = api.user_broadcast(user_id)
 		if (broadcast is None):
@@ -154,7 +178,7 @@ def get_livestreams(user_id):
 		else:
 			record_stream(broadcast)
 	except NoLivestreamException as e:
-		log('[W] ' + str(e), "YELLOW")
+		log('[I] ' + str(e), "BLUE")
 	except Exception as e:
 		if (e.__class__.__name__ is not NoLivestreamException):
 			log('[E] Could not get livestreams info: ' + str(e), "RED")
@@ -164,6 +188,7 @@ def get_livestreams(user_id):
 
 def get_replays(user_id):
 	try:
+		seperator("GREEN")
 		log('[I] Checking for available replays...', "GREEN")
 		user_story_feed = api.user_story_feed(user_id)
 		broadcasts = user_story_feed.get('post_live_item', {}).get('broadcasts', [])
@@ -197,14 +222,21 @@ def get_replays(user_id):
 					dl = replay.Downloader(
 						mpd=broadcast['dash_manifest'],
 						output_dir=output_dir,
-						user_agent=api.user_agent)
+						user_agent=api.user_agent)	
+
+
 					if settings.clear_temp_files.title() == "True":
 						replay_saved = dl.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time), cleartempfiles=True)
 					else:
 						replay_saved = dl.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time), cleartempfiles=False)
 					if (len(replay_saved) == 1):
 						log("[I] Finished downloading replay " + str(current) + " of "  + str(len(broadcasts)) + ".", "GREEN")
-						log("", "GREEN")
+						seperator("GREEN")
+					if settings.save_comments.title() == "True":
+						log("[I] Checking for available comments to save...", "GREEN")
+						comments_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+						get_replay_comments(api, broadcast, comments_json_file, dl)
+
 					else:
 						log("[W] No output video file was made, please merge the files manually.", "RED")
 						log("[W] Check if ffmpeg is available by running ffmpeg in your terminal.", "RED")
@@ -213,7 +245,7 @@ def get_replays(user_id):
 		seperator("GREEN")
 		sys.exit(0)
 	except NoReplayException as e:
-		log('[W] ' + str(e), "YELLOW")
+		log('[I] ' + str(e), "BLUE")
 		seperator("GREEN")
 		sys.exit(0)
 	except Exception as e:
@@ -222,10 +254,57 @@ def get_replays(user_id):
 		sys.exit(1)
 	except KeyboardInterrupt:
 		log("", "GREEN")
-		log('[W] Download has been aborted.', "YELLOW")
+		log('[W] Download has been aborted by the user.', "YELLOW")
 		try:
 			shutil.rmtree(output_dir)
 		except Exception as e:
 			log("[E] Could not remove temp folder: " + str(e), "RED")
 			sys.exit(1)
 		sys.exit(0)
+
+
+def get_replay_comments(api, broadcast, comments_json_file, dl):
+	cdl = CommentsDownloader(
+		api=api, broadcast=broadcast, destination_file=comments_json_file)
+	cdl.get_replay()
+
+	if cdl.comments:
+		comments_log_file = comments_json_file.replace('.json', '.log')
+		CommentsDownloader.generate_log(
+			cdl.comments, broadcast['published_time'], comments_log_file,
+			comments_delay=0)
+		log("[I] Successfully saved comments to logfile.", "GREEN")
+		seperator("GREEN")
+	else:
+		log("[I] There are no available comments to save.", "GREEN")
+		seperator("GREEN")
+
+def get_live_comments(api, broadcast, comments_json_file, dl):
+	cdl = CommentsDownloader(
+		api=api, broadcast=broadcast, destination_file=comments_json_file)
+	first_comment_created_at = 0
+	try:
+		while not dl.is_aborted:
+			if 'initial_buffered_duration' not in broadcast and dl.initial_buffered_duration:
+				broadcast['initial_buffered_duration'] = dl.initial_buffered_duration
+				cdl.broadcast = broadcast
+			first_comment_created_at = cdl.get_live(first_comment_created_at)
+	except ClientError as e:
+		if not 'media has been deleted' in e.error_response:
+			log("[W] Comment collection ClientError: %d %s" % (e.code, e.error_response), "YELLOW")
+
+	try:
+		if cdl.comments:
+			log("[I] Checking for available comments to save...", "GREEN")
+			cdl.save()
+			comments_log_file = comments_json_file.replace('.json', '.log')
+			CommentsDownloader.generate_log(
+				cdl.comments, settings.current_time, comments_log_file,
+				comments_delay=dl.initial_buffered_duration)
+			log("[I] Successfully saved comments to logfile.", "GREEN")
+			seperator("GREEN")
+		else:
+			log("[I] There are no available comments to save.", "GREEN")
+			seperator("GREEN")
+	except Exception as e:
+		log('[E] Could not save comments to logfile: ' + str(e), "RED")
