@@ -84,23 +84,27 @@ If a livestream is currently ongoing, the terminal output should be something li
 
 ```
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V1.0 - PYTHON V2.7.14) - 12:00:01 PM
+PYINSTALIVE (SCRIPT V2.3.6 - PYTHON V2.7.14) - 06:45:30 PM
 ----------------------------------------------------------------------
-[I] Login to "johndoe" OK!
-[I] Login cookie expiry date: 2018-01-01 at 12:00:01
-[I] Checking user: 'justinbieber'
+[I] Logging in to user "johndoe" successful.
+[I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
+[I] Checking user "janedoe"...
+----------------------------------------------------------------------
 [I] Checking for ongoing livestreams...
-[I] Starting livestream recording:
-[I] Username    : justinbieber
-[I] MPD URL     : https://scontent-ams3-1.cdninstagram.com/hvideo-frc1/v/rflSWUsyCsuqE-GLYgvW4/live-dash/dash-abr/17880993205152831.mpd?_nc_rl=AfCujc4yG9bJLHVn&oh=87c4fb94668286125f1169e4441056d2&oe=5A0E8951
-[I] Viewers     : 2768 watching
-[I] Airing time : 5 minutes and 10 seconds
-[I] Status      : Active
+[I] Livestream downloading started...
 ----------------------------------------------------------------------
-[I] Recording livestream... press [CTRL+C] to abort.
-
+[I] Username    : janedoe
+[I] Viewers     : 100 watching
+[I] Airing time : 0 Minutes And 10 Seconds
+[I] Status      : Active
+[I] MPD URL     : https://scontent-amt2-1.cdninstagram.com/hvideo-prn1/v/rID1yGvO_UPlsukIhbhOx/live-dash/dash-hd/17907800311113848.mpd?_nc_rl=AfBVd51QpQOj_ImC&oh=aa8d53b4fd736c0edc29c97b411bd32b&oe=5A6FDE8B
+----------------------------------------------------------------------
+[I] Downloading livestream... press [CTRL+C] to abort.
+----------------------------------------------------------------------
+[I] The livestream has ended. (Duration: 2 minutes and 30 seconds)
+----------------------------------------------------------------------
 [I] Stitching downloaded files into video...
-[I] Successfully stitched downloaded files.
+[I] Successfully stitched downloaded files into video.
 ----------------------------------------------------------------------
 ```
 
