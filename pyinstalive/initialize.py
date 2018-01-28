@@ -98,15 +98,6 @@ def check_config_validity(config):
 			settings.run_at_finish = "None"
 
 
-		try:
-			settings.save_comments = config.get('pyinstalive', 'save_comments').title()
-			if not settings.show_cookie_expiry in bool_values:
-				log("[W] Invalid or missing setting detected for 'save_comments', using default value (True)", "YELLOW")
-				settings.save_comments = 'true'
-		except:
-			log("[W] Invalid or missing setting detected for 'save_comments', using default value (True)", "YELLOW")
-			settings.save_comments = 'true'
-
 
 		try:
 			settings.save_path = config.get('pyinstalive', 'save_path')
@@ -239,7 +230,7 @@ def new_config():
 
 def run():
 	seperator("GREEN")
-	log('PYINSTALIVE (SCRIPT V{} - PYTHON V{}) - {}'.format(script_version, python_version, time.strftime('%H:%M:%S %p')), "GREEN")
+	log('PYINSTALIVE (SCRIPT V{} - PYTHON V{}) - {}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
 	seperator("GREEN")
 
 	logging.disable(logging.CRITICAL)
