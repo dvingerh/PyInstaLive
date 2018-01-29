@@ -26,6 +26,7 @@ clear_temp_files = false
 save_replays = true
 run_at_start =
 run_at_finish =
+save_comments = true 
 ```
 
 ```username```  **—**  Instagram username to login with.
@@ -42,4 +43,6 @@ run_at_finish =
 
 ```run_at_start```  **—**  Python script to run when PyInstaLive starts recording a livestream. (Experimental, use at own risk.)
 
-```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. (Experimental, use at own risk.)
+```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. (Experimental, use at own risk.) 
+ 
+```save_comments```  **—**  When enabled, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
