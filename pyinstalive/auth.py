@@ -93,9 +93,9 @@ def login(username, password, show_cookie_expiry, ignore_existing_cookie):
 		seperator("GREEN")
 		sys.exit(99)
 
-	log('[I] Login to "' + api.authenticated_user_name + '" OK!', "GREEN")
+	log('[I] Logging in to user "' + api.authenticated_user_name + '" successful.', "GREEN")
 	if show_cookie_expiry.title() == 'True' and ignore_existing_cookie == False:
 		cookie_expiry = api.cookie_jar.expires_earliest
-		log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %H:%M:%S')), "GREEN")
+		log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')), "GREEN")
 
 	return api

@@ -26,6 +26,7 @@ def check_ffmpeg():
 
 def check_config_validity(config):
 	try:
+		has_thrown_errors = False
 		settings.username = config.get('pyinstalive', 'username')
 		settings.password = config.get('pyinstalive', 'password')
 
@@ -34,9 +35,11 @@ def check_config_validity(config):
 			if not settings.show_cookie_expiry in bool_values:
 				log("[W] Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)", "YELLOW")
 				settings.show_cookie_expiry = 'true'
+				has_thrown_errors = True
 		except:
 			log("[W] Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)", "YELLOW")
 			settings.show_cookie_expiry = 'true'
+			has_thrown_errors = True
 
 
 
@@ -45,9 +48,11 @@ def check_config_validity(config):
 			if not settings.clear_temp_files in bool_values:
 				log("[W] Invalid or missing setting detected for 'clear_temp_files', using default value (True)", "YELLOW")
 				settings.clear_temp_files = 'true'
+				has_thrown_errors = True
 		except:
 			log("[W] Invalid or missing setting detected for 'clear_temp_files', using default value (True)", "YELLOW")
 			settings.clear_temp_files = 'true'
+			has_thrown_errors = True
 
 
 
@@ -56,9 +61,11 @@ def check_config_validity(config):
 			if not settings.save_replays in bool_values:
 				log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
 				settings.save_replays = 'true'
+				has_thrown_errors = True
 		except:
 			log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
 			settings.save_replays = 'true'
+			has_thrown_errors = True
 
 
 
@@ -68,15 +75,18 @@ def check_config_validity(config):
 				if not os.path.isfile(settings.run_at_start):
 					log("[W] Path to file given for 'run_at_start' does not exist, using default value (None)", "YELLOW")
 					settings.run_at_start = "None"
+					has_thrown_errors = True
 				else:
 					if not settings.run_at_start.split('.')[-1] == 'py':
 						log("[W] File given for 'run_at_start' is not a Python script, using default value (None)", "YELLOW")
 						settings.run_at_start = "None"
+						has_thrown_errors = True
 			else:
 				settings.run_at_start = "None"
 		except:
 			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (None)", "YELLOW")
 			settings.run_at_start = "None"
+			has_thrown_errors = True
 
 
 
@@ -86,26 +96,36 @@ def check_config_validity(config):
 				if not os.path.isfile(settings.run_at_finish):
 					log("[W] Path to file given for 'run_at_finish' does not exist, using default value (None)", "YELLOW")
 					settings.run_at_finish = "None"
+					has_thrown_errors = True
 				else:
 					if not settings.run_at_finish.split('.')[-1] == 'py':
 						log("[W] File given for 'run_at_finish' is not a Python script, using default value (None)", "YELLOW")
 						settings.run_at_finish = "None"
+						has_thrown_errors = True
 			else:
 				settings.run_at_finish = "None"
 
 		except:
 			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (None)", "YELLOW")
 			settings.run_at_finish = "None"
+			has_thrown_errors = True
 
 
 		try:
 			settings.save_comments = config.get('pyinstalive', 'save_comments').title()
-			if not settings.show_cookie_expiry in bool_values:
-				log("[W] Invalid or missing setting detected for 'save_comments', using default value (True)", "YELLOW")
-				settings.save_comments = 'true'
+			if sys.version.split(' ')[0].startswith('2') and settings.save_comments == "True":
+				log("[W] Comment saving is not supported in Python 2 and will be ignored.", "YELLOW")
+				settings.save_comments = 'false'
+				has_thrown_errors = True
+			else:
+				if not settings.show_cookie_expiry in bool_values:
+					log("[W] Invalid or missing setting detected for 'save_comments', using default value (False)", "YELLOW")
+					settings.save_comments = 'false'
+					has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'save_comments', using default value (True)", "YELLOW")
-			settings.save_comments = 'true'
+			log("[W] Invalid or missing setting detected for 'save_comments', using default value (False)", "YELLOW")
+			settings.save_comments = 'false'
+			has_thrown_errors = True
 
 
 		try:
@@ -116,12 +136,17 @@ def check_config_validity(config):
 			else:
 				log("[W] Invalid or missing setting detected for 'save_path', falling back to path: " + os.getcwd(), "YELLOW")
 				settings.save_path = os.getcwd()
+				has_thrown_errors = True
 
 			if not settings.save_path.endswith('/'):
 				settings.save_path = settings.save_path + '/'
 		except:
 			log("[W] Invalid or missing setting detected for 'save_path', falling back to path: " + os.getcwd(), "YELLOW")
 			settings.save_path = os.getcwd()
+			has_thrown_errors = True
+
+		if has_thrown_errors:
+			seperator("GREEN")
 
 		if not (len(settings.username) > 0):
 			log("[E] Invalid or missing setting detected for 'username'.", "RED")
@@ -239,7 +264,7 @@ def new_config():
 
 def run():
 	seperator("GREEN")
-	log('PYINSTALIVE (SCRIPT V{} - PYTHON V{}) - {}'.format(script_version, python_version, time.strftime('%H:%M:%S %p')), "GREEN")
+	log('PYINSTALIVE (SCRIPT V{} - PYTHON V{}) - {}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
 	seperator("GREEN")
 
 	logging.disable(logging.CRITICAL)

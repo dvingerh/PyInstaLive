@@ -54,12 +54,12 @@ class CommentsDownloader(object):
 			self.comments = comments_collected
 
 		except (SSLError, timeout, URLError, HTTPException, SocketError) as e:
-			log('[W] Comment collection error: %s' % e, "YELLOW")
+			log('[W] Comment downloading error: %s' % e, "YELLOW")
 		except ClientError as e:
 			if e.code == 500:
-				log('[W] Comment collection ClientError: %d %s' % (e.code, e.error_response), "YELLOW")
+				log('[W] Comment downloading ClientError: %d %s' % (e.code, e.error_response), "YELLOW")
 			elif e.code == 400 and not e.msg:
-				log('[W] Comment collection ClientError: %d %s' % (e.code, e.error_response), "YELLOW")
+				log('[W] Comment downloading ClientError: %d %s' % (e.code, e.error_response), "YELLOW")
 			else:
 				raise e
 		finally:
@@ -119,19 +119,11 @@ class CommentsDownloader(object):
 					clip_start = 0
 
 				srt = ''
-
-				if sys.version.split(' ')[0].startswith('2'):
-					for c in t:
+				for c in t:
 						if (c['user']['is_verified']):
-							srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c['user']['username'], "(V)", c['text'].encode('ascii', 'xmlcharrefreplace')))
+							srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c['user']['username'], "(v)", c['text']))
 						else:
-							srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c['user']['username'], c['text'].encode('ascii', 'xmlcharrefreplace')))
-				else:
-					for c in t:
-							if (c['user']['is_verified']):
-								srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c['user']['username'], "(v)", c['text']))
-							else:
-								srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c['user']['username'], c['text']))
+							srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c['user']['username'], c['text']))
 
 				subs.append(srt)
 
