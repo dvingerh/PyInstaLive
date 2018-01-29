@@ -38,13 +38,13 @@ def run_script(file):
 	except OSError as e:
 		pass
 
-def get_stream_duration(broadcast):
+def get_stream_duration(compare_time):
 	try:
-		started_mins, started_secs = divmod((int(time.time()) - broadcast['published_time']), 60)
-		started_label = '%d minutes' % started_mins
-		if started_secs:
-			started_label += ' and %d seconds' % started_secs
-		return started_label
+		stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
+		stream_duration_str = '%d minutes' % stream_started_mins
+		if stream_started_secs:
+			stream_duration_str += ' and %d seconds' % stream_started_secs
+		return stream_duration_str
 	except:
 		return "not available"
 
@@ -56,7 +56,7 @@ def record_stream(broadcast):
 			if sep:
 				seperator("GREEN")
 			log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
-			log('[I] Airing time : ' + get_stream_duration(broadcast).title(), "GREEN")
+			log('[I] Airing time : ' + get_stream_duration(broadcast['published_time']).title(), "GREEN")
 			log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
 
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted'] 
@@ -106,22 +106,19 @@ def record_stream(broadcast):
 				comment_thread_worker = threading.Thread(target=get_live_comments, args=(api, broadcast, comments_json_file, dl,))
 				comment_thread_worker.start()
 			except Exception as e:
-				log('[E] An error occurred while checking comments: ' + e, "RED")			
-
-
-
+				log('[E] An error occurred while checking comments: ' + e, "RED")
 		dl.run()
 		seperator("GREEN")
-		log('[I] The livestream has ended. (Duration: ' + get_stream_duration(broadcast) + ")", "GREEN")
+		log('[I] The livestream has ended.\n[I] Time recorded   : {}\n[I] Stream duration : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time'])), "YELLOW")
 		seperator("GREEN")
 		stitch_video(dl, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[W] Download has been aborted by the user.', "YELLOW")
+		log('[I] Download has been aborted by the user.\n[I] Time recorded   : {}\n[I] Stream duration : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time'])), "YELLOW")
 		seperator("GREEN")
 		if not dl.is_aborted:
 			dl.stop()
-			stitch_video(dl, broadcast)
+			stitch_video(dl, broadcast, comment_thread_worker)
 
 def stitch_video(dl, broadcast, comment_thread_worker):
 	if comment_thread_worker and comment_thread_worker.is_alive():
@@ -161,6 +158,10 @@ def get_user_info(record):
 		log('[E] Could not get user info: ' + str(e), "RED")
 		seperator("GREEN")
 		sys.exit(1)
+	except KeyboardInterrupt:
+		log('[W] Aborted checking for user.', "YELLOW")
+		seperator("GREEN")
+		sys.exit(1)
 	get_livestreams(user_id)
 	if settings.save_replays.title() == "True": 
 		get_replays(user_id)
@@ -178,7 +179,12 @@ def get_livestreams(user_id):
 		if (broadcast is None):
 			raise NoLivestreamException('There are no livestreams available.')
 		else:
-			record_stream(broadcast)
+			try:
+				record_stream(broadcast)
+			except Exception as e:
+				log('[E] An error occurred while trying to record livestream: ' + str(e), "RED")
+				seperator("GREEN")
+				sys.exit(1)	
 	except NoLivestreamException as e:
 		log('[I] ' + str(e), "YELLOW")
 	except Exception as e:
@@ -216,7 +222,7 @@ def get_replays(user_id):
 					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
 						log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
 						exists = True
-				if exists is False:
+				if not exists:
 					current = index + 1
 					log("[I] Downloading replay " + str(current) + " of "  + str(len(broadcasts)) + " with ID '" + str(broadcast['id']) + "'...", "GREEN")
 					current_time = str(int(time.time()))
@@ -257,7 +263,7 @@ def get_replays(user_id):
 		sys.exit(1)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[W] Download has been aborted by the user.', "YELLOW")
+		log('[I] Download has been aborted by the user.', "YELLOW")
 		seperator("GREEN")
 		try:
 			shutil.rmtree(output_dir)
