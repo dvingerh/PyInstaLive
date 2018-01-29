@@ -97,11 +97,22 @@ def record_stream(broadcast):
 				log('[W] Could not run file: ' + str(e), "YELLOW")
 
 
+		comment_thread_worker = None
+		if settings.save_comments.title() == "True":
+			try:
+				comments_json_file = settings.save_path + '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+				comment_thread_worker = threading.Thread(target=get_live_comments, args=(api, broadcast, comments_json_file, dl,))
+				comment_thread_worker.start()
+			except Exception as e:
+				log('[E] An error occurred while checking comments: ' + e, "RED")			
+
+
+
 		dl.run()
 		seperator("GREEN")
 		log('[I] The livestream has ended. (Duration: ' + get_stream_duration(broadcast) + ")", "GREEN")
 		seperator("GREEN")
-		stitch_video(dl, broadcast)
+		stitch_video(dl, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
 		seperator("GREEN")
 		log('[W] Download has been aborted by the user.', "YELLOW")
@@ -110,7 +121,11 @@ def record_stream(broadcast):
 			dl.stop()
 			stitch_video(dl, broadcast)
 
-def stitch_video(dl, broadcast):
+def stitch_video(dl, broadcast, comment_thread_worker):
+	if comment_thread_worker and comment_thread_worker.is_alive():
+		log("[I] Ending comment saving process...", "GREEN")
+		comment_thread_worker.join()
+
 	if (settings.run_at_finish is not "None"):
 		try:
 			thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
@@ -218,9 +233,15 @@ def get_replays(user_id):
 						log("[I] Finished downloading replay " + str(current) + " of "  + str(len(broadcasts)) + ".", "GREEN")
 						seperator("GREEN")
 					else:
-						log("[W] No output video file was made, please merge the files manually.", "RED")
-						log("[W] Check if ffmpeg is available by running ffmpeg in your terminal.", "RED")
+						log("[W] No output video file was made, please merge the files manually.", "YELLOW")
+						log("[W] Check if ffmpeg is available by running ffmpeg in your terminal.", "YELLOW")
 						log("", "GREEN")
+
+					if settings.save_comments.title() == "True":
+						log("[I] Checking for available comments to save...", "GREEN")
+						comments_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+						get_replay_comments(api, broadcast, comments_json_file, dl)
+
 		log("[I] Finished downloading available replays.", "GREEN")
 		seperator("GREEN")
 		sys.exit(0)
