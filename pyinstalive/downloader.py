@@ -9,6 +9,8 @@ from instagram_private_api_extensions import live, replay
 from instagram_private_api import ClientError
 
 from .logger import log, seperator
+from .comments import CommentsDownloader
+
 class NoLivestreamException(Exception):
 	pass
 
@@ -263,3 +265,50 @@ def get_replays(user_id):
 			log("[E] Could not remove temp folder: " + str(e), "RED")
 			sys.exit(1)
 		sys.exit(0)
+
+
+def get_replay_comments(api, broadcast, comments_json_file, dl):
+	cdl = CommentsDownloader(
+		api=api, broadcast=broadcast, destination_file=comments_json_file)
+	cdl.get_replay()
+
+	if cdl.comments:
+		comments_log_file = comments_json_file.replace('.json', '.log')
+		CommentsDownloader.generate_log(
+			cdl.comments, broadcast['published_time'], comments_log_file,
+			comments_delay=0)
+		log("[I] Successfully saved comments to logfile.", "GREEN")
+		seperator("GREEN")
+	else:
+		log("[I] There are no available comments to save.", "GREEN")
+		seperator("GREEN")
+
+def get_live_comments(api, broadcast, comments_json_file, dl):
+	cdl = CommentsDownloader(
+		api=api, broadcast=broadcast, destination_file=comments_json_file)
+	first_comment_created_at = 0
+	try:
+		while not dl.is_aborted:
+			if 'initial_buffered_duration' not in broadcast and dl.initial_buffered_duration:
+				broadcast['initial_buffered_duration'] = dl.initial_buffered_duration
+				cdl.broadcast = broadcast
+			first_comment_created_at = cdl.get_live(first_comment_created_at)
+	except ClientError as e:
+		if not 'media has been deleted' in e.error_response:
+			log("[W] Comment collection ClientError: %d %s" % (e.code, e.error_response), "YELLOW")
+
+	try:
+		if cdl.comments:
+			log("[I] Checking for available comments to save...", "GREEN")
+			cdl.save()
+			comments_log_file = comments_json_file.replace('.json', '.log')
+			CommentsDownloader.generate_log(
+				cdl.comments, settings.current_time, comments_log_file,
+				comments_delay=dl.initial_buffered_duration)
+			log("[I] Successfully saved comments to logfile.", "GREEN")
+			seperator("GREEN")
+		else:
+			log("[I] There are no available comments to save.", "GREEN")
+			seperator("GREEN")
+	except Exception as e:
+		log('[E] Could not save comments to logfile: ' + str(e), "RED")
