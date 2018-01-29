@@ -111,7 +111,9 @@ PYINSTALIVE (SCRIPT V2.3.7 - PYTHON V2.7.14) - 06:45:30 PM
 
 
 #### Notes
-- The option to run a script upon starting and ending a stream download is experimental. Use at own risk.
+- The option to run a script upon starting and ending a stream download is experimental. Use at your own risk.
+
+- The option to download comments is experimental and only available on Python 3. Use at your own risk.
 
 - You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md). You can also run `pyinstalive -h` to view all available commands. 
 
