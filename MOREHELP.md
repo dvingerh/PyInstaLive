@@ -14,7 +14,7 @@
 - ```-nr``` or ```--noreplays```  **—**  When this flag is passed, PyInstaLive will not check for any available replays. Overrides the configuration file.
 
 
-# Configuration file
+# Default configuration file
 
 ```ini
 [pyinstalive]
@@ -26,7 +26,7 @@ clear_temp_files = false
 save_replays = true
 run_at_start =
 run_at_finish =
-save_comments = true 
+save_comments = false 
 ```
 
 ```username```  **—**  Instagram username to login with.

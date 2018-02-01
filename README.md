@@ -61,7 +61,7 @@ clear_temp_files = false
 save_replays = true
 run_at_start =
 run_at_finish =
-save_comments = true
+save_comments = false
 ```
 
 Use the following command to run PyInstaLive:

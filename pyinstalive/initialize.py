@@ -234,7 +234,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \n"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\n"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
