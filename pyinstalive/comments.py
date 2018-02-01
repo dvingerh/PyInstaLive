@@ -63,7 +63,10 @@ class CommentsDownloader(object):
 			else:
 				raise e
 		finally:
-			time.sleep(4)
+			try:
+				time.sleep(4)
+			except KeyboardInterrupt:
+				return first_comment_created_at
 		return first_comment_created_at
 
 	def get_replay(self):

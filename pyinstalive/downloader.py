@@ -17,6 +17,8 @@ class NoLivestreamException(Exception):
 class NoReplayException(Exception):
 	pass
 
+
+
 def main(api_arg, record_arg, settings_arg):
 	global api
 	global record
@@ -28,6 +30,8 @@ def main(api_arg, record_arg, settings_arg):
 	record = record_arg
 	get_user_info(record)
 
+
+
 def run_script(file):
 	try:
 		FNULL = open(os.devnull, 'w')
@@ -38,6 +42,8 @@ def run_script(file):
 	except OSError as e:
 		pass
 
+
+
 def get_stream_duration(compare_time):
 	try:
 		stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
@@ -47,6 +53,8 @@ def get_stream_duration(compare_time):
 		return stream_duration_str
 	except:
 		return "not available"
+
+
 
 def record_stream(broadcast):
 	try:
@@ -120,34 +128,43 @@ def record_stream(broadcast):
 			dl.stop()
 			stitch_video(dl, broadcast, comment_thread_worker)
 
+
+
 def stitch_video(dl, broadcast, comment_thread_worker):
-	if comment_thread_worker and comment_thread_worker.is_alive():
-		log("[I] Ending comment saving process...", "GREEN")
-		comment_thread_worker.join()
-
-	if (settings.run_at_finish is not "None"):
-		try:
-			thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
-			thread.daemon = True
-			thread.start()
-			log("[I] Executed file to run at finish.", "GREEN")
-		except Exception as e:
-			log('[W] Could not run file: ' + e, "YELLOW")
-
-	log('[I] Stitching downloaded files into video...', "GREEN")
-	output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
 	try:
-		if settings.clear_temp_files.title() == "True":
-			dl.stitch(output_file, cleartempfiles=True)
-		else:
-			dl.stitch(output_file, cleartempfiles=False)
-		log('[I] Successfully stitched downloaded files into video.', "GREEN")
-		seperator("GREEN")
-		sys.exit(0)
-	except Exception as e:
-		log('[E] Could not stitch downloaded files: ' + str(e), "RED")
-		seperator("GREEN")
-		sys.exit(1)
+		if comment_thread_worker and comment_thread_worker.is_alive():
+			log("[I] Stopping comment downloading and saving comments (if any)...", "GREEN")
+			comment_thread_worker.join()
+
+		if (settings.run_at_finish is not "None"):
+			try:
+				thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
+				thread.daemon = True
+				thread.start()
+				log("[I] Executed file to run at finish.", "GREEN")
+			except Exception as e:
+				log('[W] Could not run file: ' + e, "YELLOW")
+
+		log('[I] Stitching downloaded files into video...', "GREEN")
+		output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time)
+		try:
+			if settings.clear_temp_files.title() == "True":
+				dl.stitch(output_file, cleartempfiles=True)
+			else:
+				dl.stitch(output_file, cleartempfiles=False)
+			log('[I] Successfully stitched downloaded files into video.', "GREEN")
+			seperator("GREEN")
+			sys.exit(0)
+		except Exception as e:
+			log('[E] Could not stitch downloaded files: ' + str(e), "RED")
+			seperator("GREEN")
+			sys.exit(1)
+	except KeyboardInterrupt:
+			log('[I] Aborted stitching process, no video was created.', "YELLOW")
+			seperator("GREEN")
+			sys.exit(0)
+
+
 
 def get_user_info(record):
 	try:
@@ -171,6 +188,8 @@ def get_user_info(record):
 		seperator("GREEN")
 		sys.exit(0)
 
+
+
 def get_livestreams(user_id):
 	try:
 		seperator("GREEN")
@@ -192,6 +211,7 @@ def get_livestreams(user_id):
 			log('[E] Could not get livestreams info: ' + str(e), "RED")
 			seperator("GREEN")
 			sys.exit(1)
+
 
 
 def get_replays(user_id):
@@ -237,20 +257,21 @@ def get_replays(user_id):
 						replay_saved = dl.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time), cleartempfiles=True)
 					else:
 						replay_saved = dl.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, record, broadcast['id'], settings.current_time), cleartempfiles=False)
-					if (len(replay_saved) == 1):
-						log("[I] Finished downloading replay " + str(current) + " of "  + str(len(broadcasts)) + ".", "GREEN")
-						seperator("GREEN")
-					else:
-						log("[W] No output video file was made, please merge the files manually.", "YELLOW")
-						log("[W] Check if ffmpeg is available by running ffmpeg in your terminal.", "YELLOW")
-						log("", "GREEN")
 
 					if settings.save_comments.title() == "True":
 						log("[I] Checking for available comments to save...", "GREEN")
 						comments_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, record, broadcast['id'], settings.current_time)
 						get_replay_comments(api, broadcast, comments_json_file, dl)
 
-		log("[I] Finished downloading available replays.", "GREEN")
+					if (len(replay_saved) == 1):
+						log("[I] Finished downloading replay " + str(current) + " of "  + str(len(broadcasts)) + ".", "GREEN")
+						seperator("GREEN")
+					else:
+						log("[W] No output video file was made, please merge the files manually if possible.", "YELLOW")
+						log("[W] Check if ffmpeg is available by running ffmpeg in your terminal/cmd prompt.", "YELLOW")
+						log("", "GREEN")
+
+		log("[I] Finished downloading all available replays.", "GREEN")
 		seperator("GREEN")
 		sys.exit(0)
 	except NoReplayException as e:
@@ -273,21 +294,28 @@ def get_replays(user_id):
 		sys.exit(0)
 
 
+
 def get_replay_comments(api, broadcast, comments_json_file, dl):
 	cdl = CommentsDownloader(
 		api=api, broadcast=broadcast, destination_file=comments_json_file)
 	cdl.get_replay()
 
-	if cdl.comments:
-		comments_log_file = comments_json_file.replace('.json', '.log')
-		CommentsDownloader.generate_log(
-			cdl.comments, broadcast['published_time'], comments_log_file,
-			comments_delay=0)
-		log("[I] Successfully saved comments to logfile.", "GREEN")
-		seperator("GREEN")
-	else:
-		log("[I] There are no available comments to save.", "GREEN")
-		seperator("GREEN")
+	try:
+		if cdl.comments:
+			comments_log_file = comments_json_file.replace('.json', '.log')
+			CommentsDownloader.generate_log(
+				cdl.comments, broadcast['published_time'], comments_log_file,
+				comments_delay=0)
+			if len(cdl.comments) == 1:
+				log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+			else:
+				log("[I] Successfully saved {} comments to logfile.".format(len(cdl.comments)), "GREEN")
+		else:
+			log("[I] There are no available comments to save.", "GREEN")
+	except Exception as e:
+		log('[E] Could not save comments to logfile: ' + str(e), "RED")
+
+
 
 def get_live_comments(api, broadcast, comments_json_file, dl):
 	cdl = CommentsDownloader(
@@ -305,13 +333,15 @@ def get_live_comments(api, broadcast, comments_json_file, dl):
 
 	try:
 		if cdl.comments:
-			log("[I] Checking for available comments to save...", "GREEN")
 			cdl.save()
 			comments_log_file = comments_json_file.replace('.json', '.log')
 			CommentsDownloader.generate_log(
 				cdl.comments, settings.current_time, comments_log_file,
 				comments_delay=dl.initial_buffered_duration)
-			log("[I] Successfully saved comments to logfile.", "GREEN")
+			if len(cdl.comments) == 1:
+				log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+			else:
+				log("[I] Successfully saved {} comments to logfile.".format(len(cdl.comments)), "GREEN")
 			seperator("GREEN")
 		else:
 			log("[I] There are no available comments to save.", "GREEN")
