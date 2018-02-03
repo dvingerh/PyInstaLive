@@ -102,7 +102,12 @@ PYINSTALIVE (SCRIPT V2.3.9 - PYTHON V2.7.14) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Downloading livestream... press [CTRL+C] to abort.
 ----------------------------------------------------------------------
-[I] The livestream has ended. (Duration: 2 minutes and 30 seconds)
+[I] The livestream has ended.
+[I] Time recorded   : 15 minutes and 10 seconds
+[I] Stream duration : 15 minutes and 20 seconds
+----------------------------------------------------------------------
+[I] Stopping comment downloading and saving comments (if any)...
+[I] Successfully saved 550 comments to logfile.
 ----------------------------------------------------------------------
 [I] Stitching downloaded files into video...
 [I] Successfully stitched downloaded files into video.
