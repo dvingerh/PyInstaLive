@@ -98,7 +98,7 @@ class CommentsDownloader(object):
 			json.dump(broadcast, outfile, indent=2)
 
 	@staticmethod
-	def generate_log(comments, download_start_time, srt_file, comments_delay=10.0):
+	def generate_log(comments, download_start_time, log_file, comments_delay=10.0):
 		python_version = sys.version.split(' ')[0]
 		subtitles_timeline = {}
 		for i, c in enumerate(comments):
@@ -121,14 +121,14 @@ class CommentsDownloader(object):
 				if clip_start < 0:
 					clip_start = 0
 
-				srt = ''
+				log = ''
 				for c in t:
 						if (c['user']['is_verified']):
-							srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c['user']['username'], "(v)", c['text']))
+							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c['user']['username'], "(v)", c['text']))
 						else:
-							srt += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c['user']['username'], c['text']))
+							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c['user']['username'], c['text']))
 
-				subs.append(srt)
+				subs.append(log)
 
-			with codecs.open(srt_file, 'w', 'utf-8-sig') as srt_outfile:
-				srt_outfile.write(''.join(subs))
+			with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
+				log_outfile.write(''.join(subs))

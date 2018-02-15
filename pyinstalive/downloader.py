@@ -44,9 +44,14 @@ def run_script(file):
 
 
 
-def get_stream_duration(compare_time):
+def get_stream_duration(compare_time, broadcast=None):
 	try:
-		stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
+		if broadcast:
+			record_time = int(time.time()) - int(compare_time)
+			stream_time = int(time.time()) - int(broadcast['published_time'])
+			stream_started_mins, stream_started_secs = divmod(stream_time - record_time, 60)
+		else:
+			stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
 		stream_duration_str = '%d minutes' % stream_started_mins
 		if stream_started_secs:
 			stream_duration_str += ' and %d seconds' % stream_started_secs
@@ -64,7 +69,7 @@ def record_stream(broadcast):
 			if sep:
 				seperator("GREEN")
 			log('[I] Viewers     : ' + str(int(viewers)) + " watching", "GREEN")
-			log('[I] Airing time : ' + get_stream_duration(broadcast['published_time']).title(), "GREEN")
+			log('[I] Airing time : ' + get_stream_duration(broadcast['published_time']), "GREEN")
 			log('[I] Status      : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
 
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted'] 
@@ -117,12 +122,12 @@ def record_stream(broadcast):
 				log('[E] An error occurred while checking comments: ' + e, "RED")
 		dl.run()
 		seperator("GREEN")
-		log('[I] The livestream has ended.\n[I] Time recorded   : {}\n[I] Stream duration : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time'])), "YELLOW")
+		log('[I] The livestream has ended.\n[I] Time recorded   : {}\n[I] Stream duration : {}\n[I] Missed time     : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		stitch_video(dl, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] Download has been aborted by the user.\n[I] Time recorded   : {}\n[I] Stream duration : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time'])), "YELLOW")
+		log('[I] Download has been aborted by the user.\n[I] Time recorded   : {}\n[I] Stream duration : {}\n[I] Missed time     : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		if not dl.is_aborted:
 			dl.stop()
