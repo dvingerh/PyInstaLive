@@ -2,7 +2,7 @@ from setuptools import setup
 
 __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
-__version__ = '2.3.9'
+__version__ = '2.4.0'
 
 _api_version = '1.3.5'
 _api_extensions_version = '0.3.6'

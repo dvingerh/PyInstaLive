@@ -11,7 +11,7 @@ from .logger import log, seperator, supports_color
 from .downloader import main
 from .settings import settings
 
-script_version = "2.3.9"
+script_version = "2.4.0"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
 

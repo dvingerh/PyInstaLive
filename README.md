@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.3.9](https://img.shields.io/badge/Version-2.3.9-pink.svg?style=for-the-badge)
+![Version 2.4.0](https://img.shields.io/badge/Version-2.4.0-pink.svg?style=for-the-badge)
 
 This script enables you to download Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
@@ -22,15 +22,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.3.9 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.0 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.3.9**) run the following command:
+To update PyInstaLive to the latest version (currently **2.4.0**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.3.9 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.0 --process-dependency-links --upgrade
 ```
 
 **Note**: From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
@@ -85,7 +85,7 @@ If a livestream is currently ongoing, the terminal output should be something li
 
 ```
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.3.9 - PYTHON V2.7.14) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.4.0 - PYTHON V2.7.14) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Logging in to user "johndoe" successful.
 [I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
