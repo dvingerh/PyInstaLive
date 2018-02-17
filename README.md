@@ -12,6 +12,10 @@ This script enables you to download Instagram livestreams as well as any availab
 - Edit the configuration file using any text editor.
 - Run `pyinstalive -r "<live-username>"` to start recording a livestream.
 
+**Note**: From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
+
+**Note**: From version 2.4.1 and up, support for using [livestream_dl](https://github.com/taengstagram/instagram-livestream-downloader) and PyInstaLive concurrently has been dropped in favor of using the latest API version, which allows for detecting livestreams that an user is a guest of (split screen/dual-live).
+
 
 ## Installation
 
@@ -32,8 +36,6 @@ To update PyInstaLive to the latest version (currently **2.4.1**) run the follow
 ```bash
 pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.1 --process-dependency-links --upgrade
 ```
-
-**Note**: From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
 
 #### Specific versions
 
