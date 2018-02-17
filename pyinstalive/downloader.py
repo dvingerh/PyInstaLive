@@ -94,7 +94,9 @@ def record_stream(broadcast):
 		seperator("GREEN")
 		sys.exit(1)
 	try:
-		log('[I] Livestream downloading started...', "GREEN")
+		log('[I] Livestream found, beginning download...', "GREEN")
+		if (broadcast['broadcast_owner']['username'] != record):
+			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast['broadcast_owner']['username']), "YELLOW")
 		seperator("GREEN")
 		log('[I] Username    : ' + record, "GREEN")
 		print_status(False)
@@ -122,12 +124,12 @@ def record_stream(broadcast):
 				log('[E] An error occurred while checking comments: ' + e, "RED")
 		dl.run()
 		seperator("GREEN")
-		log('[I] The livestream has ended.\n[I] Time recorded   : {}\n[I] Stream duration : {}\n[I] Missed time     : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
+		log('[I] The livestream has ended.\n[I] Time recorded     : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		stitch_video(dl, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] Download has been aborted by the user.\n[I] Time recorded   : {}\n[I] Stream duration : {}\n[I] Missed time     : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
+		log('[I] The download has been aborted by the user.\n[I] Time recorded     : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		if not dl.is_aborted:
 			dl.stop()
@@ -173,7 +175,7 @@ def stitch_video(dl, broadcast, comment_thread_worker):
 
 def get_user_info(record):
 	try:
-		log('[I] Checking user "' + record + '"...', "GREEN")
+		log('[I] Getting user info for "' + record + '"...', "GREEN")
 		user_res = api.username_info(record)
 		user_id = user_res['user']['pk']
 	except Exception as e:
@@ -235,7 +237,7 @@ def get_replays(user_id):
 		else:
 			log("[I] Available replays have been found to download, press [CTRL+C] to abort.", "GREEN")
 			seperator("GREEN")
-			for index, broadcast in enumerate(broadcasts):
+			for replay_index, broadcast in enumerate(broadcasts):
 				exists = False
 
 				if sys.version.split(' ')[0].startswith('2'):
@@ -248,7 +250,7 @@ def get_replays(user_id):
 						log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
 						exists = True
 				if not exists:
-					current = index + 1
+					current = replay_index + 1
 					log("[I] Downloading replay " + str(current) + " of "  + str(len(broadcasts)) + " with ID '" + str(broadcast['id']) + "'...", "GREEN")
 					current_time = str(int(time.time()))
 					output_dir = settings.save_path + '{}_{}_{}_{}_replay_downloads'.format(settings.current_date, record, broadcast['id'], settings.current_time)
@@ -289,7 +291,7 @@ def get_replays(user_id):
 		sys.exit(1)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] Download has been aborted by the user.', "YELLOW")
+		log('[I] The download has been aborted by the user.', "YELLOW")
 		seperator("GREEN")
 		try:
 			shutil.rmtree(output_dir)
