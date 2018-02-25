@@ -28,3 +28,5 @@ wheels/
 MANIFEST
 *.json
 .python-version
+
+snippets\.py
