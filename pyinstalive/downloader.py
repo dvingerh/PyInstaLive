@@ -11,13 +11,6 @@ from instagram_private_api import ClientError
 from .logger import log, seperator
 from .comments import CommentsDownloader
 
-class NoLivestreamException(Exception):
-	pass
-
-class NoReplayException(Exception):
-	pass
-
-
 
 def main(instagram_api_arg, record_arg, settings_arg):
 	global instagram_api
@@ -61,17 +54,16 @@ def get_stream_duration(compare_time, broadcast=None):
 
 
 
-def record_stream(broadcast):
+def download_livestream(broadcast):
 	try:
 		def print_status(sep=True):
 			heartbeat_info = instagram_api.broadcast_heartbeat_and_viewercount(broadcast['id'])
 			viewers = broadcast.get('viewer_count', 0)
 			if sep:
 				seperator("GREEN")
-			log('[I] Viewers : ' + str(int(viewers)) + " watching", "GREEN")
-			log('[I] Airing time : ' + get_stream_duration(broadcast['published_time']), "GREEN")
-			log('[I] Status : ' + heartbeat_info['broadcast_status'].title(), "GREEN")
-
+			log('[I] Viewers : {:s} watching'.format(str(int(viewers))), "GREEN")
+			log('[I] Airing time : {:s}'.format(get_stream_duration(broadcast['published_time'])), "GREEN")
+			log('[I] Status : {:s}'.format(heartbeat_info['broadcast_status'].title()), "GREEN")
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted']
 
 		mpd_url = (broadcast.get('dash_manifest')
@@ -90,7 +82,7 @@ def record_stream(broadcast):
 			mpd_download_timeout=3,
 			download_timeout=3)
 	except Exception as e:
-		log('[E] Could not start downloading livestream: ' + str(e), "RED")
+		log('[E] Could not start downloading livestream: {:s}'.format(str(e)), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	try:
@@ -98,9 +90,9 @@ def record_stream(broadcast):
 		if (broadcast['broadcast_owner']['username'] != user_to_record):
 			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast['broadcast_owner']['username']), "YELLOW")
 		seperator("GREEN")
-		log('[I] Username : ' + user_to_record, "GREEN")
+		log('[I] Username : {:s}'.format(user_to_record), "GREEN")
 		print_status(False)
-		log('[I] MPD URL : ' + mpd_url, "GREEN")
+		log('[I] MPD URL : {:s}'.format(mpd_url), "GREEN")
 		seperator("GREEN")
 		log('[I] Downloading livestream... press [CTRL+C] to abort.', "GREEN")
 
@@ -111,7 +103,7 @@ def record_stream(broadcast):
 				thread.start()
 				log("[I] Executed file to run at start.", "GREEN")
 			except Exception as e:
-				log('[W] Could not run file: ' + str(e), "YELLOW")
+				log('[W] Could not run file: {:s}'.format(str(e)), "YELLOW")
 
 
 		comment_thread_worker = None
@@ -121,7 +113,7 @@ def record_stream(broadcast):
 				comment_thread_worker = threading.Thread(target=get_live_comments, args=(instagram_api, broadcast, comments_json_file, broadcast_downloader,))
 				comment_thread_worker.start()
 			except Exception as e:
-				log('[E] An error occurred while checking comments: ' + e, "RED")
+				log('[E] An error occurred while checking comments: {:s}'.format(str(e)), "RED")
 		broadcast_downloader.run()
 		seperator("GREEN")
 		log('[I] The livestream has ended.\n[I] Time recorded : {}\n[I] Stream duration : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
@@ -150,7 +142,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				thread.start()
 				log("[I] Executed file to run at finish.", "GREEN")
 			except Exception as e:
-				log('[W] Could not run file: ' + e, "YELLOW")
+				log('[W] Could not run file: {:s}'.format(str(e)), "YELLOW")
 
 		log('[I] Stitching downloaded files into video...', "GREEN")
 		output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time)
@@ -163,7 +155,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			seperator("GREEN")
 			sys.exit(0)
 		except Exception as e:
-			log('[E] Could not stitch downloaded files: ' + str(e), "RED")
+			log('[E] Could not stitch downloaded files: {:s}'.format(str(e)), "RED")
 			seperator("GREEN")
 			sys.exit(1)
 	except KeyboardInterrupt:
@@ -175,118 +167,97 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 
 def get_user_info(user_to_record):
 	try:
-		log('[I] Getting user info for "' + user_to_record + '"...', "GREEN")
 		user_res = instagram_api.username_info(user_to_record)
 		user_id = user_res['user']['pk']
 	except Exception as e:
-		log('[E] Could not get user info: ' + str(e), "RED")
+		log('[E] Could not get information for "{:s}": {:s}'.format(user_to_record, str(e)), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	except KeyboardInterrupt:
-		log('[W] Aborted checking for user.', "YELLOW")
+		log('[W] Aborted getting information for "{:s}", exiting...'.format(user_to_record), "YELLOW")
 		seperator("GREEN")
 		sys.exit(1)
-	get_livestreams(user_id)
-	if settings.save_replays.title() == "True":
-		get_replays(user_id)
+	log('[I] Getting info for "{:s}" successful.'.format(user_to_record), "GREEN")
+	get_broadcasts_info(user_id)
+
+
+
+def get_broadcasts_info(user_id):
+	seperator("GREEN")
+	log('[I] Checking for livestreams and replays...', "GREEN")
+	broadcasts = instagram_api.user_story_feed(user_id)
+
+	livestream = broadcasts.get('broadcast')
+	replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
+
+	if livestream:
+		seperator("GREEN")
+		download_livestream(livestream)
 	else:
-		seperator("GREEN")
+		log('[I] There are no available livestreams.', "YELLOW")
+	if settings.save_replays.title() == "True":
+		if replays:
+			seperator("GREEN")
+			download_replays(replays)
+		else:
+			log('[I] There are no available replays.', "YELLOW")
+	else:
 		log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
-		seperator("GREEN")
-		sys.exit(0)
+	seperator("GREEN")
 
 
-
-def get_livestreams(user_id):
+def download_replays(broadcasts):
 	try:
+		log("[I] Downloading replays... press [CTRL+C] to abort.", "GREEN")
 		seperator("GREEN")
-		log('[I] Checking for ongoing livestreams...', "GREEN")
-		broadcast = instagram_api.user_broadcast(user_id)
-		if (broadcast is None):
-			raise NoLivestreamException('There are no livestreams available.')
-		else:
-			try:
-				record_stream(broadcast)
-			except Exception as e:
-				log('[E] An error occurred while trying to record livestream: ' + str(e), "RED")
-				seperator("GREEN")
-				sys.exit(1)
-	except NoLivestreamException as e:
-		log('[I] ' + str(e), "YELLOW")
-	except Exception as e:
-		if (e.__class__.__name__ is not NoLivestreamException):
-			log('[E] Could not get livestreams info: ' + str(e), "RED")
-			seperator("GREEN")
-			sys.exit(1)
+		for replay_index, broadcast in enumerate(broadcasts):
+			exists = False
+
+			if sys.version.split(' ')[0].startswith('2'):
+				directories = (os.walk(settings.save_path).next()[1])
+			else:
+				directories = (os.walk(settings.save_path).__next__()[1])
+
+			for directory in directories:
+				if (str(broadcast['id']) in directory) and ("_live_" not in directory):
+					log("[W] Already downloaded a replay with ID '{:s}'.".format(str(broadcast['id'])), "YELLOW")
+					exists = True
+			if not exists:
+				current = replay_index + 1
+				log("[I] Downloading replay {:s} of {:s} with ID '{:s}'...".format(str(current), str(len(broadcasts)), str(broadcast['id'])), "GREEN")
+				current_time = str(int(time.time()))
+				output_dir = settings.save_path + '{}_{}_{}_{}_replay_downloads'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time)
+				broadcast_downloader = replay.Downloader(
+					mpd=broadcast['dash_manifest'],
+					output_dir=output_dir,
+					user_agent=instagram_api.user_agent)
 
 
-
-def get_replays(user_id):
-	try:
-		seperator("GREEN")
-		log('[I] Checking for available replays...', "GREEN")
-		user_story_feed = instagram_api.user_story_feed(user_id)
-		broadcasts = user_story_feed.get('post_live_item', {}).get('broadcasts', [])
-	except Exception as e:
-		log('[E] Could not get replay info: ' + str(e), "RED")
-		seperator("GREEN")
-		sys.exit(1)
-	try:
-		if (len(broadcasts) == 0):
-			raise NoReplayException('There are no replays available.')
-		else:
-			log("[I] Available replays have been found to download, press [CTRL+C] to abort.", "GREEN")
-			seperator("GREEN")
-			for replay_index, broadcast in enumerate(broadcasts):
-				exists = False
-
-				if sys.version.split(' ')[0].startswith('2'):
-					directories = (os.walk(settings.save_path).next()[1])
+				if settings.clear_temp_files.title() == "True":
+					replay_saved = broadcast_downloader.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time), cleartempfiles=True)
 				else:
-					directories = (os.walk(settings.save_path).__next__()[1])
+					replay_saved = broadcast_downloader.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time), cleartempfiles=False)
 
-				for directory in directories:
-					if (str(broadcast['id']) in directory) and ("_live_" not in directory):
-						log("[W] Already downloaded a replay with ID '" + str(broadcast['id']) + "', skipping...", "GREEN")
-						exists = True
-				if not exists:
-					current = replay_index + 1
-					log("[I] Downloading replay " + str(current) + " of " + str(len(broadcasts)) + " with ID '" + str(broadcast['id']) + "'...", "GREEN")
-					current_time = str(int(time.time()))
-					output_dir = settings.save_path + '{}_{}_{}_{}_replay_downloads'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time)
-					broadcast_downloader = replay.Downloader(
-						mpd=broadcast['dash_manifest'],
-						output_dir=output_dir,
-						user_agent=instagram_api.user_agent)
+				if settings.save_comments.title() == "True":
+					log("[I] Checking for available comments to save...", "GREEN")
+					comments_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time)
+					get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_downloader)
 
-
-					if settings.clear_temp_files.title() == "True":
-						replay_saved = broadcast_downloader.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time), cleartempfiles=True)
-					else:
-						replay_saved = broadcast_downloader.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time), cleartempfiles=False)
-
-					if settings.save_comments.title() == "True":
-						log("[I] Checking for available comments to save...", "GREEN")
-						comments_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast['id'], settings.current_time)
-						get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_downloader)
-
-					if (len(replay_saved) == 1):
-						log("[I] Finished downloading replay " + str(current) + " of " + str(len(broadcasts)) + ".", "GREEN")
+				if (len(replay_saved) == 1):
+					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
+					if (current != len(broadcasts)):
 						seperator("GREEN")
-					else:
-						log("[W] No output video file was made, please merge the files manually if possible.", "YELLOW")
-						log("[W] Check if ffmpeg is available by running ffmpeg in your terminal/cmd prompt.", "YELLOW")
-						log("", "GREEN")
+				else:
+					log("[W] No output video file was made, please merge the files manually if possible.", "YELLOW")
+					log("[W] Check if ffmpeg is available by running ffmpeg in your terminal/cmd prompt.", "YELLOW")
+					log("", "GREEN")
 
+		seperator("GREEN")
 		log("[I] Finished downloading all available replays.", "GREEN")
 		seperator("GREEN")
 		sys.exit(0)
-	except NoReplayException as e:
-		log('[I] ' + str(e), "YELLOW")
-		seperator("GREEN")
-		sys.exit(0)
 	except Exception as e:
-		log('[E] Could not save replay: ' + str(e), "RED")
+		log('[E] Could not save replay: {:s}'.format(str(e)), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	except KeyboardInterrupt:
@@ -296,7 +267,7 @@ def get_replays(user_id):
 		try:
 			shutil.rmtree(output_dir)
 		except Exception as e:
-			log("[E] Could not remove temp folder: " + str(e), "RED")
+			log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
 			sys.exit(1)
 		sys.exit(0)
 
@@ -320,7 +291,7 @@ def get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_
 		else:
 			log("[I] There are no available comments to save.", "GREEN")
 	except Exception as e:
-		log('[E] Could not save comments to logfile: ' + str(e), "RED")
+		log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
 
 
 
@@ -354,4 +325,4 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 			log("[I] There are no available comments to save.", "GREEN")
 			seperator("GREEN")
 	except Exception as e:
-		log('[E] Could not save comments to logfile: ' + str(e), "RED")
+		log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
