@@ -61,9 +61,9 @@ def download_livestream(broadcast):
 			viewers = broadcast.get('viewer_count', 0)
 			if sep:
 				seperator("GREEN")
-			log('[I] Viewers : {:s} watching'.format(str(int(viewers))), "GREEN")
+			log('[I] Viewers     : {:s} watching'.format(str(int(viewers))), "GREEN")
 			log('[I] Airing time : {:s}'.format(get_stream_duration(broadcast['published_time'])), "GREEN")
-			log('[I] Status : {:s}'.format(heartbeat_info['broadcast_status'].title()), "GREEN")
+			log('[I] Status      : {:s}'.format(heartbeat_info['broadcast_status'].title()), "GREEN")
 			return heartbeat_info['broadcast_status'] not in ['active', 'interrupted']
 
 		mpd_url = (broadcast.get('dash_manifest')
@@ -90,9 +90,9 @@ def download_livestream(broadcast):
 		if (broadcast['broadcast_owner']['username'] != user_to_record):
 			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast['broadcast_owner']['username']), "YELLOW")
 		seperator("GREEN")
-		log('[I] Username : {:s}'.format(user_to_record), "GREEN")
+		log('[I] Username    : {:s}'.format(user_to_record), "GREEN")
 		print_status(False)
-		log('[I] MPD URL : {:s}'.format(mpd_url), "GREEN")
+		log('[I] MPD URL     : {:s}'.format(mpd_url), "GREEN")
 		seperator("GREEN")
 		log('[I] Downloading livestream... press [CTRL+C] to abort.', "GREEN")
 
@@ -116,12 +116,12 @@ def download_livestream(broadcast):
 				log('[E] An error occurred while checking comments: {:s}'.format(str(e)), "RED")
 		broadcast_downloader.run()
 		seperator("GREEN")
-		log('[I] The livestream has ended.\n[I] Time recorded : {}\n[I] Stream duration : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
+		log('[I] The livestream has ended.\n[I] Time recorded     : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] The download has been aborted by the user.\n[I] Time recorded : {}\n[I] Stream duration : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
+		log('[I] The download has been aborted by the user.\n[I] Time recorded     : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast['published_time']), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		if not broadcast_downloader.is_aborted:
 			broadcast_downloader.stop()
