@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.4.1](https://img.shields.io/badge/Version-2.4.1-pink.svg?style=for-the-badge)
+![Version 2.4.2](https://img.shields.io/badge/Version-2.4.2-pink.svg?style=for-the-badge)
 
 This script enables you to download Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
@@ -26,15 +26,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in command line (as administrator in Windows) / terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.1 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.2 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.4.1**) run the following command:
+To update PyInstaLive to the latest version (currently **2.4.2**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.1 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.2 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -87,7 +87,7 @@ If a livestream is currently ongoing, the terminal output should be something li
 
 ```
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.4.1 - PYTHON V2.7.14) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.4.2 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Logging in to user "johndoe" successful.
 [I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
@@ -98,15 +98,16 @@ PYINSTALIVE (SCRIPT V2.4.1 - PYTHON V2.7.14) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Username    : janedoe
 [I] Viewers     : 100 watching
-[I] Airing time : 0 Minutes And 10 Seconds
+[I] Airing time : 2 minutes And 10 seconds
 [I] Status      : Active
 [I] MPD URL     : https://scontent-amt2-1.cdninstagram.com/hvideo-prn1/v/rID1yGvO_UPlsukIhbhOx/live-dash/dash-hd/17907800311113848.mpd?_nc_rl=AfBVd51QpQOj_ImC&oh=aa8d53b4fd736c0edc29c97b411bd32b&oe=5A6FDE8B
 ----------------------------------------------------------------------
 [I] Downloading livestream... press [CTRL+C] to abort.
 ----------------------------------------------------------------------
 [I] The livestream has ended.
-[I] Time recorded   : 15 minutes and 10 seconds
-[I] Stream duration : 15 minutes and 20 seconds
+[I] Time recorded     : 13 minutes and 10 seconds
+[I] Stream duration   : 15 minutes and 20 seconds
+[I] Missing (approx.) : 2 minutes and 10 seconds
 ----------------------------------------------------------------------
 [I] Stopping comment downloading and saving comments (if any)...
 [I] Successfully saved 550 comments to logfile.
