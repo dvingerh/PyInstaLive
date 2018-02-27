@@ -10,7 +10,7 @@ This script enables you to download Instagram livestreams as well as any availab
 - Install the prerequisites and then PyInstaLive.
 - Run `pyinstalive -c` to generate a configuration file.
 - Edit the configuration file using any text editor.
-- Run `pyinstalive -r "<live-username>"` to start recording a livestream.
+- Run `pyinstalive -r "<live-username>"` to start downloading a livestream or replay.
 
 **Note**: From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
 
@@ -51,6 +51,8 @@ Use the version number you want after the **@** symbol (e.g **2.2.0**).
 ## Usage
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
 You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
+
+For more information about the configuration file go  [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md).
 
 Here is an example of a valid configuration file:
 ```ini
