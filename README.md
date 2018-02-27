@@ -24,7 +24,7 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 #### Installing
 
-Run the following command in command line (as administrator in Windows) / terminal:
+Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
 pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.2 --process-dependency-links
 ```
