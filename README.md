@@ -52,7 +52,7 @@ Use the version number you want after the **@** symbol (e.g **2.2.0**).
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
 You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
 
-For more information about the configuration file go  [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md).
+For more information about the configuration file go  [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md#default-configuration-file).
 
 Here is an example of a valid configuration file:
 ```ini
