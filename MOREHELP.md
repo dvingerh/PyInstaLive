@@ -45,4 +45,4 @@ save_comments = false
 
 ```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. Leave empty to disable.(Experimental, use at own risk.) 
  
-```save_comments```  **—**  When enabled, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
+```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
