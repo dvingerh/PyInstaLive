@@ -11,7 +11,7 @@
 
 - ```-i``` or ```--info```  **—**  When this flag is passed, PyInstaLive will show information such as its current version, the configuration file contents, available cookie files and more.
 
-- ```-nr``` or ```--noreplays```  **—**  When this flag is passed, PyInstaLive will not check for any available replays. Overrides the configuration file.
+- ```-nr``` or ```--noreplays```  **—**  When this flag is passed, PyInstaLive will not download any available replays. Overrides the configuration file.
 
 
 # Default configuration file
@@ -33,7 +33,7 @@ save_comments = false
 
 ```password```  **—**  Instagram password to login with.
 
-```save_path```  **—**  Path to the folder where downloaded Instagram livestreams and replays will be saved. (Requires write permissions)
+```save_path```  **—**  Path to the folder where downloaded Instagram livestreams and replays will be saved. PyInstaLive must have permission to write files to this folder. If left empty, PyInstaLive will attempt to fall back to the folder where it's being run from.
 
 ```show_cookie_expiry```  **—**  When set to True, PyInstaLive will show when the current cookie used to login will expire.
 
@@ -41,8 +41,8 @@ save_comments = false
 
 ```save_replays```  **—**  When set to True, PyInstaLive will check for and download any available replays.
 
-```run_at_start```  **—**  Python script to run when PyInstaLive starts recording a livestream. (Experimental, use at own risk.)
+```run_at_start```  **—**  Python script to run when PyInstaLive starts recording a livestream. Leave empty to disable. (Experimental, use at own risk.)
 
-```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. (Experimental, use at own risk.) 
+```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. Leave empty to disable.(Experimental, use at own risk.) 
  
 ```save_comments```  **—**  When enabled, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
