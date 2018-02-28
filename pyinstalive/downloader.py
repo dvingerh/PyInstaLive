@@ -6,7 +6,7 @@ import subprocess
 import threading
 
 from instagram_private_api_extensions import live, replay
-from instagram_private_api import ClientError
+from instagram_private_api import ClientError, ClientThrottledError
 
 from .logger import log, seperator
 from .comments import CommentsDownloader
@@ -185,26 +185,31 @@ def get_user_info(user_to_record):
 def get_broadcasts_info(user_id):
 	seperator("GREEN")
 	log('[I] Checking for livestreams and replays...', "GREEN")
-	broadcasts = instagram_api.user_story_feed(user_id)
+	try:
+		broadcasts = instagram_api.user_story_feed(user_id)
 
-	livestream = broadcasts.get('broadcast')
-	replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
+		livestream = broadcasts.get('broadcast')
+		replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
 
-	if livestream:
-		seperator("GREEN")
-		download_livestream(livestream)
-	else:
-		log('[I] There are no available livestreams.', "YELLOW")
-	if settings.save_replays.title() == "True":
-		if replays:
+		if livestream:
 			seperator("GREEN")
-			download_replays(replays)
+			download_livestream(livestream)
 		else:
-			log('[I] There are no available replays.', "YELLOW")
-	else:
-		log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
-	seperator("GREEN")
-
+			log('[I] There are no available livestreams.', "YELLOW")
+		if settings.save_replays.title() == "True":
+			if replays:
+				seperator("GREEN")
+				download_replays(replays)
+			else:
+				log('[I] There are no available replays.', "YELLOW")
+		else:
+			log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
+		seperator("GREEN")
+	except Exception as e:
+		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")
+	except ClientThrottledError as cte:
+		log('[E] Could not check because you are making too many requests at this time.', "RED")
+		log('[E] Error response: {:s}'.format(str(cte)), "RED")
 
 def download_replays(broadcasts):
 	try:
