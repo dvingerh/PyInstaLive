@@ -170,7 +170,7 @@ def get_user_info(user_to_record):
 		user_res = instagram_api.username_info(user_to_record)
 		user_id = user_res['user']['pk']
 	except Exception as e:
-		log('[E] Could not get information for "{:s}": {:s}'.format(user_to_record, str(e)), "RED")
+		log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_record, str(e), e.code, e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	except KeyboardInterrupt:

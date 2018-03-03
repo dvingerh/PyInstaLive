@@ -4,7 +4,7 @@ __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
 __version__ = '2.4.3'
 
-_api_version = '1.4.0'
+_api_version = '1.4.1'
 _api_extensions_version = '0.3.6'
 
 long_description = 'This script enables you to record Instagram livestreams as well as download any available replays. It is based on another script that has now been discontinued.'
