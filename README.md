@@ -1,20 +1,16 @@
 # PyInstaLive
-![Version 2.4.4](https://img.shields.io/badge/Version-2.4.4-pink.svg?style=for-the-badge)
+![Version 2.4.5](https://img.shields.io/badge/Version-2.4.5-pink.svg?style=for-the-badge)
 
 This script enables you to download Instagram any ongoing livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 
 ## Quickstart
 
-- [Read the notes below.](https://github.com/notcammy/PyInstaLive#notes)
+- [Read the notes below (important!)](https://github.com/notcammy/PyInstaLive#notes)
 - Install the prerequisites and then PyInstaLive.
 - Run `pyinstalive -c` to generate a configuration file.
 - Edit the configuration file using any text editor.
 - Run `pyinstalive -r "<live-username>"` to start downloading a livestream or replay.
-
-**Note**: From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
-
-**Note**: From version 2.4.1 and up, support for using [livestream_dl](https://github.com/taengstagram/instagram-livestream-downloader) and PyInstaLive concurrently has been dropped in favor of using the latest API version, which allows for detecting livestreams that an user is a guest of (split screen/dual-live).
 
 
 ## Installation
@@ -26,15 +22,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.4 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.5 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.4.4**) run the following command:
+To update PyInstaLive to the latest version (currently **2.4.5**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.4 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.5 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -89,7 +85,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 
 ```
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.4.4 - PYTHON V3.6.3) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.4.5 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Logging in to user "johndoe" successful.
 [I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
@@ -123,7 +119,7 @@ PYINSTALIVE (SCRIPT V2.4.4 - PYTHON V3.6.3) - 06:45:30 PM
 #### Notes
 - The option to run a script upon starting and ending a stream download is experimental. Use at your own risk.
 
-- The option to download comments is experimental and only available on Python 3. Use at your own risk.
+- The option to download comments is experimental and only fully supported with Python 3. Python 2 cannot save any unicode characters such as emojis. Use at your own risk.
 
 - You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md). You can also run `pyinstalive -h` to view all available commands. 
 
@@ -132,6 +128,10 @@ PYINSTALIVE (SCRIPT V2.4.4 - PYTHON V3.6.3) - 06:45:30 PM
 - This script is also reported to work on Python 3.4.x but is not officially supported.
 
 - If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
+
+- From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
+
+- From version 2.4.1 and up, support for using [livestream_dl](https://github.com/taengstagram/instagram-livestream-downloader) and PyInstaLive concurrently has been dropped in favor of using the latest API library version, which allows for detecting livestreams that an user is a guest of (split screen/dual-live).
 
 
 ## Help
