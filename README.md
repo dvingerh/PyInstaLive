@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.4.5](https://img.shields.io/badge/Version-2.4.5-pink.svg?style=for-the-badge)
+![Version 2.4.6](https://img.shields.io/badge/Version-2.4.6-pink.svg?style=for-the-badge)
 
 This script enables you to download Instagram any ongoing livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
@@ -22,15 +22,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.5 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.6 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.4.5**) run the following command:
+To update PyInstaLive to the latest version (currently **2.4.6**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.5 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.6 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -85,7 +85,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 
 ```
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.4.5 - PYTHON V3.6.3) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.4.6 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Logging in to user "johndoe" successful.
 [I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
@@ -119,7 +119,7 @@ PYINSTALIVE (SCRIPT V2.4.5 - PYTHON V3.6.3) - 06:45:30 PM
 #### Notes
 - The option to run a script upon starting and ending a stream download is experimental. Use at your own risk.
 
-- The option to download comments is experimental and only fully supported with Python 3. Python 2 cannot save any unicode characters such as emojis. Use at your own risk.
+- The option to download comments is experimental and only fully supported with Python 3. Python 2 cannot save most unicode characters if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). Use at your own risk.
 
 - You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md). You can also run `pyinstalive -h` to view all available commands. 
 
