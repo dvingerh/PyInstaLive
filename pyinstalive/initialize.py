@@ -114,8 +114,7 @@ def check_config_validity(config):
 		try:
 			settings.save_comments = config.get('pyinstalive', 'save_comments').title()
 			if sys.version.split(' ')[0].startswith('2') and settings.save_comments == "True":
-				log("[W] Comment saving is not supported in Python 2 and will be ignored.", "YELLOW")
-				settings.save_comments = 'false'
+				log("[W] Comment saving is only partially supported in Python 2.\n[W] Unicode characters such as emojis will not be saved.", "YELLOW")
 				has_thrown_errors = True
 			else:
 				if not settings.show_cookie_expiry in bool_values:

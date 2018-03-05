@@ -39,7 +39,7 @@ class CommentsDownloader(object):
 		before_count = len(comments_collected)
 		try:
 			comments_res = self.api.broadcast_comments(
-				self.broadcast['id'], last_comment_ts=first_comment_created_at)
+				self.broadcast.get('id'), last_comment_ts=first_comment_created_at)
 			comments = comments_res.get('comments', [])
 			first_comment_created_at = (
 				comments[0]['created_at_utc'] if comments else int(time.time() - 5))
@@ -72,10 +72,10 @@ class CommentsDownloader(object):
 	def get_replay(self):
 		comments_collected = []
 		starting_offset = 0
-		encoding_tag = self.broadcast['encoding_tag']
+		encoding_tag = self.broadcast.get('encoding_tag')
 		while True:
 			comments_res = self.api.replay_broadcast_comments(
-				self.broadcast['id'], starting_offset=starting_offset, encoding_tag=encoding_tag)
+				self.broadcast.get('id'), starting_offset=starting_offset, encoding_tag=encoding_tag)
 			starting_offset = comments_res.get('ending_offset', 0)
 			comments = comments_res.get('comments', [])
 			comments_collected.extend(comments)
@@ -103,10 +103,10 @@ class CommentsDownloader(object):
 		subtitles_timeline = {}
 		for i, c in enumerate(comments):
 			if 'offset' in c:
-				for k in c['comment'].keys():
-					c[k] = c['comment'][k]
-				c['created_at_utc'] = download_start_time + c['offset']
-			created_at_utc = str(2 * (c['created_at_utc'] // 2))
+				for k in c.get('comment').keys():
+					c[k] = c.get('comment', {}).get(k)
+				c['created_at_utc'] = download_start_time + c.get('offset')
+			created_at_utc = str(2 * (c.get('created_at_utc') // 2))
 			comment_list = subtitles_timeline.get(created_at_utc) or []
 			comment_list.append(c)
 			subtitles_timeline[created_at_utc] = comment_list
@@ -123,12 +123,21 @@ class CommentsDownloader(object):
 
 				log = ''
 				for c in t:
-						if (c['user']['is_verified']):
-							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c['user']['username'], "(v)", c['text']))
+					if python_version.startswith('3'):
+						if (c.get('user', {}).get('is_verified')):
+							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
 						else:
-							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c['user']['username'], c['text']))
+							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
+					else:
+						if (c.get('user', {}).get('is_verified')):
+							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
+						else:
+							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
 
 				subs.append(log)
 
 			with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
-				log_outfile.write(''.join(subs))
+				if python_version.startswith('2'):
+					log_outfile.write('This log was generated using Python {:s}. This means unicode characters such as emojis are not saved.\nUser comments without any text usually are comments that only had emojis. Use Python 3 for full unicode support.\n\n'.format(python_version) + ''.join(subs))
+				else:
+					log_outfile.write(''.join(subs))
