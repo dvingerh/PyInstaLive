@@ -101,6 +101,7 @@ class CommentsDownloader(object):
 	def generate_log(comments, download_start_time, log_file, comments_delay=10.0):
 		python_version = sys.version.split(' ')[0]
 		subtitles_timeline = {}
+		wide_build = sys.maxunicode > 65536
 		for i, c in enumerate(comments):
 			if 'offset' in c:
 				for k in c.get('comment').keys():
@@ -129,15 +130,21 @@ class CommentsDownloader(object):
 						else:
 							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
 					else:
-						if (c.get('user', {}).get('is_verified')):
-							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
+						if not wide_build:
+							if (c.get('user', {}).get('is_verified')):
+								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
+							else:
+								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
 						else:
-							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
+							if (c.get('user', {}).get('is_verified')):
+								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
+							else:
+								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
 
 				subs.append(log)
 
 			with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
-				if python_version.startswith('2'):
-					log_outfile.write('This log was generated using Python {:s}. This means unicode characters such as emojis are not saved.\nUser comments without any text usually are comments that only had emojis. Use Python 3 for full unicode support.\n\n'.format(python_version) + ''.join(subs))
+				if python_version.startswith('2') and not wide_build:
+					log_outfile.write('This log was generated using Python {:s} without wide unicode support. This means characters such as emojis are not saved.\nUser comments without any text usually are comments that only had emojis.\nBuild Python 2 with the --enable-unicode=ucs4 flag or use Python 3 for full unicode support.\n\n'.format(python_version) + ''.join(subs))
 				else:
 					log_outfile.write(''.join(subs))

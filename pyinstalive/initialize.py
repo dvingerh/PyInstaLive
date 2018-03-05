@@ -113,8 +113,9 @@ def check_config_validity(config):
 
 		try:
 			settings.save_comments = config.get('pyinstalive', 'save_comments').title()
-			if sys.version.split(' ')[0].startswith('2') and settings.save_comments == "True":
-				log("[W] Comment saving is only partially supported in Python 2.\n[W] Unicode characters such as emojis will not be saved.", "YELLOW")
+			wide_build = sys.maxunicode > 65536
+			if sys.version.split(' ')[0].startswith('2') and settings.save_comments == "True" and not wide_build:
+				log("[W] Your Python 2 build does not support wide unicode characters.\n[W] This means characters such as mojis will not be saved.", "YELLOW")
 				has_thrown_errors = True
 			else:
 				if not settings.show_cookie_expiry in bool_values:
