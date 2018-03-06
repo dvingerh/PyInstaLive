@@ -30,3 +30,5 @@ MANIFEST
 .python-version
 
 snippets\.py
+
+downloaded/
