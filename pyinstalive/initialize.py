@@ -286,7 +286,6 @@ def run():
 	parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE')
 
-	# Erase line that tells the user the error has to do with ambiguous arguments
 	args, unknown = parser.parse_known_args()
 	if unknown:
 		log("[E] The following invalid argument(s) were provided: ", "RED") 
@@ -296,7 +295,12 @@ def run():
 		log("[I] \033[94mpyinstalive -h\033[92m can be used to display command help.", "GREEN")
 		exit(1)
 
-	if (len(vars(args)) == 12) or (args.info):
+	if (args.info) or (not
+	args.username and not
+    args.password and not
+    args.record and not
+    args.info and not
+    args.config):
 		show_info(config)
 		sys.exit(0)
 	
