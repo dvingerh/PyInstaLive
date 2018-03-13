@@ -389,15 +389,20 @@ def upload_ftp_files(files):
 			try:
 				filename = file.split('/').pop() or file.split('\\').pop()
 				log("", "GREEN")
-				log("[I] Uploading {:s}...".format(filename), "GREEN")
+				if filename.endswith("mp4"):
+					log("[I] Uploading video MP4 file to FTP server...".format(filename), "GREEN")
+				if filename.endswith("log"):
+					log("[I] Uploading comments logfile to FTP server...".format(filename), "GREEN")
+				if filename.endswith("json"):
+					log("[I] Uploading comments JSON file to FTP server...".format(filename), "GREEN")
 				filesize = os.path.getsize(file)
 				file_read = open(file, 'rb')
 				with tqdm(leave = False, ncols=70, miniters = 1, total = filesize, bar_format=">{bar}< - {percentage:3.0f}%") as tqdm_instance:
 					ftp.storbinary('STOR ' + filename, file_read, 2048, callback = lambda sent: tqdm_instance.update(len(sent)))
 				file_read.close()
-				log("[I] Successfully uploaded {:s}.".format(filename), "GREEN")
+				log("[I] Successfully uploaded file to FTP server.", "GREEN")
 			except Exception as e:
-				log("[E] Could not upload file to FTP server: {:s}".format(str(e)), "RED")
+				log("[E] Could not upload file '{:s}' to FTP server: {:s}".format(filename, str(e)), "RED")
 		ftp.quit()
 		ftp = None
 	except Exception as e:
