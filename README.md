@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.4.6](https://img.shields.io/badge/Version-2.4.6-pink.svg?style=for-the-badge)
+![Version 2.4.7](https://img.shields.io/badge/Version-2.4.7-pink.svg?style=for-the-badge)
 
 This script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
@@ -22,15 +22,15 @@ You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/d
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.6 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.7 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.4.6**) run the following command:
+To update PyInstaLive to the latest version (currently **2.4.7**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.6 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.4.7 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -62,6 +62,13 @@ save_replays = true
 run_at_start =
 run_at_finish =
 save_comments = false
+
+[ftp]
+ftp_enabled = false
+ftp_host = 
+ftp_save_path = 
+ftp_username = 
+ftp_password = 
 ```
 
 Use the following command to run PyInstaLive:
@@ -85,7 +92,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 
 ```
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.4.6 - PYTHON V3.6.3) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.4.7 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Logging in to user "johndoe" successful.
 [I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
@@ -117,6 +124,8 @@ PYINSTALIVE (SCRIPT V2.4.6 - PYTHON V3.6.3) - 06:45:30 PM
 
 
 #### Notes
+- The option to upload downloaded files to an FTP server is experimental. Use at your own risk.
+
 - The option to run a script upon starting and ending a stream download is experimental. Use at your own risk.
 
 - The option to download comments is experimental and only fully supported with Python 3. Python 2 cannot save most unicode characters if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). Use at your own risk.
