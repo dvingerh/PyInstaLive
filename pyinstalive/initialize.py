@@ -287,6 +287,7 @@ def run():
 	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE')
 
 	args, unknown = parser.parse_known_args()
+	
 	if unknown:
 		log("[E] The following invalid argument(s) were provided: ", "RED") 
 		log('', "GREEN") 
@@ -300,13 +301,15 @@ def run():
     args.password and not
     args.record and not
     args.info and not
-    args.config):
+    args.config and not
+    args.noreplays):
 		show_info(config)
 		sys.exit(0)
 	
 	if (args.config == True):
 		new_config()
 		sys.exit(0)
+
 
 	if os.path.exists('pyinstalive.ini'):
 		try:

@@ -6,7 +6,7 @@ import subprocess
 import threading
 
 from instagram_private_api_extensions import live, replay
-from instagram_private_api import ClientError, ClientThrottledError
+from instagram_private_api import ClientError, ClientThrottledError, ClientConnectionError
 
 from .logger import log, seperator
 from .comments import CommentsDownloader
@@ -170,6 +170,13 @@ def get_user_info(user_to_record):
 	try:
 		user_res = instagram_api.username_info(user_to_record)
 		user_id = user_res.get('user', {}).get('pk')
+	except ClientConnectionError as e:
+		if "timed out" in str(e):
+			log('[E] Could not get information for "{:s}": The connection has timed out.'.format(user_to_record), "RED")
+		else:
+			log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_record, str(e), e.code, e.error_response), "RED")
+		seperator("GREEN")
+		sys.exit(1)
 	except Exception as e:
 		log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_record, str(e), e.code, e.error_response), "RED")
 		seperator("GREEN")
