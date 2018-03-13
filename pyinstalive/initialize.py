@@ -144,6 +144,27 @@ def check_config_validity(config):
 			settings.save_path = os.getcwd()
 			has_thrown_errors = True
 
+
+		try:
+			if config.get('ftp', 'ftp_enabled').title() == "True":
+				settings.ftp_host = config.get('ftp', 'ftp_host')
+				settings.ftp_save_path = config.get('ftp', 'ftp_save_path')
+				settings.ftp_username = config.get('ftp', 'ftp_username')
+				settings.ftp_password = config.get('ftp', 'ftp_password')
+
+				if len(settings.ftp_host) > 0 and len(settings.ftp_save_path) > 0 and len(settings.ftp_username) > 0 and len(settings.ftp_password) > 0:
+					settings.ftp_enabled = True
+				else:
+					log("[W] Missing settings detected for the FTP settings, FTP will be ignored.", "YELLOW")
+					has_thrown_errors = True
+		except:
+			log("[W] Missing or invalid settings detected for the FTP settings, FTP will be ignored.", "YELLOW")
+			has_thrown_errors = True
+
+
+
+
+
 		if has_thrown_errors:
 			seperator("GREEN")
 

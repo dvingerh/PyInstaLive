@@ -12,3 +12,8 @@ class settings:
 	run_at_start = "None"
 	run_at_finish = "None"
 	save_comments = "true"
+	ftp_host = "ftp.cluster020.hosting.ovh.net"
+	ftp_save_path = "/"
+	ftp_username = "milliemelp"
+	ftp_password = "xXkzcdV9SMZU"
+	ftp_enabled = False

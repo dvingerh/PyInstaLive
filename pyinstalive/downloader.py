@@ -4,6 +4,9 @@ import os
 import shutil
 import subprocess
 import threading
+import ftplib
+from tqdm import tqdm
+from glob import glob
 
 from instagram_private_api_extensions import live, replay
 from instagram_private_api import ClientError, ClientThrottledError, ClientConnectionError
@@ -132,9 +135,18 @@ def download_livestream(broadcast):
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 	try:
+
+		live_mp4_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+		live_json_file = settings.save_path + '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+		live_comments_file = live_json_file.replace(".json", ".log")
+
+		live_files = [live_mp4_file]
+
+
 		if comment_thread_worker and comment_thread_worker.is_alive():
 			log("[I] Stopping comment downloading and saving comments (if any)...", "GREEN")
 			comment_thread_worker.join()
+			live_files.extend([live_json_file, live_comments_file])
 
 		if (settings.run_at_finish is not "None"):
 			try:
@@ -145,14 +157,20 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			except Exception as e:
 				log('[W] Could not run file: {:s}'.format(str(e)), "YELLOW")
 
-		log('[I] Stitching downloaded files into video...', "GREEN")
-		output_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+		log('[I] Stitching downloaded files into video...', "GREEN")		
+
 		try:
 			if settings.clear_temp_files.title() == "True":
-				broadcast_downloader.stitch(output_file, cleartempfiles=True)
+				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=True)
 			else:
-				broadcast_downloader.stitch(output_file, cleartempfiles=False)
+				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=False)
 			log('[I] Successfully stitched downloaded files into video.', "GREEN")
+			if settings.ftp_enabled:
+				try:
+					seperator("GREEN")
+					upload_ftp_files(live_files)
+				except Exception as e:
+					log("[E] Could not upload files to FTP server: {:s}".format(str(e)), "RED")
 			seperator("GREEN")
 			sys.exit(0)
 		except Exception as e:
@@ -245,21 +263,32 @@ def download_replays(broadcasts):
 					output_dir=output_dir,
 					user_agent=instagram_api.user_agent)
 
+				replay_mp4_file = settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+				replay_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+				replay_comments_file = replay_json_file.replace(".json", ".log")
+
+				replay_files = [replay_mp4_file]
 
 				if settings.clear_temp_files.title() == "True":
-					replay_saved = broadcast_downloader.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time), cleartempfiles=True)
+					replay_saved = broadcast_downloader.download(replay_mp4_file, cleartempfiles=True)
 				else:
-					replay_saved = broadcast_downloader.download(settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time), cleartempfiles=False)
+					replay_saved = broadcast_downloader.download(replay_mp4_file, cleartempfiles=False)
 
 				if settings.save_comments.title() == "True":
 					log("[I] Checking for available comments to save...", "GREEN")
-					comments_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
-					get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_downloader)
+					if get_replay_comments(instagram_api, broadcast, replay_json_file, broadcast_downloader):
+						replay_files.extend([replay_json_file, replay_comments_file])
 
 				if (len(replay_saved) == 1):
 					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
+					if settings.ftp_enabled:
+						try:
+							upload_ftp_files(replay_files)
+						except Exception as e:
+							log("[E] Could not upload files to FTP server: {:s}".format(str(e)), "RED")
 					if (current != len(broadcasts)):
 						seperator("GREEN")
+
 				else:
 					log("[W] No output video file was made, please merge the files manually if possible.", "YELLOW")
 					log("[W] Check if ffmpeg is available by running ffmpeg in your terminal/cmd prompt.", "YELLOW")
@@ -299,12 +328,16 @@ def get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_
 				comments_delay=0)
 			if len(comments_downloader.comments) == 1:
 				log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+				return True
 			else:
 				log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+				return True
 		else:
 			log("[I] There are no available comments to save.", "GREEN")
+			return False
 	except Exception as e:
 		log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
+		return False
 
 
 
@@ -312,6 +345,7 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 	comments_downloader = CommentsDownloader(
 		api=instagram_api, broadcast=broadcast, destination_file=comments_json_file)
 	first_comment_created_at = 0
+
 	try:
 		while not broadcast_downloader.is_aborted:
 			if 'initial_buffered_duration' not in broadcast and broadcast_downloader.initial_buffered_duration:
@@ -331,11 +365,40 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 				comments_delay=broadcast_downloader.initial_buffered_duration)
 			if len(comments_downloader.comments) == 1:
 				log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+				return True
 			else:
 				log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+				return True
 			seperator("GREEN")
 		else:
 			log("[I] There are no available comments to save.", "GREEN")
+			return False
 			seperator("GREEN")
 	except Exception as e:
 		log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
+		return False
+
+
+
+def upload_ftp_files(files):
+	try:
+		ftp = ftplib.FTP(settings.ftp_host, settings.ftp_username, settings.ftp_password)
+		ftp.cwd(settings.ftp_save_path)
+
+		for file in files:
+			try:
+				filename = file.split('/').pop() or file.split('\\').pop()
+				log("", "GREEN")
+				log("[I] Uploading {:s}...".format(filename), "GREEN")
+				filesize = os.path.getsize(file)
+				file_read = open(file, 'rb')
+				with tqdm(leave = False, ncols=70, miniters = 1, total = filesize, bar_format=">{bar}< - {percentage:3.0f}%") as tqdm_instance:
+					ftp.storbinary('STOR ' + filename, file_read, 2048, callback = lambda sent: tqdm_instance.update(len(sent)))
+				file_read.close()
+				log("[I] Successfully uploaded {:s}.".format(filename), "GREEN")
+			except Exception as e:
+				log("[E] Could not upload file to FTP server: {:s}".format(str(e)), "RED")
+		ftp.quit()
+		ftp = None
+	except Exception as e:
+		log("[E] Could not upload files to FTP server: {:s}".format(str(e)), "RED")

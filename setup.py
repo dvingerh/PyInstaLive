@@ -25,7 +25,8 @@ setup(
 		'instagram_private_api>=%(api)s' % {'api': _api_version},
 		'instagram_private_api_extensions>=%(ext)s' % {'ext': _api_extensions_version},
 		'argparse',
-		'configparser'
+		'configparser',
+		'tqdm'
 	],
 	dependency_links=[
 		'https://github.com/ping/instagram_private_api/archive/%(api)s.tar.gz'

@@ -32,3 +32,5 @@ MANIFEST
 snippets\.py
 
 downloaded/
+
+requirements\.txt
