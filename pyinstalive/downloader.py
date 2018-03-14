@@ -170,7 +170,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 					seperator("GREEN")
 					upload_ftp_files(live_files)
 				except Exception as e:
-					log("[E] Could not upload files to FTP server: {:s}".format(str(e)), "RED")
+					log("[E] Could not upload livestream files to FTP server: {:s}".format(str(e)), "RED")
 			seperator("GREEN")
 			sys.exit(0)
 		except Exception as e:
@@ -285,7 +285,8 @@ def download_replays(broadcasts):
 						try:
 							upload_ftp_files(replay_files)
 						except Exception as e:
-							log("[E] Could not upload files to FTP server: {:s}".format(str(e)), "RED")
+							log("[E] Could not upload replay files to FTP server: {:s}".format(str(e)), "RED")
+
 					if (current != len(broadcasts)):
 						seperator("GREEN")
 
@@ -316,68 +317,75 @@ def download_replays(broadcasts):
 
 
 def get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_downloader):
-	comments_downloader = CommentsDownloader(
-		api=instagram_api, broadcast=broadcast, destination_file=comments_json_file)
-	comments_downloader.get_replay()
-
 	try:
-		if comments_downloader.comments:
-			comments_log_file = comments_json_file.replace('.json', '.log')
-			CommentsDownloader.generate_log(
-				comments_downloader.comments, broadcast.get('published_time'), comments_log_file,
-				comments_delay=0)
-			if len(comments_downloader.comments) == 1:
-				log("[I] Successfully saved 1 comment to logfile.", "GREEN")
-				return True
+		comments_downloader = CommentsDownloader(
+			api=instagram_api, broadcast=broadcast, destination_file=comments_json_file)
+		comments_downloader.get_replay()
+
+		try:
+			if comments_downloader.comments:
+				comments_log_file = comments_json_file.replace('.json', '.log')
+				CommentsDownloader.generate_log(
+					comments_downloader.comments, broadcast.get('published_time'), comments_log_file,
+					comments_delay=0)
+				if len(comments_downloader.comments) == 1:
+					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+					return True
+				else:
+					log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+					return True
 			else:
-				log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
-				return True
-		else:
-			log("[I] There are no available comments to save.", "GREEN")
+				log("[I] There are no available comments to save.", "GREEN")
+				return False
+		except Exception as e:
+			log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
 			return False
-	except Exception as e:
-		log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
+	except KeyboardInterrupt as e:
+		log("[W] Downloading replay comments has been aborted.", "YELLOW")
 		return False
 
 
 
 def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_downloader):
-	comments_downloader = CommentsDownloader(
-		api=instagram_api, broadcast=broadcast, destination_file=comments_json_file)
-	first_comment_created_at = 0
-
 	try:
-		while not broadcast_downloader.is_aborted:
-			if 'initial_buffered_duration' not in broadcast and broadcast_downloader.initial_buffered_duration:
-				broadcast['initial_buffered_duration'] = broadcast_downloader.initial_buffered_duration
-				comments_downloader.broadcast = broadcast
-			first_comment_created_at = comments_downloader.get_live(first_comment_created_at)
-	except ClientError as e:
-		if not 'media has been deleted' in e.error_response:
-			log("[W] Comment collection ClientError: %d %s" % (e.code, e.error_response), "YELLOW")
+		comments_downloader = CommentsDownloader(
+			api=instagram_api, broadcast=broadcast, destination_file=comments_json_file)
+		first_comment_created_at = 0
 
-	try:
-		if comments_downloader.comments:
-			comments_downloader.save()
-			comments_log_file = comments_json_file.replace('.json', '.log')
-			CommentsDownloader.generate_log(
-				comments_downloader.comments, settings.current_time, comments_log_file,
-				comments_delay=broadcast_downloader.initial_buffered_duration)
-			if len(comments_downloader.comments) == 1:
-				log("[I] Successfully saved 1 comment to logfile.", "GREEN")
-				return True
+		try:
+			while not broadcast_downloader.is_aborted:
+				if 'initial_buffered_duration' not in broadcast and broadcast_downloader.initial_buffered_duration:
+					broadcast['initial_buffered_duration'] = broadcast_downloader.initial_buffered_duration
+					comments_downloader.broadcast = broadcast
+				first_comment_created_at = comments_downloader.get_live(first_comment_created_at)
+		except ClientError as e:
+			if not 'media has been deleted' in e.error_response:
+				log("[W] Comment collection ClientError: %d %s" % (e.code, e.error_response), "YELLOW")
+
+		try:
+			if comments_downloader.comments:
+				comments_downloader.save()
+				comments_log_file = comments_json_file.replace('.json', '.log')
+				CommentsDownloader.generate_log(
+					comments_downloader.comments, settings.current_time, comments_log_file,
+					comments_delay=broadcast_downloader.initial_buffered_duration)
+				if len(comments_downloader.comments) == 1:
+					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+					return True
+				else:
+					log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+					return True
+				seperator("GREEN")
 			else:
-				log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
-				return True
-			seperator("GREEN")
-		else:
-			log("[I] There are no available comments to save.", "GREEN")
+				log("[I] There are no available comments to save.", "GREEN")
+				return False
+				seperator("GREEN")
+		except Exception as e:
+			log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
 			return False
-			seperator("GREEN")
-	except Exception as e:
-		log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
+	except KeyboardInterrupt as e:
+		log("[W] Downloading livestream comments has been aborted.", "YELLOW")
 		return False
-
 
 
 def upload_ftp_files(files):
@@ -385,12 +393,14 @@ def upload_ftp_files(files):
 		ftp = ftplib.FTP(settings.ftp_host, settings.ftp_username, settings.ftp_password)
 		ftp.cwd(settings.ftp_save_path)
 
+		stream_type = "replay" if "_replay.mp4" in files[0] else "livestream"
+
 		for file in files:
 			try:
 				filename = file.split('/').pop() or file.split('\\').pop()
 				log("", "GREEN")
 				if filename.endswith("mp4"):
-					log("[I] Uploading video MP4 file to FTP server...".format(filename), "GREEN")
+					log("[I] Uploading video file to FTP server...".format(filename), "GREEN")
 				if filename.endswith("log"):
 					log("[I] Uploading comments logfile to FTP server...".format(filename), "GREEN")
 				if filename.endswith("json"):
@@ -406,4 +416,6 @@ def upload_ftp_files(files):
 		ftp.quit()
 		ftp = None
 	except Exception as e:
-		log("[E] Could not upload files to FTP server: {:s}".format(str(e)), "RED")
+		log("[E] Could not upload {:s} files to FTP server: {:s}".format(stream_type, str(e)), "RED")
+	except KeyboardInterrupt as e:
+		log("[W] Uploading {:s} files to FTP server has been aborted.".format(stream_type), "YELLOW")
