@@ -48,6 +48,6 @@ def log(string, color):
 
 def seperator(color):
 	if not supports_color():
-		print("=" * 70)
+		print("-" * 70)
 	else:
-		print('\033[1m' + colors(color) + ("=" * 70) + colors("ENDC"))
+		print('\033[1m' + colors(color) + ("-" * 70) + colors("ENDC"))
