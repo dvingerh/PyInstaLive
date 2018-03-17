@@ -1,25 +1,29 @@
-import sys
-import time
+import ftplib
 import os
 import shutil
 import subprocess
+import sys
 import threading
-import ftplib
-from tqdm import tqdm
+import time
+
 from glob import glob
+from tqdm import tqdm
 
-from instagram_private_api_extensions import live, replay
-from instagram_private_api import ClientError, ClientThrottledError, ClientConnectionError
+from instagram_private_api import ClientConnectionError
+from instagram_private_api import ClientError
+from instagram_private_api import ClientThrottledError
+from instagram_private_api_extensions import live
+from instagram_private_api_extensions import replay
 
-from .logger import log, seperator
 from .comments import CommentsDownloader
+from .logger import log
+from .logger import seperator
 
 
 def main(instagram_api_arg, record_arg, settings_arg):
 	global instagram_api
 	global user_to_record
 	global broadcast
-	global mpd_url
 	global settings
 	settings = settings_arg
 	instagram_api = instagram_api_arg

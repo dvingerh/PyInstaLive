@@ -2,13 +2,15 @@ import argparse
 import configparser
 import logging
 import os.path
-import sys
 import subprocess
+import sys
 import time
 
 from .auth import login
-from .logger import log, seperator, supports_color
 from .downloader import main
+from .logger import log
+from .logger import seperator
+from .logger import supports_color
 from .settings import settings
 
 script_version = "2.4.7"

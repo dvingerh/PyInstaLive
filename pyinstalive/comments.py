@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import time
-import json
 import codecs
+import json
 import sys
-from socket import timeout, error as SocketError
+import time
+
+from socket import error as SocketError
+from socket import timeout
 from ssl import SSLError
 try:
 	# py2
@@ -15,8 +17,9 @@ except ImportError:
 	from urllib.error import URLError
 	from http.client import HTTPException
 
+from .logger import log
+from .logger import seperator
 from instagram_private_api import ClientError
-from .logger import log, seperator
 
 """
 This feature of PyInstaLive was originally written by https://github.com/taengstagram

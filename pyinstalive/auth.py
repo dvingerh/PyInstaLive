@@ -3,7 +3,9 @@ import datetime
 import json
 import os.path
 import sys
-from .logger import log, seperator
+
+from .logger import log
+from .logger import seperator
 
 
 
