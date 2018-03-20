@@ -110,8 +110,12 @@ def download_livestream(broadcast):
 	try:
 		log('[I] Livestream found, beginning download...', "GREEN")
 		broadcast_owner = broadcast.get('broadcast_owner', {}).get('username')
+		broadcast_guest = broadcast.get('cobroadcasters', {})[0].get('username')
 		if (broadcast_owner != user_to_record):
-			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner, "YELLOW"))
+			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner), "BLUE")
+			broadcast_guest = None
+		if broadcast_guest:
+			log('[I] This livestream is a dual-live, the guest is "{}".'.format(broadcast_guest), "BLUE")
 		seperator("GREEN")
 		log('[I] Username    : {:s}'.format(user_to_record), "GREEN")
 		print_status(False)
