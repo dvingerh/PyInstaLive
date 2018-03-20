@@ -361,9 +361,11 @@ def get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_
 					comments_delay=0)
 				if len(comments_downloader.comments) == 1:
 					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+					seperator("GREEN")
 					return True
 				else:
 					log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+					seperator("GREEN")
 					return True
 			else:
 				log("[I] There are no available comments to save.", "GREEN")
@@ -402,11 +404,12 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 					comments_delay=broadcast_downloader.initial_buffered_duration)
 				if len(comments_downloader.comments) == 1:
 					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
+					seperator("GREEN")
 					return True
 				else:
 					log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+					seperator("GREEN")
 					return True
-				seperator("GREEN")
 			else:
 				log("[I] There are no available comments to save.", "GREEN")
 				return False
