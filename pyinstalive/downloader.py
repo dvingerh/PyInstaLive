@@ -53,7 +53,7 @@ def get_stream_duration(compare_time, broadcast=None):
 				corrected_compare_time = int(compare_time) - 5
 				record_time = int(time.time()) - int(corrected_compare_time)
 			else:
-			record_time = int(time.time()) - int(compare_time)
+				record_time = int(time.time()) - int(compare_time)
 			stream_time = int(time.time()) - int(broadcast.get('published_time'))
 			stream_started_mins, stream_started_secs = divmod(stream_time - record_time, 60)
 		else:
@@ -62,14 +62,14 @@ def get_stream_duration(compare_time, broadcast=None):
 				corrected_compare_time = int(compare_time) - 5
 				stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(corrected_compare_time)), 60)
 			else:
-			stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
+				stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
 		stream_duration_str = '%d minutes' % stream_started_mins
 		if stream_started_secs:
 			stream_duration_str += ' and %d seconds' % stream_started_secs
 		if had_wrong_time:
 			return stream_duration_str + " (corrected)"
 		else:
-		return stream_duration_str
+			return stream_duration_str
 	except Exception as e:
 		print(str(e))
 		return "Not available"
@@ -192,6 +192,10 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 					log("[E] Could not upload livestream files to FTP server: {:s}".format(str(e)), "RED")
 			seperator("GREEN")
 			sys.exit(0)
+		except ValueError as e:
+			log('[E] Could not stitch downloaded files: {:s}\n[E] Likely the download duration was too short and no temp files were saved.'.format(str(e)), "RED")
+			seperator("GREEN")
+			sys.exit(1)
 		except Exception as e:
 			log('[E] Could not stitch downloaded files: {:s}'.format(str(e)), "RED")
 			seperator("GREEN")
