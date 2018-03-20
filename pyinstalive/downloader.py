@@ -46,18 +46,33 @@ def run_script(file):
 
 def get_stream_duration(compare_time, broadcast=None):
 	try:
+		had_wrong_time = False
 		if broadcast:
+			if (int(time.time()) < int(compare_time)):
+				had_wrong_time = True				
+				corrected_compare_time = int(compare_time) - 5
+				record_time = int(time.time()) - int(corrected_compare_time)
+			else:
 			record_time = int(time.time()) - int(compare_time)
 			stream_time = int(time.time()) - int(broadcast.get('published_time'))
 			stream_started_mins, stream_started_secs = divmod(stream_time - record_time, 60)
 		else:
+			if (int(time.time()) < int(compare_time)):	
+				had_wrong_time = True			
+				corrected_compare_time = int(compare_time) - 5
+				stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(corrected_compare_time)), 60)
+			else:
 			stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(compare_time)), 60)
 		stream_duration_str = '%d minutes' % stream_started_mins
 		if stream_started_secs:
 			stream_duration_str += ' and %d seconds' % stream_started_secs
+		if had_wrong_time:
+			return stream_duration_str + " (corrected)"
+		else:
 		return stream_duration_str
-	except:
-		return "not available"
+	except Exception as e:
+		print(str(e))
+		return "Not available"
 
 
 
