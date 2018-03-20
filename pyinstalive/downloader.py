@@ -153,7 +153,8 @@ def download_livestream(broadcast):
 		if not broadcast_downloader.is_aborted:
 			broadcast_downloader.stop()
 			stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
-
+	except Exception as e:
+		log("[E] Could not download livestream: {:s}".format(str(e)), "RED")
 
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
@@ -243,26 +244,26 @@ def get_broadcasts_info(user_id):
 
 		livestream = broadcasts.get('broadcast')
 		replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
-
-		if livestream:
-			seperator("GREEN")
-			download_livestream(livestream)
-		else:
-			log('[I] There are no available livestreams.', "YELLOW")
-		if settings.save_replays.title() == "True":
-			if replays:
-				seperator("GREEN")
-				download_replays(replays)
-			else:
-				log('[I] There are no available replays.', "YELLOW")
-		else:
-			log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
-		seperator("GREEN")
 	except Exception as e:
 		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")
 	except ClientThrottledError as cte:
 		log('[E] Could not check because you are making too many requests at this time.', "RED")
 		log('[E] Error response: {:s}'.format(str(cte)), "RED")
+
+	if livestream:
+		seperator("GREEN")
+		download_livestream(livestream)
+	else:
+		log('[I] There are no available livestreams.', "YELLOW")
+	if settings.save_replays.title() == "True":
+		if replays:
+			seperator("GREEN")
+			download_replays(replays)
+		else:
+			log('[I] There are no available replays.', "YELLOW")
+	else:
+		log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
+	seperator("GREEN")
 
 def download_replays(broadcasts):
 	try:
