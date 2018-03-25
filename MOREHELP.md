@@ -50,9 +50,11 @@ ftp_password =
 
 ```run_at_start```  **—**  Command to run when PyInstaLive starts recording a livestream. Leave empty to disable. (Experimental, use at own risk.)
 
-```run_at_finish```  **—**  Command to run when PyInstaLive finishes recording a livestream. Leave empty to disable.(Experimental, use at own risk.) 
+```run_at_finish```  **—**  Command to run when PyInstaLive finishes recording a livestream. Leave empty to disable. (Experimental, use at own risk.) 
  
 ```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
+
+#
 
 ```ftp_enabled```  **—** When set to true, PyInstaLive will upload downloaded files to the configured FTP server. (Experimental, use at own risk.)
 
