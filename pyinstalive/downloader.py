@@ -5,6 +5,7 @@ import subprocess
 import sys
 import threading
 import time
+import shlex
 
 from glob import glob
 from tqdm import tqdm
@@ -32,13 +33,10 @@ def main(instagram_api_arg, record_arg, settings_arg):
 
 
 
-def run_script(file):
+def run_command(command):
 	try:
 		FNULL = open(os.devnull, 'w')
-		if sys.version.split(' ')[0].startswith('2'):
-			subprocess.call(["python", file], stdout=FNULL, stderr=subprocess.STDOUT)
-		else:
-			subprocess.call(["python3", file], stdout=FNULL, stderr=subprocess.STDOUT)
+		subprocess.Popen(shlex.split(command), stdout=FNULL, stderr=subprocess.STDOUT)
 	except OSError as e:
 		pass
 
@@ -128,12 +126,12 @@ def download_livestream(broadcast):
 
 		if (settings.run_at_start is not "None"):
 			try:
-				thread = threading.Thread(target=run_script, args=(settings.run_at_start,))
+				thread = threading.Thread(target=run_command, args=(settings.run_at_start,))
 				thread.daemon = True
 				thread.start()
-				log("[I] Executed file to run at start.", "GREEN")
+				log("[I] Command executed: \033[94m{:s}".format(settings.run_at_start), "GREEN")
 			except Exception as e:
-				log('[W] Could not run file: {:s}'.format(str(e)), "YELLOW")
+				log('[W] Could not execute command: {:s}'.format(str(e)), "YELLOW")
 
 
 		comment_thread_worker = None
@@ -177,12 +175,12 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 
 		if (settings.run_at_finish is not "None"):
 			try:
-				thread = threading.Thread(target=run_script, args=(settings.run_at_finish,))
+				thread = threading.Thread(target=run_command, args=(settings.run_at_finish,))
 				thread.daemon = True
 				thread.start()
-				log("[I] Executed file to run at finish.", "GREEN")
+				log("[I] Command executed: \033[94m{:s}".format(settings.run_at_finish), "GREEN")
 			except Exception as e:
-				log('[W] Could not run file: {:s}'.format(str(e)), "YELLOW")
+				log('[W] Could not execute command: {:s}'.format(str(e)), "YELLOW")
 
 		log('[I] Stitching downloaded files into video...', "GREEN")		
 

@@ -72,18 +72,8 @@ def check_config_validity(config):
 
 
 		try:
-			settings.run_at_start = config.get('pyinstalive', 'run_at_start')
-			if (settings.run_at_start):
-				if not os.path.isfile(settings.run_at_start):
-					log("[W] Path to file given for 'run_at_start' does not exist, using default value (None)", "YELLOW")
-					settings.run_at_start = "None"
-					has_thrown_errors = True
-				else:
-					if not settings.run_at_start.split('.')[-1] == 'py':
-						log("[W] File given for 'run_at_start' is not a Python script, using default value (None)", "YELLOW")
-						settings.run_at_start = "None"
-						has_thrown_errors = True
-			else:
+			settings.run_at_start = config.get('pyinstalive', 'run_at_start').replace("\\", "\\\\")
+			if not settings.run_at_start:
 				settings.run_at_start = "None"
 		except:
 			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (None)", "YELLOW")
@@ -93,20 +83,9 @@ def check_config_validity(config):
 
 
 		try:
-			settings.run_at_finish = config.get('pyinstalive', 'run_at_finish')
-			if (settings.run_at_finish):
-				if not os.path.isfile(settings.run_at_finish):
-					log("[W] Path to file given for 'run_at_finish' does not exist, using default value (None)", "YELLOW")
-					settings.run_at_finish = "None"
-					has_thrown_errors = True
-				else:
-					if not settings.run_at_finish.split('.')[-1] == 'py':
-						log("[W] File given for 'run_at_finish' is not a Python script, using default value (None)", "YELLOW")
-						settings.run_at_finish = "None"
-						has_thrown_errors = True
-			else:
+			settings.run_at_finish = config.get('pyinstalive', 'run_at_finish').replace("\\", "\\\\")
+			if not settings.run_at_finish:
 				settings.run_at_finish = "None"
-
 		except:
 			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (None)", "YELLOW")
 			settings.run_at_finish = "None"
