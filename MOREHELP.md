@@ -48,9 +48,9 @@ ftp_password =
 
 ```save_replays```  **—**  When set to True, PyInstaLive will check for and download any available replays.
 
-```run_at_start```  **—**  Python script to run when PyInstaLive starts recording a livestream. Leave empty to disable. (Experimental, use at own risk.)
+```run_at_start```  **—**  Command to run when PyInstaLive starts recording a livestream. Leave empty to disable. (Experimental, use at own risk.)
 
-```run_at_finish```  **—**  Python script to run when PyInstaLive finishes recording a livestream. Leave empty to disable.(Experimental, use at own risk.) 
+```run_at_finish```  **—**  Command to run when PyInstaLive finishes recording a livestream. Leave empty to disable.(Experimental, use at own risk.) 
  
 ```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
 

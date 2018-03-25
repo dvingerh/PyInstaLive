@@ -13,7 +13,7 @@ from .logger import seperator
 from .logger import supports_color
 from .settings import settings
 
-script_version = "2.4.8"
+script_version = "2.4.9"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
 
