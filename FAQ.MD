@@ -55,3 +55,8 @@ Make sure there is a configuration file called pyinstalive.ini in the directory 
 ### How can I run PyInstaLive 24/7 so I won't miss a livestream?
 
 Use the scripts provided in the previous question, they'll infinitely run the PyInstaLive command you entered there. You'll need to have a computer or other device running this script 24/7 for this to work, obviously.
+
+### Can I use PyInstaLive and [livestream_dl](https://github.com/taengstagram/instagram-livestream-downloader) concurrently?
+
+No. This is because livestream_dl is no longer being maintained and as such uses an older version of libraries required by PyInstaLive. Installing PyInstaLive and livestream_dl on different Python versions (2/3) might work though.
+
