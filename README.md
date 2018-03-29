@@ -4,6 +4,14 @@
 This script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
 
+## Features
+
+- Download ongoing livestreams (also detects livestreams in which the user is curently a guest)
+- Download available replays
+- Download livestream and replay comments
+- Run a command when starting and/or finishing a download (Experimental)
+- Upload the downloaded livestream or replay to an FTP server (Experimental)
+
 ## Quickstart
 
 - [Read the notes below (important!)](https://github.com/notcammy/PyInstaLive#notes)
@@ -46,9 +54,10 @@ Use the version number you want after the **@** symbol (e.g **2.2.0**).
 
 ## Usage
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
+
 You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
 
-For more information about the configuration file go  [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md#default-configuration-file).
+For more information about the configuration file go [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md#default-configuration-file).
 
 Here is an example of a valid configuration file:
 ```ini
@@ -124,26 +133,18 @@ PYINSTALIVE (SCRIPT V2.4.9 - PYTHON V3.6.3) - 06:45:30 PM
 
 
 #### Notes
-- The option to upload downloaded files to an FTP server is experimental. Use at your own risk.
+- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux systems.
 
-- The option to run a script upon starting and ending a stream download is experimental. Use at your own risk.
-
-- The option to download comments is experimental and only fully supported with Python 3. Python 2 cannot save most unicode characters if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). Use at your own risk.
-
-- You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md). You can also run `pyinstalive -h` to view all available commands. 
-
-- The `username` and `password` parameters are not required when you have specified these in the configuration file.
+- The `username` and `password` arguments are not required when you have specified these in the configuration file.
 
 - This script is also reported to work on Python 3.4.x but is not officially supported.
 
 - If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
 
-- From version 2.2.9 and up, newly generated login cookie files are now named after the username in the configuration file. If you have an existing cookie file called 'credentials.json' it is a good idea to rename it to the username it is associated with so PyInstaLive won't needlessly create a new cookie file.
-
-- From version 2.4.1 and up, support for using [livestream_dl](https://github.com/taengstagram/instagram-livestream-downloader) and PyInstaLive concurrently has been dropped in favor of using the latest API library version, which allows for detecting livestreams that an user is a guest of (split screen/dual-live).
-
 
 ## Help
-You can find a FAQ [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.MD).
+You can find a list of frequently asked questions [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.MD).
+
+You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.MD).
 
 If you would like to report a bug or ask a question please [open an issue](https://github.com/notcammy/PyInstaLive/issues/new).
