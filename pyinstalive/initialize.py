@@ -144,21 +144,12 @@ def check_config_validity(config):
 
 
 
-
-
 		if has_thrown_errors:
 			seperator("GREEN")
 
-		if not (len(settings.username) > 0):
-			log("[E] Invalid or missing setting detected for 'username'.", "RED")
-			return False
-
-		if not (len(settings.password) > 0):
-			log("[E] Invalid or missing setting detected for 'password'.", "RED")
-			return False
-
 		return True
 	except Exception as e:
+		print(str(e))
 		return False
 
 def show_info(config):
@@ -340,14 +331,25 @@ def run():
 
 		if (args.username is not None) and (args.password is not None):
 			api = login(args.username, args.password, settings.show_cookie_expiry, True)
+		elif (args.username is not None) or (args.password is not None):
+			log("[W] Missing -u or -p arguments, falling back to config file...", "YELLOW")
+			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
+				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+				seperator("GREEN")
+				sys.exit(1)
+			else:
+				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 		else:
-			if (args.username is not None) or (args.password is not None):
-				log("[W] Missing -u or -p arguments, falling back to config login...", "YELLOW")
-			api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
+			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
+				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+				seperator("GREEN")
+				sys.exit(1)
+			else:
+				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
 		main(api, args.record, settings)
 
 	else:
 		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
 		seperator("GREEN")
-		sys.exit(0)
+		sys.exit(1)
