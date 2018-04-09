@@ -4,10 +4,10 @@ __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
 __version__ = '2.4.9'
 
-_api_version = '1.4.1'
-_api_extensions_version = '0.3.6'
+_api_version = '1.5.1'
+_api_extensions_version = '0.3.7'
 
-long_description = 'This script enables you to record Instagram livestreams as well as download any available replays. It is based on another script that has now been discontinued.'
+long_description = 'This script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on another script that has now been discontinued.'
 
 setup(
 	name='pyinstalive',
@@ -37,7 +37,7 @@ setup(
 	platforms='any',
 	long_description=long_description,
 	keywords='instagram-livestream-recorder record-instagram-livestreams live instagram record livestream video recorder downloader download save',
-	description='This script enables you to record Instagram livestreams.',
+	description='This script enables you to download Instagram livestreams and replays.',
 	classifiers=[
 		'Environment :: Console',
 		'Programming Language :: Python :: 2.7',
