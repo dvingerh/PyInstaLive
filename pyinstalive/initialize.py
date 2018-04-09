@@ -5,6 +5,7 @@ import os.path
 import subprocess
 import sys
 import time
+import shutil
 
 from .auth import login
 from .downloader import main
@@ -143,7 +144,6 @@ def check_config_validity(config):
 			has_thrown_errors = True
 
 
-
 		if has_thrown_errors:
 			seperator("GREEN")
 
@@ -151,6 +151,8 @@ def check_config_validity(config):
 	except Exception as e:
 		print(str(e))
 		return False
+
+
 
 def show_info(config):
 	if os.path.exists('pyinstalive.ini'):
@@ -212,6 +214,8 @@ def show_info(config):
 	log("[I] End of PyInstaLive information screen.", "GREEN")
 	seperator("GREEN")
 
+
+
 def new_config():
 	try:
 		if os.path.exists('pyinstalive.ini'):
@@ -221,8 +225,8 @@ def new_config():
 				for line in f:
 					log("    " + line.rstrip(), "YELLOW")
 			log("", "GREEN")
-			log("[W] To create a default config file, delete 'pyinstalive.ini' and ", "YELLOW")
-			log("    run this script again.", "YELLOW")
+			log("[I] To create a default config file, delete 'pyinstalive.ini' and ", "GREEN")
+			log("    run this script again.", "GREEN")
 			seperator("GREEN")
 		else:
 			try:
@@ -254,6 +258,57 @@ def new_config():
 
 
 
+def clean_download_dir():
+	dir_delcount = 0
+	file_delcount = 0
+	error_count = 0
+	log('[I] Cleaning up temporary files and folders...', "GREEN")
+	try:
+		if sys.version.split(' ')[0].startswith('2'):
+			directories = (os.walk(settings.save_path).next()[1])
+			files = (os.walk(settings.save_path).next()[2])
+		else:
+			directories = (os.walk(settings.save_path).__next__()[1])
+			files = (os.walk(settings.save_path).__next__()[2])
+
+		for directory in directories:
+			if directory.endswith('_downloads'):
+				try:
+					shutil.rmtree(settings.save_path + directory)
+					dir_delcount += 1
+				except Exception as e:
+					log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
+					error_count += 1
+		for file in files:
+			if file.endswith('_comments.json'):
+				try:
+					os.remove(settings.save_path + file)
+					file_delcount += 1
+				except Exception as e:
+					log("[E] Could not remove temp file: {:s}".format(str(e)), "RED")
+					error_count += 1
+		seperator("GREEN")
+		log('[I] The cleanup has finished.', "YELLOW")
+		if dir_delcount == 0 and file_delcount == 0 and error_count == 0:
+			log('[I] No files or folders were removed.', "YELLOW")
+			seperator("GREEN")
+			return
+		log('[I] Folders removed:     {:d}'.format(dir_delcount), "YELLOW")
+		log('[I] Files removed:       {:d}'.format(file_delcount), "YELLOW")
+		log('[I] Errors:              {:d}'.format(error_count), "YELLOW")
+		seperator("GREEN")
+	except KeyboardInterrupt as e:
+		seperator("GREEN")
+		log("[W] The cleanup has been aborted.", "YELLOW")
+		if dir_delcount == 0 and file_delcount == 0 and error_count == 0:
+			log('[I] No files or folders were removed.', "YELLOW")
+			seperator("GREEN")
+			return
+		log('[I] Folders removed:     {:d}'.format(dir_delcount), "YELLOW")
+		log('[I] Files removed:       {:d}'.format(file_delcount), "YELLOW")
+		log('[I] Errors:              {:d}'.format(error_count), "YELLOW")
+		seperator("GREEN")
+
 def run():
 	seperator("GREEN")
 	log('PYINSTALIVE (SCRIPT V{} - PYTHON V{}) - {}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
@@ -269,7 +324,7 @@ def run():
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
 	parser.add_argument('-nr', '--noreplays', dest='noreplays', action='store_true', help="When used, do not check for any available replays.")
-
+	parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="PyInstaLive will clean the current download folder of all leftover files.")
 
 	# Workaround to 'disable' argument abbreviations
 	parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
@@ -277,7 +332,10 @@ def run():
 	parser.add_argument('--recorx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--infx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
-	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE') 
+	parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
+
 
 	args, unknown = parser.parse_known_args()
 	
@@ -295,7 +353,8 @@ def run():
     args.record and not
     args.info and not
     args.config and not
-    args.noreplays):
+    args.noreplays and not
+    args.clean):
 		show_info(config)
 		sys.exit(0)
 	
@@ -316,6 +375,10 @@ def run():
 
 
 	if check_config_validity(config):
+		if (args.clean == True):
+			clean_download_dir()
+			sys.exit(0)
+
 		if check_ffmpeg() == False:
 			log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
 			seperator("GREEN")
