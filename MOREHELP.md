@@ -44,7 +44,7 @@ ftp_password =
 
 ```show_cookie_expiry```  **—**  When set to True, PyInstaLive will show when the current cookie used to login will expire.
 
-```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded. Folders created by PyInstaLive will not be deleted.
+```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded as well as the folders which contained these files. Replay folders created by PyInstaLive will not be deleted because they are used to determine if a replay has already been downloaded.
 
 ```save_replays```  **—**  When set to True, PyInstaLive will check for and download any available replays.
 
