@@ -86,7 +86,7 @@ Use the following command to run PyInstaLive:
 pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
 ```
 
-Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream or replay you want to download or save.
+Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream or replay you want to download.
 
 ## Example
 ```bash
