@@ -190,6 +190,12 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			else:
 				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=False)
 			log('[I] Successfully stitched downloaded files into video.', "GREEN")
+			if settings.clear_temp_files.title() == "True":
+				live_folder_to_del = live_mp4_file.split('.mp4')[0] + "_downloads"
+				try:
+					shutil.rmtree(live_folder_to_del)
+				except Exception as e:
+					log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
 			if settings.ftp_enabled:
 				try:
 					seperator("GREEN")
