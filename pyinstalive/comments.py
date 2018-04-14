@@ -4,6 +4,7 @@ import codecs
 import json
 import sys
 import time
+import os
 
 from socket import error as SocketError
 from socket import timeout
@@ -102,6 +103,9 @@ class CommentsDownloader(object):
 
 	@staticmethod
 	def generate_log(comments, download_start_time, log_file, comments_delay=10.0):
+		comment_log_save_path = os.path.dirname(os.path.dirname(log_file))
+		comment_log_file_name = os.path.basename(log_file)
+		log_file = os.path.join(comment_log_save_path, comment_log_file_name)
 		python_version = sys.version.split(' ')[0]
 		subtitles_timeline = {}
 		wide_build = sys.maxunicode > 65536

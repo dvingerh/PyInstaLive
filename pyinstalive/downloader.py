@@ -122,6 +122,7 @@ def download_livestream(broadcast):
 		print_status(False)
 		log('[I] MPD URL     : {:s}'.format(mpd_url), "GREEN")
 		seperator("GREEN")
+		open(os.path.join(output_dir,'folder.lock'), 'a').close()
 		log('[I] Downloading livestream... press [CTRL+C] to abort.', "GREEN")
 
 		if (settings.run_at_start is not "None"):
@@ -137,7 +138,7 @@ def download_livestream(broadcast):
 		comment_thread_worker = None
 		if settings.save_comments.title() == "True":
 			try:
-				comments_json_file = settings.save_path + '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+				comments_json_file = os.path.join(output_dir, '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
 				comment_thread_worker = threading.Thread(target=get_live_comments, args=(instagram_api, broadcast, comments_json_file, broadcast_downloader,))
 				comment_thread_worker.start()
 			except Exception as e:
@@ -156,14 +157,19 @@ def download_livestream(broadcast):
 			stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
 	except Exception as e:
 		log("[E] Could not download livestream: {:s}".format(str(e)), "RED")
+		try:
+		    os.remove(os.path.join(output_dir,'folder.lock'))
+		except OSError:
+		    pass
 
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 	try:
 
 		live_mp4_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
-		live_json_file = settings.save_path + '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
-		live_comments_file = live_json_file.replace(".json", ".log")
+		live_folder_path = live_mp4_file.split('.mp4')[0] + "_downloads"
+		live_json_file = os.path.join(settings.save_path, live_folder_path, '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
+		live_comments_file = live_mp4_file.replace(".mp4", "_live_comments.log")
 
 		live_files = [live_mp4_file]
 
@@ -183,17 +189,19 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				log('[W] Could not execute command: {:s}'.format(str(e)), "YELLOW")
 
 		log('[I] Stitching downloaded files into video...', "GREEN")		
-
 		try:
 			if settings.clear_temp_files.title() == "True":
 				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=True)
 			else:
 				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=False)
 			log('[I] Successfully stitched downloaded files into video.', "GREEN")
+			try:
+			    os.remove(os.path.join(live_folder_path,'folder.lock'))
+			except OSError:
+			    pass
 			if settings.clear_temp_files.title() == "True":
-				live_folder_to_del = live_mp4_file.split('.mp4')[0] + "_downloads"
 				try:
-					shutil.rmtree(live_folder_to_del)
+					shutil.rmtree(live_folder_path)
 				except Exception as e:
 					log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
 			if settings.ftp_enabled:
@@ -207,14 +215,26 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 		except ValueError as e:
 			log('[E] Could not stitch downloaded files: {:s}\n[E] Likely the download duration was too short and no temp files were saved.'.format(str(e)), "RED")
 			seperator("GREEN")
+			try:
+			    os.remove(os.path.join(live_folder_path,'folder.lock'))
+			except OSError:
+			    pass
 			sys.exit(1)
 		except Exception as e:
 			log('[E] Could not stitch downloaded files: {:s}'.format(str(e)), "RED")
 			seperator("GREEN")
+			try:
+			    os.remove(os.path.join(live_folder_path,'folder.lock'))
+			except OSError:
+			    pass
 			sys.exit(1)
 	except KeyboardInterrupt:
 			log('[I] Aborted stitching process, no video was created.', "YELLOW")
 			seperator("GREEN")
+			try:
+			    os.remove(os.path.join(live_folder_path,'folder.lock'))
+			except OSError:
+			    pass
 			sys.exit(0)
 
 
@@ -297,9 +317,9 @@ def download_replays(broadcasts):
 					mpd=broadcast.get('dash_manifest'),
 					output_dir=output_dir,
 					user_agent=instagram_api.user_agent)
-
+				open(os.path.join(output_dir,'folder.lock'), 'a').close()
 				replay_mp4_file = settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
-				replay_json_file = settings.save_path + '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+				replay_json_file = os.path.join(output_dir, '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
 				replay_comments_file = replay_json_file.replace(".json", ".log")
 
 				replay_files = [replay_mp4_file]
@@ -316,6 +336,10 @@ def download_replays(broadcasts):
 
 				if (len(replay_saved) == 1):
 					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
+					try:
+					    os.remove(os.path.join(output_dir,'folder.lock'))
+					except OSError:
+					    pass
 					if settings.ftp_enabled:
 						try:
 							upload_ftp_files(replay_files)
@@ -337,6 +361,10 @@ def download_replays(broadcasts):
 	except Exception as e:
 		log('[E] Could not save replay: {:s}'.format(str(e)), "RED")
 		seperator("GREEN")
+		try:
+		    os.remove(os.path.join(output_dir,'folder.lock'))
+		except OSError:
+		    pass
 		sys.exit(1)
 	except KeyboardInterrupt:
 		seperator("GREEN")

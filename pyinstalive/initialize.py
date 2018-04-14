@@ -260,8 +260,9 @@ def new_config():
 
 def clean_download_dir():
 	dir_delcount = 0
-	file_delcount = 0
 	error_count = 0
+	lock_count = 0
+
 	log('[I] Cleaning up temporary files and folders...', "GREEN")
 	try:
 		if sys.version.split(' ')[0].startswith('2'):
@@ -273,39 +274,34 @@ def clean_download_dir():
 
 		for directory in directories:
 			if directory.endswith('_downloads'):
-				try:
-					shutil.rmtree(settings.save_path + directory)
-					dir_delcount += 1
-				except Exception as e:
-					log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
-					error_count += 1
-		for file in files:
-			if file.endswith('_comments.json'):
-				try:
-					os.remove(settings.save_path + file)
-					file_delcount += 1
-				except Exception as e:
-					log("[E] Could not remove temp file: {:s}".format(str(e)), "RED")
-					error_count += 1
+				if not any(filename.endswith('.lock') for filename in os.listdir(settings.save_path + directory)):
+					try:
+						shutil.rmtree(settings.save_path + directory)
+						dir_delcount += 1
+					except Exception as e:
+						log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
+						error_count += 1
+				else:
+					lock_count += 1
 		seperator("GREEN")
 		log('[I] The cleanup has finished.', "YELLOW")
-		if dir_delcount == 0 and file_delcount == 0 and error_count == 0:
-			log('[I] No files or folders were removed.', "YELLOW")
+		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
+			log('[I] No folders were removed.', "YELLOW")
 			seperator("GREEN")
 			return
 		log('[I] Folders removed:     {:d}'.format(dir_delcount), "YELLOW")
-		log('[I] Files removed:       {:d}'.format(file_delcount), "YELLOW")
+		log('[I] Locked folders:      {:d}'.format(lock_count), "YELLOW")
 		log('[I] Errors:              {:d}'.format(error_count), "YELLOW")
 		seperator("GREEN")
 	except KeyboardInterrupt as e:
 		seperator("GREEN")
 		log("[W] The cleanup has been aborted.", "YELLOW")
-		if dir_delcount == 0 and file_delcount == 0 and error_count == 0:
-			log('[I] No files or folders were removed.', "YELLOW")
+		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
+			log('[I] No folders were removed.', "YELLOW")
 			seperator("GREEN")
 			return
 		log('[I] Folders removed:     {:d}'.format(dir_delcount), "YELLOW")
-		log('[I] Files removed:       {:d}'.format(file_delcount), "YELLOW")
+		log('[I] Locked folders:      {:d}'.format(lock_count), "YELLOW")
 		log('[I] Errors:              {:d}'.format(error_count), "YELLOW")
 		seperator("GREEN")
 

@@ -34,3 +34,5 @@ snippets\.py
 downloaded/
 
 requirements\.txt
+
+*.lock
