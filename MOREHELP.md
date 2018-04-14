@@ -13,6 +13,8 @@
 
 - ```-nr``` or ```--noreplays```  **—**  When this flag is passed, PyInstaLive will not download any available replays. Overrides the configuration file.
 
+- ```-cl``` or ```--clean```  **—**  When this flag is passed, PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
+
 
 # Default configuration file
 
