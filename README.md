@@ -143,7 +143,7 @@ PYINSTALIVE (SCRIPT V2.5.0 - PYTHON V3.6.3) - 06:45:30 PM
 
 
 ## Help
-You can find a list of frequently asked questions [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.MD).
+You can find a list of frequently asked questions [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.md).
 
 You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.MD).
 
