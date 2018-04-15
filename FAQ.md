@@ -15,8 +15,11 @@ The reasons above are things I have no control over, so there's no direct way fo
 
 If that doesn't help you out either I recommend creating a new temporary Instagram account (on the device and internet connection you will be using PyInstaLive with) and use that instead.
 
+### I get a Rate Limit related error, how do I solve this?
+This means you are making too many requests to Instagram and is usually the case when you try to check and download livestreams of multiple users at the same time by using a script (as seen below). Increase the interval for the scripts or decrease the amount of users you are checking.
 
-### How do I record multiple users at the same time?
+
+### How do I download livestreams of multiple users at the same time?
 
 #### Windows
 
@@ -28,9 +31,9 @@ pyinstalive -u "username" -p "password" -r "live-username"
 timeout 10 > nul
 goto loop
 ```
-Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .bat file. Do this for each user you want to record and run the scripts concurrently.
+Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .bat file. Do this for each user you want to download a livestream of and run the scripts concurrently.
 
-Increase the timeout by at least 5 seconds or more for each user you want to record to lessen the chances of getting blocked by Instagram.
+Increase the timeout by at least 5 seconds or more for each user you want to download a livestream of to lessen the chances of getting blocked by Instagram.
 
 Make sure there is a configuration file called pyinstalive.ini in the directory you want to run PyInstaLive from. (Use `cd` to navigate to that directory if you put this script in a different location.)
 
@@ -46,9 +49,9 @@ done
 ```
 Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .sh file.
 You must make the script executable with `chmod +x <filename>`. Use Google.
-Do this for each user you want to record and run the scripts concurrently.
+Do this for each user you want to download a livestream of and run the scripts concurrently.
 
-Increase the timeout by at least 5 seconds or more for each user you want to record to lessen the chances of getting blocked by Instagram.
+Increase the timeout by at least 5 seconds or more for each user you want to download a livestream of to lessen the chances of getting blocked by Instagram.
 
 Make sure there is a configuration file called pyinstalive.ini in the directory you want to run PyInstaLive from. (Use `cd` to navigate to that directory if you put this script in a different location.)
 
