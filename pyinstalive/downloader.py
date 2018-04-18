@@ -1,4 +1,3 @@
-import ftplib
 import os
 import shutil
 import subprocess
@@ -6,9 +5,6 @@ import sys
 import threading
 import time
 import shlex
-
-from glob import glob
-from tqdm import tqdm
 
 from instagram_private_api import ClientConnectionError
 from instagram_private_api import ClientError
@@ -168,16 +164,10 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 
 		live_mp4_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
 		live_folder_path = live_mp4_file.split('.mp4')[0] + "_downloads"
-		live_json_file = os.path.join(settings.save_path, live_folder_path, '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
-		live_comments_file = live_mp4_file.replace(".mp4", "_live_comments.log")
-
-		live_files = [live_mp4_file]
-
 
 		if comment_thread_worker and comment_thread_worker.is_alive():
 			log("[I] Stopping comment downloading and saving comments (if any)...", "GREEN")
 			comment_thread_worker.join()
-			live_files.extend([live_json_file, live_comments_file])
 
 		if (settings.run_at_finish is not "None"):
 			try:
@@ -204,12 +194,6 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 					shutil.rmtree(live_folder_path)
 				except Exception as e:
 					log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
-			if settings.ftp_enabled:
-				try:
-					seperator("GREEN")
-					upload_ftp_files(live_files)
-				except Exception as e:
-					log("[E] Could not upload livestream files to FTP server: {:s}".format(str(e)), "RED")
 			seperator("GREEN")
 			sys.exit(0)
 		except ValueError as e:
@@ -320,9 +304,6 @@ def download_replays(broadcasts):
 				open(os.path.join(output_dir,'folder.lock'), 'a').close()
 				replay_mp4_file = settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
 				replay_json_file = os.path.join(output_dir, '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
-				replay_comments_file = replay_json_file.replace(".json", ".log")
-
-				replay_files = [replay_mp4_file]
 
 				if settings.clear_temp_files.title() == "True":
 					replay_saved = broadcast_downloader.download(replay_mp4_file, cleartempfiles=True)
@@ -331,8 +312,7 @@ def download_replays(broadcasts):
 
 				if settings.save_comments.title() == "True":
 					log("[I] Checking for available comments to save...", "GREEN")
-					if get_replay_comments(instagram_api, broadcast, replay_json_file, broadcast_downloader):
-						replay_files.extend([replay_json_file, replay_comments_file])
+					get_replay_comments(instagram_api, broadcast, replay_json_file, broadcast_downloader)
 
 				if (len(replay_saved) == 1):
 					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
@@ -340,11 +320,6 @@ def download_replays(broadcasts):
 					    os.remove(os.path.join(output_dir,'folder.lock'))
 					except OSError:
 					    pass
-					if settings.ftp_enabled:
-						try:
-							upload_ftp_files(replay_files)
-						except Exception as e:
-							log("[E] Could not upload replay files to FTP server: {:s}".format(str(e)), "RED")
 
 					if (current != len(broadcasts)):
 						seperator("GREEN")
@@ -452,36 +427,3 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 	except KeyboardInterrupt as e:
 		log("[W] Downloading livestream comments has been aborted.", "YELLOW")
 		return False
-
-
-def upload_ftp_files(files):
-	try:
-		ftp = ftplib.FTP(settings.ftp_host, settings.ftp_username, settings.ftp_password)
-		ftp.cwd(settings.ftp_save_path)
-
-		stream_type = "replay" if "_replay.mp4" in files[0] else "livestream"
-
-		for file in files:
-			try:
-				filename = file.split('/').pop() or file.split('\\').pop()
-				log("", "GREEN")
-				if filename.endswith("mp4"):
-					log("[I] Uploading video file to FTP server...".format(filename), "GREEN")
-				if filename.endswith("log"):
-					log("[I] Uploading comments logfile to FTP server...".format(filename), "GREEN")
-				if filename.endswith("json"):
-					log("[I] Uploading comments JSON file to FTP server...".format(filename), "GREEN")
-				filesize = os.path.getsize(file)
-				file_read = open(file, 'rb')
-				with tqdm(leave = False, ncols=70, miniters = 1, total = filesize, bar_format=">{bar}< - {percentage:3.0f}%") as tqdm_instance:
-					ftp.storbinary('STOR ' + filename, file_read, 2048, callback = lambda sent: tqdm_instance.update(len(sent)))
-				file_read.close()
-				log("[I] Successfully uploaded file to FTP server.", "GREEN")
-			except Exception as e:
-				log("[E] Could not upload file '{:s}' to FTP server: {:s}".format(filename, str(e)), "RED")
-		ftp.quit()
-		ftp = None
-	except Exception as e:
-		log("[E] Could not upload {:s} files to FTP server: {:s}".format(stream_type, str(e)), "RED")
-	except KeyboardInterrupt as e:
-		log("[W] Uploading {:s} files to FTP server has been aborted.".format(stream_type), "YELLOW")

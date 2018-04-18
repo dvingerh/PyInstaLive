@@ -127,23 +127,6 @@ def check_config_validity(config):
 			has_thrown_errors = True
 
 
-		try:
-			if config.get('ftp', 'ftp_enabled').title() == "True":
-				settings.ftp_host = config.get('ftp', 'ftp_host')
-				settings.ftp_save_path = config.get('ftp', 'ftp_save_path')
-				settings.ftp_username = config.get('ftp', 'ftp_username')
-				settings.ftp_password = config.get('ftp', 'ftp_password')
-
-				if len(settings.ftp_host) > 0 and len(settings.ftp_save_path) > 0 and len(settings.ftp_username) > 0 and len(settings.ftp_password) > 0:
-					settings.ftp_enabled = True
-				else:
-					log("[W] Missing settings detected for the FTP settings, FTP will be ignored.", "YELLOW")
-					has_thrown_errors = True
-		except:
-			log("[W] Missing or invalid settings detected for the FTP settings, FTP will be ignored.", "YELLOW")
-			has_thrown_errors = True
-
-
 		if has_thrown_errors:
 			seperator("GREEN")
 
@@ -231,7 +214,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\n\n[ftp]\nftp_enabled = false\nftp_host = \nftp_save_path = \nftp_username = \nftp_password = \n"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\n"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
@@ -363,7 +346,7 @@ def run():
 		try:
 			config.read('pyinstalive.ini')
 		except Exception:
-			log("[E] Could not read configuration file. Try passing the required arguments manually.", "RED")
+			log("[E] Could not read configuration file.", "RED")
 			seperator("GREEN")
 	else:
 		new_config()

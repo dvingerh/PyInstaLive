@@ -29,13 +29,6 @@ save_replays = true
 run_at_start =
 run_at_finish =
 save_comments = false
-
-[ftp]
-ftp_enabled = false
-ftp_host = 
-ftp_save_path = 
-ftp_username = 
-ftp_password = 
 ```
 
 ```username```  **—**  Instagram username to login with.
@@ -55,15 +48,3 @@ ftp_password =
 ```run_at_finish```  **—**  Command to run when PyInstaLive finishes recording a livestream. Leave empty to disable. (Experimental, use at own risk.) 
  
 ```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
-
-#
-
-```ftp_enabled```  **—** When set to true, PyInstaLive will upload downloaded files to the configured FTP server. (Experimental, use at own risk.)
-
-```ftp_host```  **—** Host IP or URL for the FTP server.
-
-```ftp_save_path```  **—** FTP server save path to upload the downloaded files to.
-
-```ftp_username```  **—** FTP username to login with.
-
-```ftp_password```  **—** FTP password to login with.

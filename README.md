@@ -10,7 +10,6 @@ This script enables you to download any ongoing Instagram livestreams as well as
 - Download available replays
 - Download livestream and replay comments
 - Run a command when starting and/or finishing a download (Experimental)
-- Upload the downloaded livestream or replay to an FTP server (Experimental)
 
 ## Quickstart
 
@@ -71,13 +70,6 @@ save_replays = true
 run_at_start =
 run_at_finish =
 save_comments = false
-
-[ftp]
-ftp_enabled = false
-ftp_host = 
-ftp_save_path = 
-ftp_username = 
-ftp_password = 
 ```
 
 Use the following command to run PyInstaLive:
@@ -103,12 +95,13 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 ----------------------------------------------------------------------
 PYINSTALIVE (SCRIPT V2.5.0 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
-[I] Logging in to user "johndoe" successful.
+[I] Using cached login cookie for "johndoe".
 [I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
-[I] Checking user "janedoe"...
+[I] Getting info for "janedoe" successful.
 ----------------------------------------------------------------------
-[I] Checking for ongoing livestreams...
-[I] Livestream downloading started...
+[I] Checking for livestreams and replays...
+----------------------------------------------------------------------
+[I] Livestream found, beginning download...
 ----------------------------------------------------------------------
 [I] Username    : janedoe
 [I] Viewers     : 100 watching
