@@ -21,7 +21,9 @@ This means you are making too many requests to Instagram and is usually the case
 
 ### How do I download livestreams of multiple users at the same time?
 
-#### Windows
+#### Note: Continuously checking for livestreams with a batch file is considered suspicious behaviour by Instagram. Use a timeout as large as possible to decrease the chances of your account, device or IP from getting flagged as suspicious and getting blocked as a result of that. Use the scripts below at your own risk.
+
+###### Windows
 
 
 ```batch
@@ -33,11 +35,9 @@ goto loop
 ```
 Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .bat file. Do this for each user you want to download a livestream of and run the scripts concurrently.
 
-Increase the timeout by at least 5 seconds or more for each user you want to download a livestream of to lessen the chances of getting blocked by Instagram.
-
 Make sure there is a configuration file called pyinstalive.ini in the directory you want to run PyInstaLive from. (Use `cd` to navigate to that directory if you put this script in a different location.)
 
-#### Linux / MacOS (not tested)
+###### Linux / MacOS
 
 ```shell
 while true
@@ -50,8 +50,6 @@ done
 Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .sh file.
 You must make the script executable with `chmod +x <filename>`. Use Google.
 Do this for each user you want to download a livestream of and run the scripts concurrently.
-
-Increase the timeout by at least 5 seconds or more for each user you want to download a livestream of to lessen the chances of getting blocked by Instagram.
 
 Make sure there is a configuration file called pyinstalive.ini in the directory you want to run PyInstaLive from. (Use `cd` to navigate to that directory if you put this script in a different location.)
 
