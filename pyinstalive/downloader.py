@@ -161,7 +161,6 @@ def download_livestream(broadcast):
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 	try:
-
 		live_mp4_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
 		live_folder_path = live_mp4_file.split('.mp4')[0] + "_downloads"
 
@@ -248,33 +247,33 @@ def get_user_info(user_to_record):
 
 
 def get_broadcasts_info(user_id):
-	seperator("GREEN")
-	log('[I] Checking for livestreams and replays...', "GREEN")
 	try:
+		log('[I] Checking for livestreams and replays...', "GREEN")
+		seperator("GREEN")
 		broadcasts = instagram_api.user_story_feed(user_id)
 
 		livestream = broadcasts.get('broadcast')
 		replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
+
+		if livestream:
+			seperator("GREEN")
+			download_livestream(livestream)
+		else:
+			log('[I] There are no available livestreams.', "YELLOW")
+		if settings.save_replays.title() == "True":
+			if replays:
+				seperator("GREEN")
+				download_replays(replays)
+			else:
+				log('[I] There are no available replays.', "YELLOW")
+		else:
+			log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
+		seperator("GREEN")
 	except Exception as e:
 		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")
 	except ClientThrottledError as cte:
 		log('[E] Could not check because you are making too many requests at this time.', "RED")
 		log('[E] Error response: {:s}'.format(str(cte)), "RED")
-
-	if livestream:
-		seperator("GREEN")
-		download_livestream(livestream)
-	else:
-		log('[I] There are no available livestreams.', "YELLOW")
-	if settings.save_replays.title() == "True":
-		if replays:
-			seperator("GREEN")
-			download_replays(replays)
-		else:
-			log('[I] There are no available replays.', "YELLOW")
-	else:
-		log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
-	seperator("GREEN")
 
 def download_replays(broadcasts):
 	try:
@@ -312,7 +311,10 @@ def download_replays(broadcasts):
 
 				if settings.save_comments.title() == "True":
 					log("[I] Checking for available comments to save...", "GREEN")
-					get_replay_comments(instagram_api, broadcast, replay_json_file, broadcast_downloader)
+					try:
+						get_replay_comments(instagram_api, broadcast, replay_json_file, broadcast_downloader)
+					except Exception as e:
+						log('[E] An error occurred while checking comments: {:s}'.format(str(e)), "RED")
 
 				if (len(replay_saved) == 1):
 					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
