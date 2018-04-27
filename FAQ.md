@@ -16,7 +16,7 @@ The reasons above are things I have no control over, so there's no direct way fo
 If that doesn't help you out either I recommend creating a new temporary Instagram account (on the device and internet connection you will be using PyInstaLive with) and use that instead.
 
 ### I get a Rate Limit related error, how do I solve this?
-This means you are making too many requests to Instagram and is usually the case when you try to check and download livestreams of multiple users at the same time by using a script (as seen below). Increase the interval for the scripts or decrease the amount of users you are checking.
+This means you are making too many requests to Instagram and is usually the case when you try to check and download livestreams of multiple users at the same time by using a script (as seen below). Increase the timeout for the scripts or decrease the amount of users you are checking.
 
 
 ### How do I download livestreams of multiple users at the same time?
