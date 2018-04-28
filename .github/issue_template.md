@@ -21,6 +21,16 @@ I am using:
 
 ### To report a bug, fill in the information below.
 
+###### Python version
+Run ```python -V``` or ```python3 -V``` and paste its output below.
+
+**Example:**
+```bash
+C:\Users\User
+$ python3 -V
+Python 3.6.4
+```
+
 ###### Command used
 Paste the command here that you are running. Remove any information like usernames and passwords.
 
