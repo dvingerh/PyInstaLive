@@ -135,7 +135,7 @@ PYINSTALIVE (SCRIPT V2.5.1 - PYTHON V3.6.3) - 06:45:30 PM
 
 
 ## Notes
-- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux systems.
+- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
 
 - The `username` and `password` arguments are not required when you have specified these in the configuration file.
 
