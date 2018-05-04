@@ -29,6 +29,7 @@ save_replays = true
 run_at_start =
 run_at_finish =
 save_comments = false
+log_to_file = false
 ```
 
 ```username```  **—**  Instagram username to login with.
@@ -48,3 +49,5 @@ save_comments = false
 ```run_at_finish```  **—**  Command to run when PyInstaLive finishes recording a livestream. Leave empty to disable. (Experimental, use at own risk.) 
  
 ```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
+
+```log_to_file```  **—**  When set to true, PyInstaLive will all its console logs to a text file. Useful if you want to keep track of errors when running the script in a loop for example. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the filename will simply be named `pyinstalive_log.log`.
