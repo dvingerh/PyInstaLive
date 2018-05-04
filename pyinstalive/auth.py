@@ -79,11 +79,13 @@ def login(username, password, show_cookie_expiry, ignore_existing_cookie):
 			on_login=lambda x: onlogin_callback(x, settings_file))
 
 	except ClientLoginError as e:
-		log('[E] ClientLoginError: {0!s}\n\n(Code: {1:d}, Response: {2!s})\n'.format(e.msg, e.code, e.error_response), "RED")
+		seperator("GREEN")
+		log('[E] Could not login: {:s}.\n[E] {:s}\n\n{:s}'.format(json.loads(e.error_response).get("error_title", "Error title not available."), json.loads(e.error_response).get("message", "Not available"), e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(9)
 	except ClientError as e:
-		log('[E] ClientError: {0!s}\n\n(Code: {1:d}, Response: {2!s})\n'.format(e.msg, e.code, e.error_response), "RED")
+		seperator("GREEN")
+		log('[E] Client Error: {0!s}\n[E] Message: {1!s}\n[E] Code: {2:d}\n\n[E] Full response:\n{3!s}\n'.format(e.msg, json.loads(e.error_response).get("message", "Additional error information not available."), e.code, e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(9)
 	except Exception as e:

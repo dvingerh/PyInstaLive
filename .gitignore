@@ -36,3 +36,5 @@ downloaded/
 requirements\.txt
 
 *.lock
+
+*.log

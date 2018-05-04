@@ -75,12 +75,12 @@ def check_config_validity(config):
 		try:
 			settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
 			if not settings.log_to_file in bool_values:
-				log("[W] Invalid or missing setting detected for 'log_to_file', using default value (True)", "YELLOW")
-				settings.log_to_file = 'true'
+				log("[W] Invalid or missing setting detected for 'log_to_file', using default value (False)", "YELLOW")
+				settings.log_to_file = 'False'
 				has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'log_to_file', using default value (True)", "YELLOW")
-			settings.log_to_file = 'true'
+			log("[W] Invalid or missing setting detected for 'log_to_file', using default value (False)", "YELLOW")
+			settings.log_to_file = 'False'
 			has_thrown_errors = True
 
 
@@ -186,9 +186,9 @@ def show_info(config):
 		log("[I] FFmpeg framework:       	Available", "GREEN")
 
 	if (len(cookie_from_config) > 0):
-		log("[I] Cookie files:            	{:d} ({:s} matches config user)".format(str(len(cookie_files)), cookie_from_config), "GREEN")
+		log("[I] Cookie files:            	{:s} ({:s} matches config user)".format(str(len(cookie_files)), cookie_from_config), "GREEN")
 	elif len(cookie_files) > 0:
-		log("[I] Cookie files:            	{:d}".format(str(len(cookie_files))), "GREEN")
+		log("[I] Cookie files:            	{:s}".format(str(len(cookie_files))), "GREEN")
 	else:
 		log("[W] Cookie files:            	None found", "YELLOW")
 
@@ -326,29 +326,32 @@ def run():
 
 	args, unknown = parser.parse_known_args()
 
-	if args.record:
-		settings.user_to_record = args.record
-		try:
-			config.read('pyinstalive.ini')
-			settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
-			if not settings.log_to_file in bool_values:
-				settings.log_to_file = 'false'
-			elif settings.log_to_file == "True":
-				try:
-					with open("pyinstalive_{:s}.log".format(args.record),"a+") as f:
-						f.write("\n")
-						f.close()
-				except:
-					pass
-		except Exception as e:
-			settings.log_to_file = 'false'
-			print(str(e))
-			pass # Pretend nothing happened
+
+	try:
+		config.read('pyinstalive.ini')
+		settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
+		if not settings.log_to_file in bool_values:
+			settings.log_to_file = 'False'
+		elif settings.log_to_file == "True":
+			if args.record:
+				settings.user_to_record = args.record
+			else:
+				settings.user_to_record = "log"
+			try:
+				with open("pyinstalive_{:s}.log".format(settings.user_to_record),"a+") as f:
+					f.write("\n")
+					f.close()
+			except:
+				pass
+	except Exception as e:
+		print(str(e))
+		settings.log_to_file = 'False'
+		pass # Pretend nothing happened
 
 	seperator("GREEN")
 	log('PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
 	seperator("GREEN")
-	
+
 	if unknown:
 		log("[E] The following invalid argument(s) were provided: ", "RED") 
 		log('', "GREEN") 
