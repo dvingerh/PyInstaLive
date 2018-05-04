@@ -73,6 +73,19 @@ def check_config_validity(config):
 
 
 		try:
+			settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
+			if not settings.log_to_file in bool_values:
+				log("[W] Invalid or missing setting detected for 'log_to_file', using default value (True)", "YELLOW")
+				settings.log_to_file = 'true'
+				has_thrown_errors = True
+		except:
+			log("[W] Invalid or missing setting detected for 'log_to_file', using default value (True)", "YELLOW")
+			settings.log_to_file = 'true'
+			has_thrown_errors = True
+
+
+
+		try:
 			settings.run_at_start = config.get('pyinstalive', 'run_at_start').replace("\\", "\\\\")
 			if not settings.run_at_start:
 				settings.run_at_start = "None"
@@ -173,9 +186,9 @@ def show_info(config):
 		log("[I] FFmpeg framework:       	Available", "GREEN")
 
 	if (len(cookie_from_config) > 0):
-		log("[I] Cookie files:            	{} ({} matches config user)".format(str(len(cookie_files)), cookie_from_config), "GREEN")
+		log("[I] Cookie files:            	{:d} ({:s} matches config user)".format(str(len(cookie_files)), cookie_from_config), "GREEN")
 	elif len(cookie_files) > 0:
-		log("[I] Cookie files:            	{}".format(str(len(cookie_files))), "GREEN")
+		log("[I] Cookie files:            	{:d}".format(str(len(cookie_files))), "GREEN")
 	else:
 		log("[W] Cookie files:            	None found", "YELLOW")
 
@@ -214,7 +227,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\n"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n"
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
@@ -289,12 +302,7 @@ def clean_download_dir():
 		seperator("GREEN")
 
 def run():
-	seperator("GREEN")
-	log('PYINSTALIVE (SCRIPT V{} - PYTHON V{}) - {}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
-	seperator("GREEN")
-
 	logging.disable(logging.CRITICAL)
-
 	config = configparser.ConfigParser()
 	parser = argparse.ArgumentParser(description='You are running PyInstaLive ' + script_version + " using Python " + python_version)
 	parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
@@ -317,6 +325,29 @@ def run():
 
 
 	args, unknown = parser.parse_known_args()
+
+	if args.record:
+		settings.user_to_record = args.record
+		try:
+			config.read('pyinstalive.ini')
+			settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
+			if not settings.log_to_file in bool_values:
+				settings.log_to_file = 'false'
+			elif settings.log_to_file == "True":
+				try:
+					with open("pyinstalive_{:s}.log".format(args.record),"a+") as f:
+						f.write("\n")
+						f.close()
+				except:
+					pass
+		except Exception as e:
+			settings.log_to_file = 'false'
+			print(str(e))
+			pass # Pretend nothing happened
+
+	seperator("GREEN")
+	log('PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
+	seperator("GREEN")
 	
 	if unknown:
 		log("[E] The following invalid argument(s) were provided: ", "RED") 

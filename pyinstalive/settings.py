@@ -1,6 +1,7 @@
 import time
 
 class settings:
+	user_to_record = ""
 	username = ""
 	password = ""
 	save_path = "/"
@@ -12,3 +13,4 @@ class settings:
 	run_at_start = "None"
 	run_at_finish = "None"
 	save_comments = "true"
+	log_to_file = "false"

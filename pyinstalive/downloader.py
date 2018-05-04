@@ -112,7 +112,7 @@ def download_livestream(broadcast):
 			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner), "BLUE")
 			broadcast_guest = None
 		if broadcast_guest:
-			log('[I] This livestream is a dual-live, the guest is "{}".'.format(broadcast_guest), "BLUE")
+			log('[I] This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest), "BLUE")
 		seperator("GREEN")
 		log('[I] Username    : {:s}'.format(user_to_record), "GREEN")
 		print_status(False)
@@ -141,12 +141,12 @@ def download_livestream(broadcast):
 				log('[E] An error occurred while checking comments: {:s}'.format(str(e)), "RED")
 		broadcast_downloader.run()
 		seperator("GREEN")
-		log('[I] The livestream has ended.\n[I] Time recorded     : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
+		log('[I] The livestream has ended.\n[I] Download duration : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] The download has been aborted by the user.\n[I] Time recorded     : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
+		log('[I] The download has been aborted by the user.\n[I] Download duration : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
 		seperator("GREEN")
 		if not broadcast_downloader.is_aborted:
 			broadcast_downloader.stop()
@@ -256,7 +256,6 @@ def get_broadcasts_info(user_id):
 		replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
 
 		if livestream:
-			seperator("GREEN")
 			download_livestream(livestream)
 		else:
 			log('[I] There are no available livestreams.', "YELLOW")
