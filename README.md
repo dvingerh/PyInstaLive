@@ -3,17 +3,26 @@
 
 This script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
 
+## Table of Contents
+- [Features](https://github.com/notcammy/PyInstaLive#features)
+- [Quickstart](https://github.com/notcammy/PyInstaLive#quickstart)
+- [Installation](https://github.com/notcammy/PyInstaLive#installation)
+- [Usage](https://github.com/notcammy/PyInstaLive#usage)
+- [Example](https://github.com/notcammy/PyInstaLive#example)
+- [Notes](https://github.com/notcammy/PyInstaLive#notes)
+- [Help](https://github.com/notcammy/PyInstaLive#help)
+
 
 ## Features
 
-- Download ongoing livestreams (also detects livestreams in which the user is curently a guest)
+- Download ongoing livestreams (also detects livestreams in which the user is live with the livestream owner)
 - Download available replays
 - Download livestream and replay comments
 - Run a command when starting and/or finishing a download (Experimental)
 
 ## Quickstart
 
-- [Read the notes below (important!)](https://github.com/notcammy/PyInstaLive#notes)
+- [Read the Notes & Help sections below (important!)](https://github.com/notcammy/PyInstaLive#notes)
 - Install the prerequisites and then PyInstaLive.
 - Run `pyinstalive -c` to generate a configuration file.
 - Edit the configuration file using any text editor.
@@ -125,8 +134,8 @@ PYINSTALIVE (SCRIPT V2.5.1 - PYTHON V3.6.3) - 06:45:30 PM
 ```
 
 
-#### Notes
-- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux systems.
+## Notes
+- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
 
 - The `username` and `password` arguments are not required when you have specified these in the configuration file.
 
