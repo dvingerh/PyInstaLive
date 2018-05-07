@@ -364,15 +364,18 @@ def get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_
 		try:
 			if comments_downloader.comments:
 				comments_log_file = comments_json_file.replace('.json', '.log')
-				CommentsDownloader.generate_log(
+				comment_errors, total_comments = CommentsDownloader.generate_log(
 					comments_downloader.comments, broadcast.get('published_time'), comments_log_file,
 					comments_delay=0)
-				if len(comments_downloader.comments) == 1:
+				if total_comments == 1:
 					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
 					seperator("GREEN")
 					return True
 				else:
-					log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+					if comment_errors:
+						log("[W] Successfully saved {:s} comments to logfile but {:s} comments are (partially) missing.".format(str(total_comments), str(comment_errors)), "YELLOW")
+					else:
+						log("[I] Successfully saved {:s} comments to logfile.".format(str(total_comments)), "GREEN")
 					seperator("GREEN")
 					return True
 			else:
@@ -407,7 +410,7 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 			if comments_downloader.comments:
 				comments_downloader.save()
 				comments_log_file = comments_json_file.replace('.json', '.log')
-				CommentsDownloader.generate_log(
+				comment_errors, total_comments = CommentsDownloader.generate_log(
 					comments_downloader.comments, settings.current_time, comments_log_file,
 					comments_delay=broadcast_downloader.initial_buffered_duration)
 				if len(comments_downloader.comments) == 1:
@@ -415,7 +418,10 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 					seperator("GREEN")
 					return True
 				else:
-					log("[I] Successfully saved {} comments to logfile.".format(len(comments_downloader.comments)), "GREEN")
+					if comment_errors:
+						log("[W] Successfully saved {:s} comments to logfile but {:s} comments are (partially) missing.".format(str(total_comments), str(comment_errors)), "YELLOW")
+					else:
+						log("[I] Successfully saved {:s} comments to logfile.".format(str(total_comments)), "GREEN")
 					seperator("GREEN")
 					return True
 			else:

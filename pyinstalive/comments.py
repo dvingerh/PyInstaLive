@@ -78,14 +78,17 @@ class CommentsDownloader(object):
 		starting_offset = 0
 		encoding_tag = self.broadcast.get('encoding_tag')
 		while True:
-			comments_res = self.api.replay_broadcast_comments(
-				self.broadcast.get('id'), starting_offset=starting_offset, encoding_tag=encoding_tag)
-			starting_offset = comments_res.get('ending_offset', 0)
-			comments = comments_res.get('comments', [])
-			comments_collected.extend(comments)
-			if not comments_res.get('comments') or not starting_offset:
-				break
-			time.sleep(4)
+			try:
+				comments_res = self.api.replay_broadcast_comments(
+					self.broadcast.get('id'), starting_offset=starting_offset, encoding_tag=encoding_tag)
+				starting_offset = comments_res.get('ending_offset', 0)
+				comments = comments_res.get('comments', [])
+				comments_collected.extend(comments)
+				if not comments_res.get('comments') or not starting_offset:
+					break
+				time.sleep(4)
+			except:
+				pass
 
 		if comments_collected:
 			self.broadcast['comments'] = comments_collected
@@ -120,6 +123,8 @@ class CommentsDownloader(object):
 			subtitles_timeline[created_at_utc] = comment_list
 
 		if subtitles_timeline:
+			comment_errors = 0
+			total_comments = 0
 			timestamps = sorted(subtitles_timeline.keys())
 			mememe = False
 			subs = []
@@ -129,29 +134,41 @@ class CommentsDownloader(object):
 				if clip_start < 0:
 					clip_start = 0
 
-				log = ''
+				comments_log = ''
 				for c in t:
-					if python_version.startswith('3'):
-						if (c.get('user', {}).get('is_verified')):
-							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
-						else:
-							log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
-					else:
-						if not wide_build:
+					try:
+						if python_version.startswith('3'):
 							if (c.get('user', {}).get('is_verified')):
-								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
+								comments_log+= '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
 							else:
-								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
+								comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
 						else:
-							if (c.get('user', {}).get('is_verified')):
-								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
+							if not wide_build:
+								if (c.get('user', {}).get('is_verified')):
+									comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
+								else:
+									comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
 							else:
-								log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
+								if (c.get('user', {}).get('is_verified')):
+									comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
+								else:
+									comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
+					except:
+						comment_errors += 1
+						total_comments += 1
+						try:
+							if (c.get('user', {}).get('is_verified')):
+								comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
+							else:
+								comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
+						except:
+							pass
 
-				subs.append(log)
-
+				subs.append(comments_log)
+				
 			with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
 				if python_version.startswith('2') and not wide_build:
 					log_outfile.write('This log was generated using Python {:s} without wide unicode support. This means characters such as emojis are not saved.\nUser comments without any text usually are comments that only had emojis.\nBuild Python 2 with the --enable-unicode=ucs4 flag or use Python 3 for full unicode support.\n\n'.format(python_version) + ''.join(subs))
 				else:
 					log_outfile.write(''.join(subs))
+			return comment_errors, total_comments
