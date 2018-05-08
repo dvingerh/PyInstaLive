@@ -155,7 +155,6 @@ class CommentsDownloader(object):
 									comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
 					except:
 						comment_errors += 1
-						total_comments += 1
 						try:
 							if (c.get('user', {}).get('is_verified')):
 								comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text').encode('ascii', 'ignore')))
@@ -163,7 +162,7 @@ class CommentsDownloader(object):
 								comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)), '{}: {}'.format(c.get('user', {}).get('username'), c.get('text').encode('ascii', 'ignore')))
 						except:
 							pass
-
+				total_comments += 1
 				subs.append(comments_log)
 				
 			with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
