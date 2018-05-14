@@ -180,7 +180,7 @@ def show_info(config):
 	log("", "GREEN")
 	log("[I] PyInstaLive version:    	" + script_version, "GREEN")
 	log("[I] Python version:         	" + python_version, "GREEN")
-	if check_ffmpeg() == False:
+	if not check_ffmpeg():
 		log("[E] FFmpeg framework:       	Not found", "RED")
 	else:
 		log("[I] FFmpeg framework:       	Available", "GREEN")
@@ -371,7 +371,7 @@ def run():
 		show_info(config)
 		sys.exit(0)
 	
-	if (args.config == True):
+	if (args.config):
 		new_config()
 		sys.exit(0)
 
@@ -388,11 +388,11 @@ def run():
 
 
 	if check_config_validity(config):
-		if (args.clean == True):
+		if (args.clean):
 			clean_download_dir()
 			sys.exit(0)
 
-		if check_ffmpeg() == False:
+		if not check_ffmpeg():
 			log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
 			seperator("GREEN")
 			sys.exit(1)
@@ -402,7 +402,7 @@ def run():
 			seperator("GREEN")
 			sys.exit(1)
 
-		if (args.noreplays == True):
+		if (args.noreplays):
 			settings.save_replays = "false"
 
 		if (args.username is not None) and (args.password is not None):

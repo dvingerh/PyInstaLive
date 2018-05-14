@@ -40,8 +40,8 @@ def supports_color():
 	# isatty is not always implemented, #6223.
 	is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
 	if not supported_platform or not is_a_tty:
-		return False
-	return True
+		return "No"
+	return "Yes"
 
 def log(string, color):
 	if not supports_color():
