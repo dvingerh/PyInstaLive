@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 import shutil
+import json
 
 from .auth import login
 from .downloader import main
@@ -170,7 +171,10 @@ def show_info(config):
 	try:
 		for file in os.listdir(os.getcwd()):
 			if file.endswith(".json"):
-				cookie_files.append(file)
+				with open(file) as data_file:    
+					json_data = json.load(data_file)
+					if (json_data.get('created_ts')):
+						cookie_files.append(file)
 			if settings.username == file.replace(".json", ''):
 				cookie_from_config = file
 	except Exception as e:
@@ -362,12 +366,12 @@ def run():
 
 	if (args.info) or (not
 	args.username and not
-    args.password and not
-    args.record and not
-    args.info and not
-    args.config and not
-    args.noreplays and not
-    args.clean):
+	args.password and not
+	args.record and not
+	args.info and not
+	args.config and not
+	args.noreplays and not
+	args.clean):
 		show_info(config)
 		sys.exit(0)
 	
