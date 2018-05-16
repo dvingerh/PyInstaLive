@@ -28,6 +28,12 @@ This script enables you to download any ongoing Instagram livestreams as well as
 - Edit the configuration file using any text editor.
 - Run `pyinstalive -r "<live-username>"` to start downloading a livestream or replay.
 
+#### Note for Windows users using the executable
+The Windows builds have not been fully tested and may not work for you but feel free to try it out and report any errors you may encounter.
+
+This is a CLI application and as such must be run from the command line. There is no available user interface.
+
+If using Windows 7, 8 or 8.1 make sure you have installed the [update for Universal C Runtime in Windows](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows). Windows 10 users already have this update installed by default.
 
 ## Installation
 
@@ -72,6 +78,7 @@ Use the version number you want after the **@** symbol (e.g **2.2.0**).
 
 
 ## Usage
+
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
 
 You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
