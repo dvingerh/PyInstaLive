@@ -32,7 +32,18 @@ This script enables you to download any ongoing Instagram livestreams as well as
 ## Installation
 
 #### Prerequisites
-You need [ffmpeg](https://ffmpeg.org/download.html), [Git](https://git-scm.com/downloads) and [Python 2.7.x or 3.5>=](https://www.python.org/downloads/) with [pip](https://pip.pypa.io/en/stable/installing/) and [setuptools](https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel) installed before you can install and use this script. Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
+
+###### Windows 
+- [ffmpeg](https://ffmpeg.org/download.html)
+
+###### Linux
+- [ffmpeg](https://ffmpeg.org/download.html)
+- [Git](https://git-scm.com/downloads)
+- [Python 2.7.x or 3.5>=](https://www.python.org/downloads/)
+- [pip](https://pip.pypa.io/en/stable/installing/)
+- [setuptools](https://packaging.python.org/tutorials/installing-packages/#install-pip-setuptools-and-wheel)
+
+Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
 
 #### Installing
 
