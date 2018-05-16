@@ -42,7 +42,7 @@ If using Windows 7, 8 or 8.1 make sure you have installed the [update for Univer
 ###### Windows 
 - [ffmpeg](https://ffmpeg.org/download.html)
 
-###### Linux
+###### Linux (and Windows if not using the executable)
 - [ffmpeg](https://ffmpeg.org/download.html)
 - [Git](https://git-scm.com/downloads)
 - [Python 2.7.x or 3.5>=](https://www.python.org/downloads/)
@@ -51,7 +51,13 @@ If using Windows 7, 8 or 8.1 make sure you have installed the [update for Univer
 
 Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
 
+**Tip** — If you use the Windows executable you can add that to your PATH as well. The easiest way is by copying it to the Windows installation folder.
+
 #### Installing
+
+###### Note
+If you run Windows you can also try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
+In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below. 
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
