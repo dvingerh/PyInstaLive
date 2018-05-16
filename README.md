@@ -47,6 +47,7 @@ If using Windows 7, 8 or 8.1 make sure you have installed the [update for Univer
 - [Git](https://git-scm.com/downloads)
 - [Python 2.7.x or 3.5>=](https://www.python.org/downloads/)
 - [pip + setuptools](https://pip.pypa.io/en/stable/installing/)
+
 Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
 
 #### Installing
