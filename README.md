@@ -51,13 +51,12 @@ If using Windows 7, 8 or 8.1 make sure you have installed the [update for Univer
 
 Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
 
-**Tip** — If you use the Windows executable you can add that to your PATH as well. The easiest way is by copying it to the Windows installation folder.
-
 #### Installing
 
-###### Note
 If you run Windows you can also try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
-In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below. 
+In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below.
+
+*Tip — If you use the Windows executable you can add that to your PATH as well. The easiest way is by copying it to the Windows installation folder.*
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
