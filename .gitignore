@@ -38,3 +38,5 @@ requirements\.txt
 *.lock
 
 *.log
+
+*.spec
