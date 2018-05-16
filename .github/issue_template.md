@@ -1,8 +1,8 @@
 ### Please check the boxes below by filling [ ] with an x so it looks like [x].
 ###### Remove all spaces already present in the box.
 
-- [ ] I have installed the latest version of PyInstaLive: 2.5.3.
-- [ ] I have installed either Python 2.7.x or 3.5>=.
+- [ ] I am using the latest version of PyInstaLive: 2.5.3.
+- [ ] I have installed either Python 2.7.x or 3.5>=. (If applicable)
 - [ ] I have read the [README](https://github.com/notcammy/pyinstalive/blob/master/README.md).
 - [ ] I have read the [FAQ](https://github.com/notcammy/pyinstalive/blob/master/FAQ.md).
 - [ ] I have checked all [existing issues](https://github.com/notcammy/PyInstaLive/issues?q=is%3Aissue), none of which could solve my issue.
@@ -10,8 +10,9 @@
 
 I am using:
 - [ ] Windows 10
-- [ ] Windows 8.1
-- [ ] Windows 7
+- [ ] Windows 8.1 and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
+- [ ] Windows 8 and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
+- [ ] Windows 7  and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
 - [ ] Linux (distribution: )
 - [ ] macOS (version: )
 - [ ] Other (device & OS name: )
@@ -21,7 +22,7 @@ I am using:
 
 ### To report a bug, fill in the information below.
 
-###### Python version
+###### Python version (if applicable) 
 Run ```python -V``` or ```python3 -V``` and paste its output below.
 
 **Example:**
