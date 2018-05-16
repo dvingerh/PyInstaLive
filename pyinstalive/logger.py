@@ -44,7 +44,7 @@ def supports_color():
 	return "Yes"
 
 def log(string, color):
-	if not supports_color():
+	if supports_color() == "No":
 		print(string)
 	else:
 		print('\033[1m' + colors(color) + string + colors("ENDC"))
@@ -57,7 +57,7 @@ def log(string, color):
 			pass
 
 def seperator(color):
-	if not supports_color():
+	if supports_color() == "No":
 		print(sep)
 	else:
 		print('\033[1m' + colors(color) + (sep) + colors("ENDC"))
