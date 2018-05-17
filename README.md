@@ -31,26 +31,28 @@ This CLI script enables you to download any ongoing Instagram livestreams as wel
 
 ![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
-## Installation
+## Prerequisites
 
-If you run Windows you can try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
-In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below.
-
-*Tip — You can easily add the executable to your PATH as well by copying it to the Windows installation folder.*
-
-#### Prerequisites
-
-###### Windows 
+#### Windows 
 - [ffmpeg](https://ffmpeg.org/download.html)
 - [Universal C Runtime Update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) (If not using Windows 10)
 
-###### Linux (and Windows if not using the executable)
+#### Linux (Windows if not using the executable)
 - [ffmpeg](https://ffmpeg.org/download.html)
 - [Git](https://git-scm.com/downloads)
 - [Python 2.7.x or 3.5>=](https://www.python.org/downloads/)
 - [pip + setuptools](https://pip.pypa.io/en/stable/installing/)
 
 Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
+
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+
+## Installation
+
+If you run Windows you can try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
+In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below.
+
+*Tip — You can easily add the executable to your PATH as well by copying it to the Windows installation folder.*
 
 #### Installing
 
