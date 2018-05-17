@@ -8,7 +8,6 @@ This CLI script enables you to download any ongoing Instagram livestreams as wel
 - [Quickstart](https://github.com/notcammy/PyInstaLive#quickstart)
 - [Installation](https://github.com/notcammy/PyInstaLive#installation)
 - [Usage](https://github.com/notcammy/PyInstaLive#usage)
-- [Example](https://github.com/notcammy/PyInstaLive#example)
 - [Notes](https://github.com/notcammy/PyInstaLive#notes)
 - [Help](https://github.com/notcammy/PyInstaLive#help)
 
@@ -102,17 +101,8 @@ save_comments = false
 log_to_file = false
 ```
 
-Use the following command to run PyInstaLive:
+#### Example
 
-```bash
-pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
-```
-
-Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream or replay you want to download.
-
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
-
-## Example
 ```bash
 pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
 ```
