@@ -1,7 +1,7 @@
 # PyInstaLive
 ![Version 2.5.3](https://img.shields.io/badge/Version-2.5.3-pink.svg?style=for-the-badge)
 
-This script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued. 
+This CLI script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
 
 ## Table of Contents
 - [Features](https://github.com/notcammy/PyInstaLive#features)
@@ -12,13 +12,14 @@ This script enables you to download any ongoing Instagram livestreams as well as
 - [Notes](https://github.com/notcammy/PyInstaLive#notes)
 - [Help](https://github.com/notcammy/PyInstaLive#help)
 
-
 ## Features
 
 - Download ongoing livestreams (also detects livestreams in which the user is live with the livestream owner)
 - Download available replays
 - Download livestream and replay comments
 - Run a command when starting and/or finishing a download (Experimental)
+
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Quickstart
 
@@ -28,19 +29,20 @@ This script enables you to download any ongoing Instagram livestreams as well as
 - Edit the configuration file using any text editor.
 - Run `pyinstalive -r "<live-username>"` to start downloading a livestream or replay.
 
-#### Note for Windows users using the executable
-The Windows builds have not been fully tested and may not work for you but feel free to try it out and report any errors you may encounter.
-
-This is a CLI application and as such must be run from the command line. There is no available user interface.
-
-If using Windows 7, 8 or 8.1 make sure you have installed the [update for Universal C Runtime in Windows](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows). Windows 10 users already have this update installed by default.
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Installation
+
+If you run Windows you can try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
+In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below.
+
+*Tip — You can easily add the executable to your PATH as well by copying it to the Windows installation folder.*
 
 #### Prerequisites
 
 ###### Windows 
 - [ffmpeg](https://ffmpeg.org/download.html)
+- [Universal C Runtime Update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) (If not using Windows 10)
 
 ###### Linux (and Windows if not using the executable)
 - [ffmpeg](https://ffmpeg.org/download.html)
@@ -51,11 +53,6 @@ If using Windows 7, 8 or 8.1 make sure you have installed the [update for Univer
 Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
 
 #### Installing
-
-If you run Windows you can also try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
-In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below.
-
-*Tip — If you use the Windows executable you can add that to your PATH as well. The easiest way is by copying it to the Windows installation folder.*
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
@@ -80,14 +77,13 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-depe
 
 Use the version number you want after the **@** symbol (e.g **2.2.0**).
 
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Usage
 
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
 
 You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
-
-For more information about the configuration file go [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md#default-configuration-file).
 
 Here is an example of a valid configuration file:
 ```ini
@@ -112,11 +108,13 @@ pyinstalive -u "<username>" -p "<password>" -r "<live-username>"
 
 Where ``<username>`` is your account's username, ``<password>`` is your password and ``<live-username>`` is the username of the user whose livestream or replay you want to download.
 
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+
 ## Example
 ```bash
 pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
 ```
-Or (see [notes](https://github.com/notcammy/PyInstaLive#notes))
+You can omit the `username` and `password` arguments if you have specified these in the configuration file:
 ```bash
 pyinstalive -r "janedoe"
 ```
@@ -156,13 +154,10 @@ PYINSTALIVE (SCRIPT V2.5.3 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
 ```
 
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Notes
 - Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
-
-- The `username` and `password` arguments are not required when you have specified these in the configuration file.
-
-- This script is also reported to work on Python 3.4.x but is not officially supported.
 
 - If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
 
