@@ -348,7 +348,6 @@ def run():
 			except:
 				pass
 	except Exception as e:
-		print(str(e))
 		settings.log_to_file = 'False'
 		pass # Pretend nothing happened
 

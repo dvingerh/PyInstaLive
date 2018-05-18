@@ -55,6 +55,7 @@ def log(string, color):
 				f.close()
 		except:
 			pass
+	sys.stdout.flush()
 
 def seperator(color):
 	if supports_color() == "No":
@@ -68,3 +69,4 @@ def seperator(color):
 				f.close()
 		except:
 			pass
+	sys.stdout.flush()

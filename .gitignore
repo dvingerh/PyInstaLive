@@ -40,3 +40,12 @@ requirements\.txt
 *.log
 
 *.spec
+
+*.bat
+
+exe-info\.txt
+
+pyinstalive\.ico
+
+pyinstalive_win\.py
+
