@@ -40,11 +40,11 @@ def supports_color():
 	# isatty is not always implemented, #6223.
 	is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
 	if not supported_platform or not is_a_tty:
-		return "No"
-	return "Yes"
+		return "No", False
+	return "Yes", True
 
 def log(string, color):
-	if supports_color() == "No":
+	if supports_color()[1] == False:
 		print(string)
 	else:
 		print('\033[1m' + colors(color) + string + colors("ENDC"))
@@ -58,7 +58,7 @@ def log(string, color):
 	sys.stdout.flush()
 
 def seperator(color):
-	if supports_color() == "No":
+	if supports_color()[1] == False:
 		print(sep)
 	else:
 		print('\033[1m' + colors(color) + (sep) + colors("ENDC"))

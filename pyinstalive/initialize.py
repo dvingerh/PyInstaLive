@@ -196,7 +196,7 @@ def show_info(config):
 	else:
 		log("[W] Cookie files:            	None found", "YELLOW")
 
-	log("[I] CLI supports color:     	" + str(supports_color()), "GREEN")
+	log("[I] CLI supports color:     	" + str(supports_color()[0]), "GREEN")
 	log("[I] File to run at start:       " + settings.run_at_start, "GREEN")
 	log("[I] File to run at finish:      " + settings.run_at_finish, "GREEN")
 	log("", "GREEN")
@@ -359,8 +359,11 @@ def run():
 		log("[E] The following invalid argument(s) were provided: ", "RED") 
 		log('', "GREEN") 
 		log(' '.join(unknown), "YELLOW") 
-		log('', "GREEN") 
-		log("[I] \033[94mpyinstalive -h\033[92m can be used to display command help.", "GREEN")
+		log('', "GREEN")
+		if (supports_color()[1] == True):
+			log("[I] \033[94mpyinstalive -h\033[92m can be used to display command help.", "GREEN")
+		else:
+			log("[I] pyinstalive -h can be used to display command help.", "GREEN")
 		exit(1)
 
 	if (args.info) or (not
