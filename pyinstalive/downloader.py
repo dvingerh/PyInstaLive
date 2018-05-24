@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import shlex
+from . import replay_dl 
 
 from instagram_private_api import ClientConnectionError
 from instagram_private_api import ClientError
@@ -18,6 +19,7 @@ from .logger import seperator
 
 
 def main(instagram_api_arg, record_arg, settings_arg):
+	replay.Downloader = replay_dl.Downloader
 	global instagram_api
 	global user_to_record
 	global broadcast
