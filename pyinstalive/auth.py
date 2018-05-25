@@ -97,9 +97,13 @@ def login(username, password, show_cookie_expiry, ignore_existing_cookie):
 		seperator("GREEN")
 		sys.exit(99)
 
-	log('[I] Using cached login cookie for "' + api.authenticated_user_name + '".', "GREEN")
+	log('[I] Using login cookie for "' + api.authenticated_user_name + '".', "GREEN")
 	if show_cookie_expiry.title() == 'True' and not ignore_existing_cookie:
-		cookie_expiry = api.cookie_jar.expires_earliest
-		log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')), "GREEN")
+		try:
+			cookie_expiry = api.cookie_jar.auth_expires
+			log('[I] Login cookie expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')), "GREEN")
+		except AttributeError as e:
+			log('[W] An error occurred while getting the cookie expiry date: {0!s}'.format(e), "YELLOW")
+
 
 	return api
