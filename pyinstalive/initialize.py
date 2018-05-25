@@ -15,7 +15,7 @@ from .logger import seperator
 from .logger import supports_color
 from .settings import settings
 
-script_version = "2.5.4"
+script_version = "2.5.5"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
 
