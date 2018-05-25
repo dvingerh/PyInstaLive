@@ -7,7 +7,6 @@
 - [ ] I have read the [FAQ](https://github.com/notcammy/pyinstalive/blob/master/FAQ.md).
 - [ ] I have checked all [existing issues](https://github.com/notcammy/PyInstaLive/issues?q=is%3Aissue), none of which could solve my issue.
 
-
 I am using:
 - [ ] Windows 10
 - [ ] Windows 8.1 and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
@@ -16,6 +15,8 @@ I am using:
 - [ ] Linux (distribution: )
 - [ ] macOS (version: )
 - [ ] Other (device & OS name: )
+
+- [ ] I am using the Windows executable.
 
 ##
 ##
