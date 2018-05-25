@@ -9,14 +9,15 @@
 
 I am using:
 - [ ] Windows 10
-- [ ] Windows 8.1 and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
-- [ ] Windows 8 and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
-- [ ] Windows 7  and have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
+- [ ] Windows 8.1
+- [ ] Windows 8
+- [ ] Windows 7
 - [ ] Linux (distribution: )
 - [ ] macOS (version: )
 - [ ] Other (device & OS name: )
 
-- [ ] I am using the Windows executable.
+- [ ] I am using the Windows executable **pyinstalive.exe** which I downloaded from [this](https://github.com/notcammy/PyInstaLive/releases) page.
+- [ ] I have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
 
 ##
 ##
