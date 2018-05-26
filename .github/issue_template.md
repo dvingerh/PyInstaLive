@@ -16,8 +16,7 @@ I am using:
 - [ ] macOS (version: )
 - [ ] Other (device & OS name: )
 
-- [ ] I am using the Windows executable **pyinstalive.exe** which I downloaded from [this](https://github.com/notcammy/PyInstaLive/releases) page.
-- [ ] I have installed the [required update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows).
+- [ ] I am using the Windows executable **pyinstalive.exe** which I downloaded from [this](https://github.com/notcammy/PyInstaLive/releases) page and I have installed the [update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) needed to use it.
 
 ##
 ##
