@@ -311,7 +311,8 @@ def run():
 	parser = argparse.ArgumentParser(description='You are running PyInstaLive ' + script_version + " using Python " + python_version)
 	parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
 	parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
-	parser.add_argument('-r', '--record', dest='record', type=str, required=False, help="The username of the user whose livestream or replay you want to save.")
+	parser.add_argument('-r', '--record', dest='download', type=str, required=False, help="The username of the user whose livestream or replay you want to save.")
+	parser.add_argument('-d', '--download', dest='download', type=str, required=False, help="The username of the user whose livestream or replay you want to save.")
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
 	parser.add_argument('-nr', '--noreplays', dest='noreplays', action='store_true', help="When used, do not check for any available replays.")
@@ -337,12 +338,12 @@ def run():
 		if not settings.log_to_file in bool_values:
 			settings.log_to_file = 'False'
 		elif settings.log_to_file == "True":
-			if args.record:
-				settings.user_to_record = args.record
+			if args.download:
+				settings.user_to_download = args.download
 			else:
-				settings.user_to_record = "log"
+				settings.user_to_download = "log"
 			try:
-				with open("pyinstalive_{:s}.log".format(settings.user_to_record),"a+") as f:
+				with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
 					f.write("\n")
 					f.close()
 			except:
@@ -369,7 +370,7 @@ def run():
 	if (args.info) or (not
 	args.username and not
 	args.password and not
-	args.record and not
+	args.download and not
 	args.info and not
 	args.config and not
 	args.noreplays and not
@@ -403,8 +404,8 @@ def run():
 			seperator("GREEN")
 			sys.exit(1)
 
-		if (args.record == None):
-			log("[E] Missing --record argument. Please specify an Instagram username.", "RED")
+		if (args.download == None):
+			log("[E] Missing --download argument. Please specify an Instagram username.", "RED")
 			seperator("GREEN")
 			sys.exit(1)
 
@@ -429,7 +430,7 @@ def run():
 			else:
 				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
-		main(api, args.record, settings)
+		main(api, args.download, settings)
 
 	else:
 		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
