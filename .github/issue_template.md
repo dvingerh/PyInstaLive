@@ -16,27 +16,54 @@ I am using:
 - [ ] macOS (version: )
 - [ ] Other (device & OS name: )
 
-- [ ] I am using the Windows executable **pyinstalive.exe** which I downloaded from [this](https://github.com/notcammy/PyInstaLive/releases) page and I have installed the [update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) needed to use it.
+- [ ] I am using the executable **pyinstalive.exe** which I downloaded from [this](https://github.com/notcammy/PyInstaLive/releases) page and I have installed the [update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) needed to use it.
 
 ##
 ##
 
 ### To report a bug, fill in the information below.
 
-###### Python version (if applicable) 
-Run ```python -V``` or ```python3 -V``` and paste its output below.
+###### PyInstaLive information 
+Run ```pyinstalive --info``` and paste its output below. Don't forget to omit your **username** and **password**.
 
 **Example:**
 ```bash
-C:\Users\User
-$ python3 -V
-Python 3.6.4
+$ pyinstalive --info
+----------------------------------------------------------------------
+PYINSTALIVE (SCRIPT V2.5.5 - PYTHON V3.6.3) - 11:50:00 AM
+----------------------------------------------------------------------
+[I] To see all the available flags, use the -h flag.
+
+[I] PyInstaLive version:        2.5.5
+[I] Python version:             3.6.3
+[I] FFmpeg framework:           Available
+[I] Cookie files:               2 (username.json matches config user)
+[I] CLI supports color:         Yes
+[I] File to run at start:       None
+[I] File to run at finish:      None
+
+[I] Config file:
+
+    [pyinstalive]
+    username = johndoe
+    password = grapefruits
+    save_path = C:\path\to\downloads\
+    show_cookie_expiry = true
+    clear_temp_files = false
+    save_replays = true
+    run_at_start =
+    run_at_finish =
+    save_comments = true
+    log_to_file = false
+
+[I] End of PyInstaLive information screen.
+----------------------------------------------------------------------
 ```
 
 ###### Command used
-Paste the command here that you are running. Remove any information like usernames and passwords.
+Paste the command here that you are running. Don't forget to omit your **username** and **password**.
 
-**Example:** ```pyinstalive -u "johndoe" -p "grapefruits" -r "justinbieber"```
+**Example:** ```pyinstalive -u "johndoe" -p "grapefruits" -d "justinbieber"```
 
 ###### Behavior
 Accurately describe the issue you're experiencing with the script.
