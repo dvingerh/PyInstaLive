@@ -358,7 +358,7 @@ def run():
 	if unknown:
 		log("[E] The following invalid argument(s) were provided: ", "RED") 
 		log('', "GREEN") 
-		log(' '.join(unknown), "YELLOW") 
+		log('    ' + ' '.join(unknown), "YELLOW") 
 		log('', "GREEN")
 		if (supports_color()[1] == True):
 			log("[I] \033[94mpyinstalive -h\033[92m can be used to display command help.", "GREEN")
