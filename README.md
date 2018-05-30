@@ -26,7 +26,7 @@ This CLI script enables you to download any ongoing Instagram livestreams as wel
 - Install the prerequisites and then PyInstaLive.
 - Run `pyinstalive -c` to generate a configuration file.
 - Edit the configuration file using any text editor.
-- Run `pyinstalive -r "<live-username>"` to start downloading a livestream or replay.
+- Run `pyinstalive -d "<live-username>"` to start downloading a livestream or replay.
 
 ![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
@@ -104,11 +104,11 @@ log_to_file = false
 #### Example
 
 ```bash
-pyinstalive -u "johndoe" -p "grapefruits" -r "janedoe"
+pyinstalive -u "johndoe" -p "grapefruits" -d "janedoe"
 ```
 You can omit the `username` and `password` arguments if you have specified these in the configuration file:
 ```bash
-pyinstalive -r "janedoe"
+pyinstalive -d "janedoe"
 ```
 
 Below is an example of PyInstaLive's output after downloading a livestream:
@@ -134,7 +134,7 @@ PYINSTALIVE (SCRIPT V2.5.5 - PYTHON V3.6.3) - 06:45:30 PM
 [I] Downloading livestream... press [CTRL+C] to abort.
 ----------------------------------------------------------------------
 [I] The livestream has ended.
-[I] Time recorded     : 13 minutes and 10 seconds
+[I] Download duration : 13 minutes and 10 seconds
 [I] Stream duration   : 15 minutes and 20 seconds
 [I] Missing (approx.) : 2 minutes and 10 seconds
 ----------------------------------------------------------------------

@@ -3,11 +3,13 @@
 
 - ```-h``` or ```--help```  **—**  When this flag is passed, PyInstaLive's help message will be shown containing all available commands.
 
-- ```-u``` or ```--username```  **—**  Instagram username to login with. Requires:  ```--password```, ```--record```.
+- ```-u``` or ```--username```  **—**  Instagram username to login with. Requires:  ```--password```, ```--download```.
 
-- ```-p``` or ```--password```  **—**  Instagram password to login with. Requires:  ```--username```, ```--record```.
+- ```-p``` or ```--password```  **—**  Instagram password to login with. Requires:  ```--username```, ```--download```.
 
-- ```-r``` or ```--record```  **—**  The username of the user whose livestream or replay you want to save.
+- ```-d``` or ```--download```  **—**  The username of the user whose livestream or replay you want to save (legacy).
+
+- ```-r``` or ```--record```  **—**  The username of the user whose livestream or replay you want to save (legacy).
 
 - ```-i``` or ```--info```  **—**  When this flag is passed, PyInstaLive will show information such as its current version, the configuration file contents, available cookie files and more.
 
@@ -44,10 +46,10 @@ log_to_file = false
 
 ```save_replays```  **—**  When set to True, PyInstaLive will check for and download any available replays.
 
-```run_at_start```  **—**  Command to run when PyInstaLive starts recording a livestream. Leave empty to disable. (Experimental, use at own risk.)
+```run_at_start```  **—**  Command to run when PyInstaLive starts downloading a livestream. Leave empty to disable. (Experimental, use at own risk.)
 
-```run_at_finish```  **—**  Command to run when PyInstaLive finishes recording a livestream. Leave empty to disable. (Experimental, use at own risk.) 
+```run_at_finish```  **—**  Command to run when PyInstaLive finishes downloading a livestream. Leave empty to disable. (Experimental, use at own risk.) 
  
 ```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
 
-```log_to_file```  **—**  When set to true, PyInstaLive will all its console logs to a text file. Useful if you want to keep track of errors when running the script in a loop for example. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the filename will simply be named `pyinstalive_log.log`.
+```log_to_file```  **—**  When set to true, PyInstaLive will save all its console logs to a text file. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the file will simply be named `pyinstalive_log.log`.
