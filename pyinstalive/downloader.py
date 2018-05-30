@@ -6,6 +6,8 @@ import threading
 import time
 import shlex
 
+from xml.dom.minidom import parse, parseString
+
 from instagram_private_api import ClientConnectionError
 from instagram_private_api import ClientError
 from instagram_private_api import ClientThrottledError
@@ -261,6 +263,8 @@ def get_broadcasts_info(user_id):
 		if settings.save_replays.title() == "True":
 			if replays:
 				seperator("GREEN")
+				log('[I] Replays found, beginning download...', "GREEN")
+				seperator("GREEN")
 				download_replays(replays)
 			else:
 				log('[I] There are no available replays.', "YELLOW")
@@ -275,6 +279,18 @@ def get_broadcasts_info(user_id):
 
 def download_replays(broadcasts):
 	try:
+		try:
+			log('[I] Amount of replays    : {:s}'.format(str(len(broadcasts))), "GREEN")
+			for replay_index, broadcast in enumerate(broadcasts):
+				bc_dash_manifest = parseString(broadcast.get('dash_manifest')).getElementsByTagName('Period')
+				bc_duration_raw = bc_dash_manifest[0].getAttribute("duration")	
+				bc_hours = (bc_duration_raw.split("PT"))[1].split("H")[0]
+				bc_minutes = (bc_duration_raw.split("H"))[1].split("M")[0]
+				bc_seconds = ((bc_duration_raw.split("M"))[1].split("S")[0]).split('.')[0]
+				log('[I] Replay {:s} duration    : {:s} minutes and {:s} seconds'.format(str(replay_index + 1), bc_minutes, bc_seconds), "GREEN")
+		except Exception as e:
+			log("[W] An error occurred while getting replay duration information: {:s}".format(str(e)))
+		seperator("GREEN")
 		log("[I] Downloading replays... press [CTRL+C] to abort.", "GREEN")
 		seperator("GREEN")
 		for replay_index, broadcast in enumerate(broadcasts):
