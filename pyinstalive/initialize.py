@@ -197,7 +197,7 @@ def show_info(config):
 		log("[W] Cookie files:            	None found", "YELLOW")
 
 	log("[I] CLI supports color:     	{:s}".format(str(supports_color()[0])), "GREEN")
-	log("[I] File to run at start:      {:s}".format(settings.run_at_start), "GREEN")
+	log("[I] File to run at start:       {:s}".format(settings.run_at_start), "GREEN")
 	log("[I] File to run at finish:      {:s}".format(settings.run_at_finish), "GREEN")
 	log("", "GREEN")
 
