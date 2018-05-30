@@ -33,7 +33,7 @@ def run_command(command):
 	try:
 		FNULL = open(os.devnull, 'w')
 		subprocess.Popen(shlex.split(command), stdout=FNULL, stderr=subprocess.STDOUT)
-	except OSError as e:
+	except Exception as e:
 		pass
 
 
@@ -154,7 +154,7 @@ def download_livestream(broadcast):
 		log("[E] Could not download livestream: {:s}".format(str(e)), "RED")
 		try:
 		    os.remove(os.path.join(output_dir, 'folder.lock'))
-		except OSError:
+		except Exception:
 		    pass
 
 
@@ -185,7 +185,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			log('[I] Successfully stitched downloaded files into video.', "GREEN")
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
-			except OSError:
+			except Exception:
 			    pass
 			if settings.clear_temp_files.title() == "True":
 				try:
@@ -199,7 +199,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			seperator("GREEN")
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
-			except OSError:
+			except Exception:
 			    pass
 			sys.exit(1)
 		except Exception as e:
@@ -207,7 +207,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			seperator("GREEN")
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
-			except OSError:
+			except Exception:
 			    pass
 			sys.exit(1)
 	except KeyboardInterrupt:
@@ -215,7 +215,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			seperator("GREEN")
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
-			except OSError:
+			except Exception:
 			    pass
 			sys.exit(0)
 
@@ -318,7 +318,7 @@ def download_replays(broadcasts):
 					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
 					try:
 					    os.remove(os.path.join(output_dir, 'folder.lock'))
-					except OSError:
+					except Exception:
 					    pass
 
 					if (current != len(broadcasts)):
@@ -338,7 +338,7 @@ def download_replays(broadcasts):
 		seperator("GREEN")
 		try:
 		    os.remove(os.path.join(output_dir, 'folder.lock'))
-		except OSError:
+		except Exception:
 		    pass
 		sys.exit(1)
 	except KeyboardInterrupt:

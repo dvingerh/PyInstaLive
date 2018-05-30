@@ -365,6 +365,7 @@ def run():
 			log("[I] \033[94mpyinstalive -h\033[92m can be used to display command help.", "GREEN")
 		else:
 			log("[I] pyinstalive -h can be used to display command help.", "GREEN")
+		seperator("GREEN")
 		exit(1)
 
 	if (args.info) or (not
