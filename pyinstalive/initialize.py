@@ -129,14 +129,14 @@ def check_config_validity(config):
 			if (os.path.exists(settings.save_path)):
 				pass
 			else:
-				log("[W] Invalid or missing setting detected for 'save_path', falling back to path: " + os.getcwd(), "YELLOW")
+				log("[W] Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()), "YELLOW")
 				settings.save_path = os.getcwd()
 				has_thrown_errors = True
 
 			if not settings.save_path.endswith('/'):
 				settings.save_path = settings.save_path + '/'
 		except:
-			log("[W] Invalid or missing setting detected for 'save_path', falling back to path: " + os.getcwd(), "YELLOW")
+			log("[W] Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()), "YELLOW")
 			settings.save_path = os.getcwd()
 			has_thrown_errors = True
 
@@ -155,8 +155,8 @@ def show_info(config):
 	if os.path.exists('pyinstalive.ini'):
 		try:
 			config.read('pyinstalive.ini')
-		except Exception:
-			log("[E] Could not read configuration file.", "RED")
+		except Exception as e:
+			log("[E] Could not read configuration file: {:s}".format(str(e)), "RED")
 			seperator("GREEN")
 	else:
 		new_config()
@@ -178,12 +178,12 @@ def show_info(config):
 			if settings.username == file.replace(".json", ''):
 				cookie_from_config = file
 	except Exception as e:
-		log("[W] Could not check for cookie files: " + str(e), "YELLOW")
+		log("[W] Could not check for cookie files: {:s}".format(str(e)), "YELLOW")
 		log("", "ENDC")
 	log("[I] To see all the available flags, use the -h flag.", "BLUE")
 	log("", "GREEN")
-	log("[I] PyInstaLive version:    	" + script_version, "GREEN")
-	log("[I] Python version:         	" + python_version, "GREEN")
+	log("[I] PyInstaLive version:    	{:s}".format(script_version), "GREEN")
+	log("[I] Python version:         	{:s}".format(python_version), "GREEN")
 	if not check_ffmpeg():
 		log("[E] FFmpeg framework:       	Not found", "RED")
 	else:
@@ -196,9 +196,9 @@ def show_info(config):
 	else:
 		log("[W] Cookie files:            	None found", "YELLOW")
 
-	log("[I] CLI supports color:     	" + str(supports_color()[0]), "GREEN")
-	log("[I] File to run at start:       " + settings.run_at_start, "GREEN")
-	log("[I] File to run at finish:      " + settings.run_at_finish, "GREEN")
+	log("[I] CLI supports color:     	{:s}".format(str(supports_color()[0])), "GREEN")
+	log("[I] File to run at start:      {:s}".format(settings.run_at_start), "GREEN")
+	log("[I] File to run at finish:      {:s}".format(settings.run_at_finish), "GREEN")
 	log("", "GREEN")
 
 
@@ -207,7 +207,7 @@ def show_info(config):
 		log("", "GREEN")
 		with open('pyinstalive.ini') as f:
 			for line in f:
-				log("    " + line.rstrip(), "YELLOW")
+				log("    {:s}".format(line.rstrip()), "YELLOW")
 	else:
 		log("[E] Config file:	    	Not found", "RED")
 	log("", "GREEN")
@@ -223,7 +223,7 @@ def new_config():
 			log("", "GREEN")
 			with open('pyinstalive.ini') as f:
 				for line in f:
-					log("    " + line.rstrip(), "YELLOW")
+					log("    {:s}".format(line.rstrip()), "YELLOW")
 			log("", "GREEN")
 			log("[I] To create a default config file, delete 'pyinstalive.ini' and ", "GREEN")
 			log("    run this script again.", "GREEN")
@@ -231,7 +231,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = " + os.getcwd() + "\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n"
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = {:s}\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n".format(os.getcwd())
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
@@ -239,7 +239,7 @@ def new_config():
 				seperator("GREEN")
 				sys.exit(0)
 			except Exception as e:
-				log("[E] Could not create default config file: " + str(e), "RED")
+				log("[E] Could not create default config file: {:s}".format(str(e)), "RED")
 				log("[W] You must manually create and edit it with the following template: ", "YELLOW")
 				log("", "GREEN")
 				log(config_template, "YELLOW")
@@ -247,7 +247,7 @@ def new_config():
 				log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
 				seperator("GREEN")
 	except Exception as e:
-		log("[E] An error occurred: " + str(e), "RED")
+		log("[E] An error occurred: {:s}".format(str(e)), "RED")
 		log("[W] If you don't have a configuration file, you must", "YELLOW")
 		log("    manually create and edit it with the following template: ", "YELLOW")
 		log("", "GREEN")
@@ -308,7 +308,7 @@ def clean_download_dir():
 def run():
 	logging.disable(logging.CRITICAL)
 	config = configparser.ConfigParser()
-	parser = argparse.ArgumentParser(description='You are running PyInstaLive ' + script_version + " using Python " + python_version)
+	parser = argparse.ArgumentParser(description="You are running PyInstaLive {:s} using Python {:s}".format(script_version, python_version))
 	parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
 	parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
 	parser.add_argument('-r', '--record', dest='download', type=str, required=False, help="The username of the user whose livestream or replay you want to save.")

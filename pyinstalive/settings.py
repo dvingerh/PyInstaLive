@@ -1,7 +1,7 @@
 import time
 
 class settings:
-	user_to_record = ""
+	user_to_download = ""
 	username = ""
 	password = ""
 	save_path = "/"

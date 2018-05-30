@@ -47,11 +47,11 @@ def log(string, color):
 	if supports_color()[1] == False:
 		print(string)
 	else:
-		print('\033[1m' + colors(color) + string + colors("ENDC"))
+		print('\033[1m{}{}{}'.format(colors(color), string, colors("ENDC")))
 	if settings.log_to_file == 'True':
 		try:
-			with open("pyinstalive_{:s}.log".format(settings.user_to_record),"a+") as f:
-				f.write(string + "\n")
+			with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
+				f.write("{:s}\n".format(string))
 				f.close()
 		except:
 			pass
@@ -61,11 +61,11 @@ def seperator(color):
 	if supports_color()[1] == False:
 		print(sep)
 	else:
-		print('\033[1m' + colors(color) + (sep) + colors("ENDC"))
+		print('\033[1m{}{}{}'.format(colors(color), sep, colors("ENDC")))
 	if settings.log_to_file == 'True':
 		try:
-			with open("pyinstalive_{:s}.log".format(settings.user_to_record),"a+") as f:
-				f.write(sep + "\n")
+			with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
+				f.write("{:s}\n".format(sep))
 				f.close()
 		except:
 			pass

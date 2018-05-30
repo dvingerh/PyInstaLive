@@ -17,15 +17,15 @@ from .logger import log
 from .logger import seperator
 
 
-def main(instagram_api_arg, record_arg, settings_arg):
+def main(instagram_api_arg, download_arg, settings_arg):
 	global instagram_api
-	global user_to_record
+	global user_to_download
 	global broadcast
 	global settings
 	settings = settings_arg
 	instagram_api = instagram_api_arg
-	user_to_record = record_arg
-	get_user_info(user_to_record)
+	user_to_download = download_arg
+	get_user_info(user_to_download)
 
 
 
@@ -45,11 +45,11 @@ def get_stream_duration(compare_time, broadcast=None):
 			if (int(time.time()) < int(compare_time)):
 				had_wrong_time = True				
 				corrected_compare_time = int(compare_time) - 5
-				record_time = int(time.time()) - int(corrected_compare_time)
+				download_time = int(time.time()) - int(corrected_compare_time)
 			else:
-				record_time = int(time.time()) - int(compare_time)
+				download_time = int(time.time()) - int(compare_time)
 			stream_time = int(time.time()) - int(broadcast.get('published_time'))
-			stream_started_mins, stream_started_secs = divmod(stream_time - record_time, 60)
+			stream_started_mins, stream_started_secs = divmod(stream_time - download_time, 60)
 		else:
 			if (int(time.time()) < int(compare_time)):	
 				had_wrong_time = True			
@@ -61,11 +61,10 @@ def get_stream_duration(compare_time, broadcast=None):
 		if stream_started_secs:
 			stream_duration_str += ' and %d seconds' % stream_started_secs
 		if had_wrong_time:
-			return stream_duration_str + " (corrected)"
+			return "{:s} (corrected)".format(stream_duration_str)
 		else:
 			return stream_duration_str
 	except Exception as e:
-		print(str(e))
 		return "Not available"
 
 
@@ -86,7 +85,7 @@ def download_livestream(broadcast):
 				 or broadcast.get('dash_abr_playback_url')
 				 or broadcast.get('dash_playback_url'))
 
-		output_dir = settings.save_path + '{}_{}_{}_{}_live_downloads'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+		output_dir = '{}{}_{}_{}_{}_live_downloads'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
 
 		broadcast_downloader = live.Downloader(
 			mpd=mpd_url,
@@ -108,13 +107,13 @@ def download_livestream(broadcast):
 			broadcast_guest = broadcast.get('cobroadcasters', {})[0].get('username')
 		except:
 			broadcast_guest = None
-		if (broadcast_owner != user_to_record):
+		if (broadcast_owner != user_to_download):
 			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner), "BLUE")
 			broadcast_guest = None
 		if broadcast_guest:
 			log('[I] This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest), "BLUE")
 		seperator("GREEN")
-		log('[I] Username    : {:s}'.format(user_to_record), "GREEN")
+		log('[I] Username    : {:s}'.format(user_to_download), "GREEN")
 		print_status(False)
 		log('[I] MPD URL     : {:s}'.format(mpd_url), "GREEN")
 		seperator("GREEN")
@@ -134,7 +133,7 @@ def download_livestream(broadcast):
 		comment_thread_worker = None
 		if settings.save_comments.title() == "True":
 			try:
-				comments_json_file = os.path.join(output_dir, '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
+				comments_json_file = os.path.join(output_dir, '{}_{}_{}_{}_live_comments.json'.format(settings.current_date, user_to_download, broadcast.get('id'), settings.current_time))
 				comment_thread_worker = threading.Thread(target=get_live_comments, args=(instagram_api, broadcast, comments_json_file, broadcast_downloader,))
 				comment_thread_worker.start()
 			except Exception as e:
@@ -154,18 +153,18 @@ def download_livestream(broadcast):
 	except Exception as e:
 		log("[E] Could not download livestream: {:s}".format(str(e)), "RED")
 		try:
-		    os.remove(os.path.join(output_dir,'folder.lock'))
+		    os.remove(os.path.join(output_dir, 'folder.lock'))
 		except OSError:
 		    pass
 
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 	try:
-		live_mp4_file = settings.save_path + '{}_{}_{}_{}_live.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
-		live_folder_path = live_mp4_file.split('.mp4')[0] + "_downloads"
+		live_mp4_file = '{}{}_{}_{}_{}_live.mp4'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
+		live_folder_path = "{:s}_downloads".format(live_mp4_file.split('.mp4')[0])
 
 		if comment_thread_worker and comment_thread_worker.is_alive():
-			log("[I] Stopping comment downloading and saving comments (if any)...", "GREEN")
+			log("[I] Waiting for comment downloader to end download cycle...", "GREEN")
 			comment_thread_worker.join()
 
 		if (settings.run_at_finish is not "None"):
@@ -222,26 +221,26 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 
 
 
-def get_user_info(user_to_record):
+def get_user_info(user_to_download):
 	try:
-		user_res = instagram_api.username_info(user_to_record)
+		user_res = instagram_api.username_info(user_to_download)
 		user_id = user_res.get('user', {}).get('pk')
 	except ClientConnectionError as e:
 		if "timed out" in str(e):
-			log('[E] Could not get information for "{:s}": The connection has timed out.'.format(user_to_record), "RED")
+			log('[E] Could not get information for "{:s}": The connection has timed out.'.format(user_to_download), "RED")
 		else:
-			log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_record, str(e), e.code, e.error_response), "RED")
+			log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_download, str(e), e.code, e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	except Exception as e:
-		log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_record, str(e), e.code, e.error_response), "RED")
+		log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_download, str(e), e.code, e.error_response), "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	except KeyboardInterrupt:
-		log('[W] Aborted getting information for "{:s}", exiting...'.format(user_to_record), "YELLOW")
+		log('[W] Aborted getting information for "{:s}", exiting...'.format(user_to_download), "YELLOW")
 		seperator("GREEN")
 		sys.exit(1)
-	log('[I] Getting info for "{:s}" successful.'.format(user_to_record), "GREEN")
+	log('[I] Getting info for "{:s}" successful.'.format(user_to_download), "GREEN")
 	get_broadcasts_info(user_id)
 
 
@@ -294,14 +293,14 @@ def download_replays(broadcasts):
 				current = replay_index + 1
 				log("[I] Downloading replay {:s} of {:s} with ID '{:s}'...".format(str(current), str(len(broadcasts)), str(broadcast.get('id'))), "GREEN")
 				current_time = str(int(time.time()))
-				output_dir = settings.save_path + '{}_{}_{}_{}_replay_downloads'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
+				output_dir = '{}{}_{}_{}_{}_replay_downloads'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
 				broadcast_downloader = replay.Downloader(
 					mpd=broadcast.get('dash_manifest'),
 					output_dir=output_dir,
 					user_agent=instagram_api.user_agent)
 				open(os.path.join(output_dir,'folder.lock'), 'a').close()
-				replay_mp4_file = settings.save_path + '{}_{}_{}_{}_replay.mp4'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time)
-				replay_json_file = os.path.join(output_dir, '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_record, broadcast.get('id'), settings.current_time))
+				replay_mp4_file = '{}{}_{}_{}_{}_replay.mp4'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
+				replay_json_file = os.path.join(output_dir, '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_download, broadcast.get('id'), settings.current_time))
 
 				if settings.clear_temp_files.title() == "True":
 					replay_saved = broadcast_downloader.download(replay_mp4_file, cleartempfiles=True)
