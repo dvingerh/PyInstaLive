@@ -92,7 +92,7 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 	except Exception as e:
 		if (str(e).startswith("unsupported pickle protocol")):
 			log("[W] This cookie file is not compatible with Python {}.".format(sys.version.split(' ')[0][0]), "YELLOW")
-			log("[W] Please delete your cookie file '{}.json' and try again.".format(useranem), "YELLOW")
+			log("[W] Please delete your cookie file '{}.json' and try again.".format(username), "YELLOW")
 		else:
 			log('[E] Unexpected Exception: {0!s}'.format(e), "RED")
 		seperator("GREEN")

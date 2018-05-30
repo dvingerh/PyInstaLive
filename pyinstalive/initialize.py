@@ -172,9 +172,12 @@ def show_info(config):
 		for file in os.listdir(os.getcwd()):
 			if file.endswith(".json"):
 				with open(file) as data_file:    
-					json_data = json.load(data_file)
-					if (json_data.get('created_ts')):
-						cookie_files.append(file)
+					try:
+						json_data = json.load(data_file)
+						if (json_data.get('created_ts')):
+							cookie_files.append(file)
+					except Exception as e:
+						pass
 			if settings.username == file.replace(".json", ''):
 				cookie_from_config = file
 	except Exception as e:
