@@ -32,11 +32,11 @@ This CLI script enables you to download any ongoing Instagram livestreams as wel
 
 ## Prerequisites
 
-#### Windows 
+#### Windows (using the executable)
 - [ffmpeg](https://ffmpeg.org/download.html)
 - [Universal C Runtime Update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) (If not using Windows 10)
 
-#### Linux (Windows if not using the executable)
+#### Linux & Windows (not using the executable)
 - [ffmpeg](https://ffmpeg.org/download.html)
 - [Git](https://git-scm.com/downloads)
 - [Python 2.7.x or 3.5>=](https://www.python.org/downloads/)
