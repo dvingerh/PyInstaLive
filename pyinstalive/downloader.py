@@ -249,6 +249,7 @@ def get_user_info(user_to_download):
 
 def get_broadcasts_info(user_id):
 	try:
+		seperator("GREEN")
 		log('[I] Checking for livestreams and replays...', "GREEN")
 		seperator("GREEN")
 		broadcasts = instagram_api.user_story_feed(user_id)
