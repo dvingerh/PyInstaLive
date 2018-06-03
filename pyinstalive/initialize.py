@@ -413,51 +413,58 @@ def run():
 
 
 	if check_config_validity(config):
-		if (args.clean):
-			clean_download_dir()
-			sys.exit(0)
+		try:
+			if (args.clean):
+				clean_download_dir()
+				sys.exit(0)
 
-		if not check_ffmpeg():
-			log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
-			seperator("GREEN")
-			sys.exit(1)
-
-		if (args.noreplays):
-			settings.save_replays = "False"
-
-		if (args.nolives):
-			settings.save_lives = "False"
-
-		if settings.save_lives == "False" and settings.save_replays == "False":
-			log("[W] Script will not run because both live and replay saving is disabled.", "YELLOW")
-			seperator("GREEN")
-			sys.exit(1)
-
-		if not args.download:
-			log("[W] Missing --download argument. Please specify an Instagram username.", "YELLOW")
-			seperator("GREEN")
-			sys.exit(1)
-
-
-		if (args.username is not None) and (args.password is not None):
-			api = login(args.username, args.password, settings.show_cookie_expiry, True)
-		elif (args.username is not None) or (args.password is not None):
-			log("[W] Missing --username or --password argument, falling back to config file...", "YELLOW")
-			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+			if not check_ffmpeg():
+				log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
 				seperator("GREEN")
 				sys.exit(1)
-			else:
-				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
-		else:
-			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+
+			if (args.noreplays):
+				settings.save_replays = "False"
+
+			if (args.nolives):
+				settings.save_lives = "False"
+
+			if settings.save_lives == "False" and settings.save_replays == "False":
+				log("[W] Script will not run because both live and replay saving is disabled.", "YELLOW")
 				seperator("GREEN")
 				sys.exit(1)
-			else:
-				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
-		main(api, args.download, settings)
+			if not args.download:
+				log("[W] Missing --download argument. Please specify an Instagram username.", "YELLOW")
+				seperator("GREEN")
+				sys.exit(1)
+
+
+			if (args.username is not None) and (args.password is not None):
+				api = login(args.username, args.password, settings.show_cookie_expiry, True)
+			elif (args.username is not None) or (args.password is not None):
+				log("[W] Missing --username or --password argument, falling back to config file...", "YELLOW")
+				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
+					log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+					seperator("GREEN")
+					sys.exit(1)
+				else:
+					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
+			else:
+				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
+					log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+					seperator("GREEN")
+					sys.exit(1)
+				else:
+					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
+
+			main(api, args.download, settings)
+		except Exception as e:
+			log("[E] Could not finish pre-download checks:  {:s}".format(str(e)), "RED")
+			seperator("GREEN")
+		except KeyboardInterrupt as ee:
+			log("[W] Pre-download checks have been aborted, exiting...", "YELLOW")
+			seperator("GREEN")
 
 	else:
 		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
