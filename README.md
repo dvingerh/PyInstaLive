@@ -94,6 +94,7 @@ password = grapefruits
 save_path = 
 show_cookie_expiry = true
 clear_temp_files = false
+save_lives = true
 save_replays = true
 run_at_start =
 run_at_finish =

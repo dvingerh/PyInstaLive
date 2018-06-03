@@ -71,6 +71,17 @@ def check_config_validity(config):
 			settings.save_replays = 'true'
 			has_thrown_errors = True
 
+		try:
+			settings.save_lives = config.get('pyinstalive', 'save_lives').title()
+			if not settings.save_lives in bool_values:
+				log("[W] Invalid or missing setting detected for 'save_lives', using default value (True)", "YELLOW")
+				settings.save_lives = 'true'
+				has_thrown_errors = True
+		except:
+			log("[W] Invalid or missing setting detected for 'save_lives', using default value (True)", "YELLOW")
+			settings.save_lives = 'true'
+			has_thrown_errors = True
+
 
 
 		try:
@@ -234,7 +245,7 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = {:s}\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n".format(os.getcwd())
+				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = {:s}\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_lives = true\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n".format(os.getcwd())
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template)
 				config_file.close()
@@ -319,6 +330,7 @@ def run():
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
 	parser.add_argument('-nr', '--noreplays', dest='noreplays', action='store_true', help="When used, do not check for any available replays.")
+	parser.add_argument('-nl', '--nolives', dest='nolives', action='store_true', help="When used, do not check for any available livestreams.")
 	parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="PyInstaLive will clean the current download folder of all leftover files.")
 
 	# Workaround to 'disable' argument abbreviations
@@ -330,6 +342,7 @@ def run():
 	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE') 
 	parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
 
 
 	args, unknown = parser.parse_known_args()
@@ -378,6 +391,7 @@ def run():
 	args.info and not
 	args.config and not
 	args.noreplays and not
+	args.nolives and not
 	args.clean):
 		show_info(config)
 		sys.exit(0)
@@ -408,18 +422,27 @@ def run():
 			seperator("GREEN")
 			sys.exit(1)
 
-		if (args.download == None):
-			log("[E] Missing --download argument. Please specify an Instagram username.", "RED")
+		if (args.noreplays):
+			settings.save_replays = "False"
+
+		if (args.nolives):
+			settings.save_lives = "False"
+
+		if settings.save_lives == "False" and settings.save_replays == "False":
+			log("[W] Script will not run because both live and replay saving is disabled.", "YELLOW")
 			seperator("GREEN")
 			sys.exit(1)
 
-		if (args.noreplays):
-			settings.save_replays = "false"
+		if not args.download:
+			log("[W] Missing --download argument. Please specify an Instagram username.", "YELLOW")
+			seperator("GREEN")
+			sys.exit(1)
+
 
 		if (args.username is not None) and (args.password is not None):
 			api = login(args.username, args.password, settings.show_cookie_expiry, True)
 		elif (args.username is not None) or (args.password is not None):
-			log("[W] Missing -u or -p arguments, falling back to config file...", "YELLOW")
+			log("[W] Missing --username or --password argument, falling back to config file...", "YELLOW")
 			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
 				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
 				seperator("GREEN")

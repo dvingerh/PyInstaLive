@@ -269,10 +269,16 @@ def get_broadcasts_info(user_id):
 		livestream = broadcasts.get('broadcast')
 		replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
 
-		if livestream:
-			download_livestream(livestream)
+		if settings.save_lives.title() == "True":
+			if livestream:
+				download_livestream(livestream)
+			else:
+				log('[I] There are no available livestreams.', "YELLOW")
 		else:
-			log('[I] There are no available livestreams.', "YELLOW")
+			seperator("GREEN")
+			log("[I] Livestream saving is disabled either with an argument or in the config file.", "BLUE")
+			
+
 		if settings.save_replays.title() == "True":
 			if replays:
 				seperator("GREEN")
@@ -282,7 +288,9 @@ def get_broadcasts_info(user_id):
 			else:
 				log('[I] There are no available replays.', "YELLOW")
 		else:
+			seperator("GREEN")
 			log("[I] Replay saving is disabled either with an argument or in the config file.", "BLUE")
+
 		seperator("GREEN")
 	except Exception as e:
 		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")

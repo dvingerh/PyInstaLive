@@ -15,6 +15,8 @@
 
 - ```-nr``` or ```--noreplays```  **—**  When this argument is passed, PyInstaLive will not download any available replays. Overrides the configuration file.
 
+- ```-nl``` or ```--nolives```  **—**  When this argument is passed, PyInstaLive will not download livestreams. Overrides the configuration file.
+
 - ```-cl``` or ```--clean```  **—**  When this argument is passed, PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
 
 
@@ -27,6 +29,7 @@ password = grapefruits
 save_path = 
 show_cookie_expiry = true
 clear_temp_files = false
+save_lives = true
 save_replays = true
 run_at_start =
 run_at_finish =
@@ -44,7 +47,9 @@ log_to_file = false
 
 ```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded as well as the folders which contained these files. Replay folders created by PyInstaLive will not be deleted because they are used to determine if a replay has already been downloaded.
 
-```save_replays```  **—**  When set to True, PyInstaLive will check for and download any available replays.
+```save_lives```  **—**  When set to True, PyInstaLive will download livestreams.
+
+```save_replays```  **—**  When set to True, PyInstaLive will download any available replays.
 
 ```run_at_start```  **—**  Command to run when PyInstaLive starts downloading a livestream. Leave empty to disable. (Experimental, use at own risk.)
 
