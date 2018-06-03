@@ -153,9 +153,11 @@ PYINSTALIVE (SCRIPT V2.5.6 - PYTHON V3.6.3) - 06:45:30 PM
 ![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Notes
+- I have not much time to extensively test the changes I make to the code, so when you do encounter a problem please [open an issue](https://github.com/notcammy/PyInstaLive/issues/new) and try using an older version of PyInstaLive in the meantime.
+
 - Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` argument. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
 
-- If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
+- If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays. Alternatively you can set `save_lives` to `False` in the configuration file or pass the `--nolives` argument to skip downloading of livestreams.
 
 
 ## Help
