@@ -115,11 +115,14 @@ pyinstalive -d "janedoe"
 Below is an example of PyInstaLive's output after downloading a livestream:
 
 ```
+> pyinstalive -d "janedoe"
+
 ----------------------------------------------------------------------
 PYINSTALIVE (SCRIPT V2.5.5 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
-[I] Using cached login cookie for "johndoe".
-[I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
+[I] Successfully logged into user "johndoe".
+[I] Cookie file expiry date: 2018-09-01 at 04:38:08 PM
+----------------------------------------------------------------------
 [I] Getting info for "janedoe" successful.
 ----------------------------------------------------------------------
 [I] Checking for livestreams and replays...
