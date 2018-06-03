@@ -32,7 +32,7 @@ $ pyinstalive --info
 ----------------------------------------------------------------------
 PYINSTALIVE (SCRIPT V2.5.5 - PYTHON V3.6.3) - 11:50:00 AM
 ----------------------------------------------------------------------
-[I] To see all the available flags, use the -h flag.
+[I] To see all the available arguments, use the -h argument.
 
 [I] PyInstaLive version:        2.5.5
 [I] Python version:             3.6.3

@@ -1,7 +1,7 @@
 # Commands
 
 
-- ```-h``` or ```--help```  **—**  When this flag is passed, PyInstaLive's help message will be shown containing all available commands.
+- ```-h``` or ```--help```  **—**  When this argument is passed, PyInstaLive's help message will be shown containing all available commands.
 
 - ```-u``` or ```--username```  **—**  Instagram username to login with. Requires:  ```--password```, ```--download```.
 
@@ -11,11 +11,11 @@
 
 - ```-r``` or ```--record```  **—**  The username of the user whose livestream or replay you want to save (legacy).
 
-- ```-i``` or ```--info```  **—**  When this flag is passed, PyInstaLive will show information such as its current version, the configuration file contents, available cookie files and more.
+- ```-i``` or ```--info```  **—**  When this argument is passed, PyInstaLive will show information such as its current version, the configuration file contents, available cookie files and more.
 
-- ```-nr``` or ```--noreplays```  **—**  When this flag is passed, PyInstaLive will not download any available replays. Overrides the configuration file.
+- ```-nr``` or ```--noreplays```  **—**  When this argument is passed, PyInstaLive will not download any available replays. Overrides the configuration file.
 
-- ```-cl``` or ```--clean```  **—**  When this flag is passed, PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
+- ```-cl``` or ```--clean```  **—**  When this argument is passed, PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
 
 
 # Default configuration file

@@ -167,7 +167,7 @@ class CommentsDownloader(object):
 				
 			with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
 				if python_version.startswith('2') and not wide_build:
-					log_outfile.write('This log was generated using Python {:s} without wide unicode support. This means characters such as emojis are not saved.\nUser comments without any text usually are comments that only had emojis.\nBuild Python 2 with the --enable-unicode=ucs4 flag or use Python 3 for full unicode support.\n\n'.format(python_version) + ''.join(subs))
+					log_outfile.write('This log was generated using Python {:s} without wide unicode support. This means characters such as emojis are not saved.\nUser comments without any text usually are comments that only had emojis.\nBuild Python 2 with the --enable-unicode=ucs4 argument or use Python 3 for full unicode support.\n\n'.format(python_version) + ''.join(subs))
 				else:
 					log_outfile.write(''.join(subs))
 			return comment_errors, total_comments

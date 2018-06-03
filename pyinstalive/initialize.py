@@ -183,7 +183,7 @@ def show_info(config):
 	except Exception as e:
 		log("[W] Could not check for cookie files: {:s}".format(str(e)), "YELLOW")
 		log("", "ENDC")
-	log("[I] To see all the available flags, use the -h flag.", "BLUE")
+	log("[I] To see all the available arguments, use the -h argument.", "BLUE")
 	log("", "GREEN")
 	log("[I] PyInstaLive version:    	{:s}".format(script_version), "GREEN")
 	log("[I] Python version:         	{:s}".format(python_version), "GREEN")

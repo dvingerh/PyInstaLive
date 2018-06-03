@@ -282,7 +282,7 @@ def get_broadcasts_info(user_id):
 			else:
 				log('[I] There are no available replays.', "YELLOW")
 		else:
-			log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
+			log("[I] Replay saving is disabled either with an argument or in the config file.", "BLUE")
 		seperator("GREEN")
 	except Exception as e:
 		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")
