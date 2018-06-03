@@ -388,7 +388,7 @@ def download_replays(broadcasts):
 		sys.exit(1)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] The download has been aborted by the user.', "YELLOW")
+		log('[I] The download has been aborted by the user, exiting...', "YELLOW")
 		seperator("GREEN")
 		try:
 			shutil.rmtree(output_dir)
