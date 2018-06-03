@@ -275,7 +275,6 @@ def get_broadcasts_info(user_id):
 			else:
 				log('[I] There are no available livestreams.', "YELLOW")
 		else:
-			seperator("GREEN")
 			log("[I] Livestream saving is disabled either with an argument or in the config file.", "BLUE")
 			
 

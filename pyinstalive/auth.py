@@ -39,6 +39,7 @@ def onlogin_callback(api, cookie_file):
 	with open(cookie_file, 'w') as outfile:
 		json.dump(cache_settings, outfile, default=to_json)
 		log('[I] New cookie file was made: {0!s}'.format(cookie_file), "GREEN")
+		seperator("GREEN")
 
 
 def login(username, password, show_cookie_expiry, force_use_login_args):
@@ -85,8 +86,13 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 			log('[E] An error occurred while trying to create a new cookie file: {:s}'.format(str(ee)), "RED")
 			if "getaddrinfo failed" in str(ee):
 				log('[E] Could not resolve host, check your internet connection.', "RED")
-			if "timed out" in str(ee):
+			elif "timed out" in str(ee):
 				log('[E] The connection timed out, check your internet connection.', "RED")
+			elif "bad_password" in str(ee):
+				log('[E] The password you entered is incorrect. Please try again.', "RED")
+			else:
+				log('[E] {:s}'.format(ee.message), "RED")
+			seperator("GREEN")
 			exit(1)
 
 	except ClientLoginError as e:
