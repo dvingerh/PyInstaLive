@@ -245,9 +245,22 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = {:s}\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_lives = true\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n".format(os.getcwd())
+				config_template = """
+[pyinstalive]
+username = johndoe
+password = grapefruits
+save_path = {:s}
+show_cookie_expiry = true
+clear_temp_files = false
+save_lives = true
+save_replays = true
+run_at_start = 
+run_at_finish = 
+save_comments = false
+log_to_file = false
+				""".format(os.getcwd())
 				config_file = open("pyinstalive.ini", "w")
-				config_file.write(config_template)
+				config_file.write(config_template.strip())
 				config_file.close()
 				log("[W] Edit the created 'pyinstalive.ini' file and run this script again.", "YELLOW")
 				seperator("GREEN")
@@ -256,7 +269,8 @@ def new_config():
 				log("[E] Could not create default config file: {:s}".format(str(e)), "RED")
 				log("[W] You must manually create and edit it with the following template: ", "YELLOW")
 				log("", "GREEN")
-				log(config_template, "YELLOW")
+				for line in config_template.strip().splitlines():
+					log("    {:s}".format(line.rstrip()), "YELLOW")
 				log("", "GREEN")
 				log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
 				seperator("GREEN")
