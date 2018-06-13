@@ -227,27 +227,40 @@ def get_user_info(user_to_download):
 	try:
 		user_res = instagram_api.username_info(user_to_download)
 		user_id = user_res.get('user', {}).get('pk')
-	except ClientConnectionError as e:
-		if "timed out" in str(e):
-			log('[E] Could not get information for "{:s}": The connection has timed out.'.format(user_to_download), "RED")
-		else:
-			log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_download, str(e), e.code, e.error_response), "RED")
+	except ClientConnectionError as cce:
+		log('[E] Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, cce.code, str(cce)), "RED")
+		if "getaddrinfo failed" in str(cce):
+			log('[E] Could not resolve host, check your internet connection.', "RED")
+		if "timed out" in str(cce):
+			log('[E] The connection timed out, check your internet connection.', "RED")
+		seperator("GREEN")
+		sys.exit(1)
+	except ClientThrottledError as cte:
+		log('[E] Could not get user info for "{:s}": {:d} {:s}\n[E] You are making too many requests at this time.'.format(user_to_download, cte.code, str(cte)), "RED")
+		seperator("GREEN")
+		sys.exit(1)
+	except ClientError as ce:
+		log('[E] Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, ce.code, str(ce)), "RED")
+		if ("Not Found") in str(ce):
+			log('[E] The specified user does not exist.', "RED")
 		seperator("GREEN")
 		sys.exit(1)
 	except Exception as e:
-		log('[E] Could not get information for "{:s}".\n[E] Error message: {:s}\n[E] Code: {:d}\n[E] Response: {:s}'.format(user_to_download, str(e), e.code, e.error_response), "RED")
+		log('[E] Could not get user info for "{:s}": {:s}'.format(user_to_download, str(e)), "RED")
+
 		seperator("GREEN")
 		sys.exit(1)
 	except KeyboardInterrupt:
-		log('[W] Aborted getting information for "{:s}", exiting...'.format(user_to_download), "YELLOW")
+		log('[W] Aborted getting user info for "{:s}", exiting...'.format(user_to_download), "YELLOW")
 		seperator("GREEN")
-		sys.exit(1)
+		sys.exit(0)
 	log('[I] Getting info for "{:s}" successful.'.format(user_to_download), "GREEN")
 	get_broadcasts_info(user_id)
 
 
 
 def get_broadcasts_info(user_id):
+	seperator("GREEN")
 	try:
 		seperator("GREEN")
 		log('[I] Checking for livestreams and replays...', "GREEN")
@@ -257,10 +270,15 @@ def get_broadcasts_info(user_id):
 		livestream = broadcasts.get('broadcast')
 		replays = broadcasts.get('post_live_item', {}).get('broadcasts', [])
 
-		if livestream:
-			download_livestream(livestream)
+		if settings.save_lives.title() == "True":
+			if livestream:
+				download_livestream(livestream)
+			else:
+				log('[I] There are no available livestreams.', "YELLOW")
 		else:
-			log('[I] There are no available livestreams.', "YELLOW")
+			log("[I] Livestream saving is disabled either with an argument or in the config file.", "BLUE")
+			
+
 		if settings.save_replays.title() == "True":
 			if replays:
 				seperator("GREEN")
@@ -270,13 +288,24 @@ def get_broadcasts_info(user_id):
 			else:
 				log('[I] There are no available replays.', "YELLOW")
 		else:
-			log("[I] Replay saving is disabled either with a flag or in the config file.", "BLUE")
+			seperator("GREEN")
+			log("[I] Replay saving is disabled either with an argument or in the config file.", "BLUE")
+
 		seperator("GREEN")
 	except Exception as e:
 		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")
+		if "timed out" in str(e):
+			log('[E] The connection timed out, check your internet connection.', "RED")
+		seperator("GREEN")
+		exit(1)
+	except KeyboardInterrupt:
+		log('[W] Aborted checking for livestreams and replays, exiting...'.format(user_to_download), "YELLOW")
+		seperator("GREEN")
+		sys.exit(1)
 	except ClientThrottledError as cte:
 		log('[E] Could not check because you are making too many requests at this time.', "RED")
-		log('[E] Error response: {:s}'.format(str(cte)), "RED")
+		seperator("GREEN")
+		exit(1)
 
 def download_replays(broadcasts):
 	try:
@@ -360,7 +389,7 @@ def download_replays(broadcasts):
 		sys.exit(1)
 	except KeyboardInterrupt:
 		seperator("GREEN")
-		log('[I] The download has been aborted by the user.', "YELLOW")
+		log('[I] The download has been aborted by the user, exiting...', "YELLOW")
 		seperator("GREEN")
 		try:
 			shutil.rmtree(output_dir)

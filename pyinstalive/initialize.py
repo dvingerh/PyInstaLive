@@ -15,7 +15,7 @@ from .logger import seperator
 from .logger import supports_color
 from .settings import settings
 
-script_version = "2.5.5"
+script_version = "2.5.6"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
 
@@ -69,6 +69,17 @@ def check_config_validity(config):
 		except:
 			log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
 			settings.save_replays = 'true'
+			has_thrown_errors = True
+
+		try:
+			settings.save_lives = config.get('pyinstalive', 'save_lives').title()
+			if not settings.save_lives in bool_values:
+				log("[W] Invalid or missing setting detected for 'save_lives', using default value (True)", "YELLOW")
+				settings.save_lives = 'true'
+				has_thrown_errors = True
+		except:
+			log("[W] Invalid or missing setting detected for 'save_lives', using default value (True)", "YELLOW")
+			settings.save_lives = 'true'
 			has_thrown_errors = True
 
 
@@ -183,7 +194,7 @@ def show_info(config):
 	except Exception as e:
 		log("[W] Could not check for cookie files: {:s}".format(str(e)), "YELLOW")
 		log("", "ENDC")
-	log("[I] To see all the available flags, use the -h flag.", "BLUE")
+	log("[I] To see all the available arguments, use the -h argument.", "BLUE")
 	log("", "GREEN")
 	log("[I] PyInstaLive version:    	{:s}".format(script_version), "GREEN")
 	log("[I] Python version:         	{:s}".format(python_version), "GREEN")
@@ -234,9 +245,22 @@ def new_config():
 		else:
 			try:
 				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
-				config_template = "[pyinstalive]\nusername = johndoe\npassword = grapefruits\nsave_path = {:s}\nshow_cookie_expiry = true\nclear_temp_files = false\nsave_replays = true\nrun_at_start = \nrun_at_finish = \nsave_comments = false\nlog_to_file = false\n".format(os.getcwd())
+				config_template = """
+[pyinstalive]
+username = johndoe
+password = grapefruits
+save_path = {:s}
+show_cookie_expiry = true
+clear_temp_files = false
+save_lives = true
+save_replays = true
+run_at_start = 
+run_at_finish = 
+save_comments = false
+log_to_file = false
+				""".format(os.getcwd())
 				config_file = open("pyinstalive.ini", "w")
-				config_file.write(config_template)
+				config_file.write(config_template.strip())
 				config_file.close()
 				log("[W] Edit the created 'pyinstalive.ini' file and run this script again.", "YELLOW")
 				seperator("GREEN")
@@ -245,7 +269,8 @@ def new_config():
 				log("[E] Could not create default config file: {:s}".format(str(e)), "RED")
 				log("[W] You must manually create and edit it with the following template: ", "YELLOW")
 				log("", "GREEN")
-				log(config_template, "YELLOW")
+				for line in config_template.strip().splitlines():
+					log("    {:s}".format(line.rstrip()), "YELLOW")
 				log("", "GREEN")
 				log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
 				seperator("GREEN")
@@ -319,6 +344,7 @@ def run():
 	parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
 	parser.add_argument('-c', '--config', dest='config', action='store_true', help="Create a default configuration file if it doesn't exist.")
 	parser.add_argument('-nr', '--noreplays', dest='noreplays', action='store_true', help="When used, do not check for any available replays.")
+	parser.add_argument('-nl', '--nolives', dest='nolives', action='store_true', help="When used, do not check for any available livestreams.")
 	parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="PyInstaLive will clean the current download folder of all leftover files.")
 
 	# Workaround to 'disable' argument abbreviations
@@ -330,6 +356,7 @@ def run():
 	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE') 
 	parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
 
 
 	args, unknown = parser.parse_known_args()
@@ -378,6 +405,7 @@ def run():
 	args.info and not
 	args.config and not
 	args.noreplays and not
+	args.nolives and not
 	args.clean):
 		show_info(config)
 		sys.exit(0)
@@ -399,42 +427,58 @@ def run():
 
 
 	if check_config_validity(config):
-		if (args.clean):
-			clean_download_dir()
-			sys.exit(0)
+		try:
+			if (args.clean):
+				clean_download_dir()
+				sys.exit(0)
 
-		if not check_ffmpeg():
-			log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
-			seperator("GREEN")
-			sys.exit(1)
-
-		if (args.download == None):
-			log("[E] Missing --download argument. Please specify an Instagram username.", "RED")
-			seperator("GREEN")
-			sys.exit(1)
-
-		if (args.noreplays):
-			settings.save_replays = "false"
-
-		if (args.username is not None) and (args.password is not None):
-			api = login(args.username, args.password, settings.show_cookie_expiry, True)
-		elif (args.username is not None) or (args.password is not None):
-			log("[W] Missing -u or -p arguments, falling back to config file...", "YELLOW")
-			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+			if not check_ffmpeg():
+				log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
 				seperator("GREEN")
 				sys.exit(1)
-			else:
-				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
-		else:
-			if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-				log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+
+			if (args.noreplays):
+				settings.save_replays = "False"
+
+			if (args.nolives):
+				settings.save_lives = "False"
+
+			if settings.save_lives == "False" and settings.save_replays == "False":
+				log("[W] Script will not run because both live and replay saving is disabled.", "YELLOW")
 				seperator("GREEN")
 				sys.exit(1)
-			else:
-				api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
-		main(api, args.download, settings)
+			if not args.download:
+				log("[W] Missing --download argument. Please specify an Instagram username.", "YELLOW")
+				seperator("GREEN")
+				sys.exit(1)
+
+
+			if (args.username is not None) and (args.password is not None):
+				api = login(args.username, args.password, settings.show_cookie_expiry, True)
+			elif (args.username is not None) or (args.password is not None):
+				log("[W] Missing --username or --password argument, falling back to config file...", "YELLOW")
+				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
+					log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+					seperator("GREEN")
+					sys.exit(1)
+				else:
+					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
+			else:
+				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
+					log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
+					seperator("GREEN")
+					sys.exit(1)
+				else:
+					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
+
+			main(api, args.download, settings)
+		except Exception as e:
+			log("[E] Could not finish pre-download checks:  {:s}".format(str(e)), "RED")
+			seperator("GREEN")
+		except KeyboardInterrupt as ee:
+			log("[W] Pre-download checks have been aborted, exiting...", "YELLOW")
+			seperator("GREEN")
 
 	else:
 		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")

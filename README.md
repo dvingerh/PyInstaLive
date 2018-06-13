@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.5.5](https://img.shields.io/badge/Version-2.5.5-pink.svg?style=for-the-badge)
+![Version 2.5.6](https://img.shields.io/badge/Version-2.5.6-pink.svg?style=for-the-badge)
 
 This CLI script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
 
@@ -57,15 +57,15 @@ In case it doesn't work or you just prefer building PyInstaLive from source foll
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.5 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.6 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.5.5**) run the following command:
+To update PyInstaLive to the latest version (currently **2.5.6**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.5 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.6 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -94,6 +94,7 @@ password = grapefruits
 save_path = 
 show_cookie_expiry = true
 clear_temp_files = false
+save_lives = true
 save_replays = true
 run_at_start =
 run_at_finish =
@@ -114,11 +115,14 @@ pyinstalive -d "janedoe"
 Below is an example of PyInstaLive's output after downloading a livestream:
 
 ```
+> pyinstalive -d "janedoe"
+
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.5.5 - PYTHON V3.6.3) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.5.6 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
-[I] Using cached login cookie for "johndoe".
-[I] Login cookie expiry date: 2018-01-31 at 10:30:00 PM
+[I] Successfully logged into user "johndoe".
+[I] Cookie file expiry date: 2018-09-01 at 04:38:08 PM
+----------------------------------------------------------------------
 [I] Getting info for "janedoe" successful.
 ----------------------------------------------------------------------
 [I] Checking for livestreams and replays...
@@ -149,9 +153,11 @@ PYINSTALIVE (SCRIPT V2.5.5 - PYTHON V3.6.3) - 06:45:30 PM
 ![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Notes
-- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` flag. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
+- I have not much time to extensively test the changes I make to the code, so when you do encounter a problem please [open an issue](https://github.com/notcammy/PyInstaLive/issues/new) and try using an older version of PyInstaLive in the meantime.
 
-- If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays.
+- Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` argument. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
+
+- If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays. Alternatively you can set `save_lives` to `False` in the configuration file or pass the `--nolives` argument to skip downloading of livestreams.
 
 
 ## Help
