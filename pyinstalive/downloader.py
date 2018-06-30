@@ -260,7 +260,6 @@ def get_user_info(user_to_download):
 
 
 def get_broadcasts_info(user_id):
-	seperator("GREEN")
 	try:
 		seperator("GREEN")
 		log('[I] Checking for livestreams and replays...', "GREEN")
