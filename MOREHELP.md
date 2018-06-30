@@ -7,7 +7,7 @@
 
 - ```-p``` or ```--password```  **—**  Instagram password to login with. Requires:  ```--username```, ```--download```.
 
-- ```-d``` or ```--download```  **—**  The username of the user whose livestream or replay you want to save (legacy).
+- ```-d``` or ```--download```  **—**  The username of the user whose livestream or replay you want to save.
 
 - ```-r``` or ```--record```  **—**  The username of the user whose livestream or replay you want to save (legacy).
 
