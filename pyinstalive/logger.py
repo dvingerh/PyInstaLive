@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 from .settings import settings
 
 sep = "-" * 70
@@ -51,7 +52,8 @@ def log(string, color):
 	if settings.log_to_file == 'True':
 		try:
 			with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
-				f.write("{:s}\n".format(string))
+				no_ansi = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+				f.write("{:s}\n".format(no_ansi.sub('', string)))
 				f.close()
 		except:
 			pass
