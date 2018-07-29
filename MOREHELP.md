@@ -57,4 +57,4 @@ log_to_file = false
  
 ```save_comments```  **—**  When set to true, PyInstaLive will try to save comments from a livestream or replay to a log file. Verified users have *(v)* next to their name. (Experimental, use at own risk.)
 
-```log_to_file```  **—**  When set to true, PyInstaLive will save all its console logs to a text file. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the file will simply be named `pyinstalive_log.log`.
+```log_to_file```  **—**  When set to true, PyInstaLive will save all its console logs to a text file. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the file will be named `pyinstalive.default.log`.
