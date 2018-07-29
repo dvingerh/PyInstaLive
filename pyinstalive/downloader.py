@@ -142,7 +142,9 @@ def download_livestream(broadcast):
 				log_error('An error occurred while downloading comments: {:s}'.format(str(e)))
 		broadcast_downloader.run()
 		log_seperator()
-		log_info_green('The livestream has ended.\n[I] Download duration : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)))
+		log_info_green('Download duration : {}'.format(get_stream_duration(int(settings.current_time))))
+		log_info_green('Stream duration   : {}'.format(get_stream_duration(broadcast.get('published_time'))))
+		log_info_green('Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time), broadcast)))
 		log_seperator()
 		stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
@@ -201,7 +203,8 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			log_seperator()
 			sys.exit(0)
 		except ValueError as e:
-			log_error('Could not stitch downloaded files: {:s}\n[E] Likely the download duration was too short and no temp files were saved.'.format(str(e)))
+			log_error('Could not stitch downloaded files: {:s}'.format(str(e)))
+			log_error('Likely the download duration was too short and no temp files were saved.')
 			log_seperator()
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
@@ -240,7 +243,8 @@ def get_user_info(user_to_download):
 		log_seperator()
 		sys.exit(1)
 	except ClientThrottledError as cte:
-		log_error('Could not get user info for "{:s}": {:d} {:s}\n[E] You are making too many requests at this time.'.format(user_to_download, cte.code, str(cte)))
+		log_error('Could not get user info for "{:s}": {:d} {:s}.'.format(user_to_download, cte.code, str(cte)))
+		log_error('You are making too many requests at this time.')
 		log_seperator()
 		sys.exit(1)
 	except ClientError as ce:

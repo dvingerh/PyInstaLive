@@ -97,15 +97,23 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 
 	except ClientLoginError as e:
 		log_seperator()
-		log_error('Could not login: {:s}.\n[E] {:s}\n\n{:s}'.format(json.loads(e.error_response).get("error_title", "Error title not available."), json.loads(e.error_response).get("message", "Not available"), e.error_response))
+		log_error('Could not login: {:s}.'.format(json.loads(e.error_response).get("error_title", "Error title not available.")))
+		log_error('{:s}'.format(json.loads(e.error_response).get("message", "Not available")))
+		log_error('{:s}'.format(e.error_response))
 		log_seperator()
 		sys.exit(9)
 	except ClientError as e:
 		log_seperator()
 		try:
-			log_error('Unexpected exception: {0!s}\n[E] Message: {1!s}\n[E] Code: {2:d}\n\n[E] Full response:\n{3!s}\n'.format(e.msg, json.loads(e.error_response).get("message", "Additional error information not available."), e.code, e.error_response))
+			log_error('Unexpected exception: {0!s}'.format(e.msg))
+			log_error('Message: {1!s}'.format(json.loads(e.error_response).get("message", "Additional error information not available.")))
+			log_error('Code: {2:d}'.format(e.code))
+			log_error('Full response:\n{3!s}'.format(e.error_response))
+			log_whiteline()
 		except Exception as ee:
-			log_error('An error occurred while trying to handle a previous exception.\n[E] 1: {:s}\n[E] 2: {:s}'.format(str(e), str(ee)))
+			log_error('An error occurred while trying to handle a previous exception.')
+			log_error('1: {:s}'.format(str(e)))
+			log_error('2: {:s}'.format(str(ee)))
 			if "getaddrinfo failed" in str(ee):
 				log_error('Could not resolve host, check your internet connection.')
 			if "timed out" in str(ee):

@@ -73,7 +73,7 @@ def log_warn(string):
 	if settings.log_to_file == 'True':
 		try:
 			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
-				f.write("[I] {:s}\n".format(string))
+				f.write("[W] {:s}\n".format(string))
 				f.close()
 		except:
 			pass
@@ -87,7 +87,7 @@ def log_error(string):
 	if settings.log_to_file == 'True':
 		try:
 			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
-				f.write("[I] {:s}\n".format(string))
+				f.write("[E] {:s}\n".format(string))
 				f.close()
 		except:
 			pass
@@ -109,7 +109,7 @@ def log_plain(string):
 	if settings.log_to_file == 'True':
 		try:
 			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
-				f.write("    {:s}\n".format(string))
+				f.write("{:s}\n".format(string))
 				f.close()
 		except:
 			pass
