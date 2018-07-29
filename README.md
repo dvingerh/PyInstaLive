@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.5.6](https://img.shields.io/badge/Version-2.5.6-pink.svg?style=for-the-badge)
+![Version 2.5.6](https://img.shields.io/badge/Version-2.5.6-orange.svg?longCache=true&style=flat)
 
 This CLI script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
 
