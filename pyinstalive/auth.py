@@ -4,8 +4,8 @@ import json
 import os.path
 import sys
 
-from .logger import log
-from .logger import seperator
+from .logger import log_seperator, supports_color, log_info_blue, log_info_green, log_warn, log_error, log_whiteline, log_plain
+
 
 
 
@@ -38,23 +38,23 @@ def onlogin_callback(api, cookie_file):
 	cache_settings = api.settings
 	with open(cookie_file, 'w') as outfile:
 		json.dump(cache_settings, outfile, default=to_json)
-		log('[I] New cookie file was made: {0!s}'.format(cookie_file), "GREEN")
-		seperator("GREEN")
+		log_info_green('New cookie file was made: {0!s}'.format(cookie_file))
+		log_seperator()
 
 
 def login(username, password, show_cookie_expiry, force_use_login_args):
 	device_id = None
 	try:
 		if force_use_login_args:
-			log("[I] Overriding standard login with -u and -p arguments...", "GREEN")
+			log_info_green("Overriding standard login with -u and -p arguments...")
 			api = Client(
 				username, password)
 		else:
 			cookie_file = "{}.json".format(username)
 			if not os.path.isfile(cookie_file):
 				# settings file does not exist
-				log('[W] Unable to find cookie file: {0!s}'.format(cookie_file), "YELLOW")
-				log('[I] Creating a new cookie file...', "YELLOW")
+				log_warn('Unable to find cookie file: {0!s}'.format(cookie_file))
+				log_info_green('Creating a new cookie file...')
 
 				# login new
 				api = Client(
@@ -63,7 +63,7 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 			else:
 				with open(cookie_file) as file_data:
 					cached_settings = json.load(file_data, object_hook=from_json)
-				# log('[I] Using settings file: {0!s}'.format(cookie_file), "GREEN")
+				# log_info_green('Using settings file: {0!s}'.format(cookie_file))
 
 				device_id = cached_settings.get('device_id')
 				# reuse auth cached_settings
@@ -72,7 +72,7 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 					settings=cached_settings)
 
 	except (ClientCookieExpiredError) as e:
-		log('[W] The current cookie file for "{:s}" has expired, creating a new one...'.format(username), "YELLOW")
+		log_warn('The current cookie file for "{:s}" has expired, creating a new one...'.format(username))
 
 		# Login expired
 		# Do relogin but use default ua, keys and such
@@ -82,58 +82,58 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 				device_id=device_id,
 				on_login=lambda x: onlogin_callback(x, cookie_file))
 		except Exception as ee:
-			seperator("GREEN")
-			log('[E] An error occurred while trying to create a new cookie file: {:s}'.format(str(ee)), "RED")
+			log_seperator()
+			log_error('An error occurred while trying to create a new cookie file: {:s}'.format(str(ee)))
 			if "getaddrinfo failed" in str(ee):
-				log('[E] Could not resolve host, check your internet connection.', "RED")
+				log_error('Could not resolve host, check your internet connection.')
 			elif "timed out" in str(ee):
-				log('[E] The connection timed out, check your internet connection.', "RED")
+				log_error('The connection timed out, check your internet connection.')
 			elif "bad_password" in str(ee):
-				log('[E] The password you entered is incorrect. Please try again.', "RED")
+				log_error('The password you entered is incorrect. Please try again.')
 			else:
-				log('[E] {:s}'.format(ee.message), "RED")
-			seperator("GREEN")
+				log_error('{:s}'.format(ee.message))
+			log_seperator()
 			exit(1)
 
 	except ClientLoginError as e:
-		seperator("GREEN")
-		log('[E] Could not login: {:s}.\n[E] {:s}\n\n{:s}'.format(json.loads(e.error_response).get("error_title", "Error title not available."), json.loads(e.error_response).get("message", "Not available"), e.error_response), "RED")
-		seperator("GREEN")
+		log_seperator()
+		log_error('Could not login: {:s}.\n[E] {:s}\n\n{:s}'.format(json.loads(e.error_response).get("error_title", "Error title not available."), json.loads(e.error_response).get("message", "Not available"), e.error_response))
+		log_seperator()
 		sys.exit(9)
 	except ClientError as e:
-		seperator("GREEN")
+		log_seperator()
 		try:
-			log('[E] Unexpected exception: {0!s}\n[E] Message: {1!s}\n[E] Code: {2:d}\n\n[E] Full response:\n{3!s}\n'.format(e.msg, json.loads(e.error_response).get("message", "Additional error information not available."), e.code, e.error_response), "RED")
+			log_error('Unexpected exception: {0!s}\n[E] Message: {1!s}\n[E] Code: {2:d}\n\n[E] Full response:\n{3!s}\n'.format(e.msg, json.loads(e.error_response).get("message", "Additional error information not available."), e.code, e.error_response))
 		except Exception as ee:
-			log('[E] An error occurred while trying to handle a previous exception.\n[E] 1: {:s}\n[E] 2: {:s}'.format(str(e), str(ee)), "RED")
+			log_error('An error occurred while trying to handle a previous exception.\n[E] 1: {:s}\n[E] 2: {:s}'.format(str(e), str(ee)))
 			if "getaddrinfo failed" in str(ee):
-				log('[E] Could not resolve host, check your internet connection.', "RED")
+				log_error('Could not resolve host, check your internet connection.')
 			if "timed out" in str(ee):
-				log('[E] The connection timed out, check your internet connection.', "RED")
-		seperator("GREEN")
+				log_error('The connection timed out, check your internet connection.')
+		log_seperator()
 		sys.exit(9)
 	except Exception as e:
 		if (str(e).startswith("unsupported pickle protocol")):
-			log("[W] This cookie file is not compatible with Python {}.".format(sys.version.split(' ')[0][0]), "YELLOW")
-			log("[W] Please delete your cookie file '{}.json' and try again.".format(username), "YELLOW")
+			log_warn("This cookie file is not compatible with Python {}.".format(sys.version.split(' ')[0][0]))
+			log_warn("Please delete your cookie file '{}.json' and try again.".format(username))
 		else:
-			seperator("GREEN")
-			log('[E] Unexpected exception: {0!s}'.format(e), "RED")
-		seperator("GREEN")
+			log_seperator()
+			log_error('Unexpected exception: {0!s}'.format(e))
+		log_seperator()
 		sys.exit(99)
 	except KeyboardInterrupt as e:
-		seperator("GREEN")
-		log("[W] The user authentication has been aborted.", "YELLOW")
-		seperator("GREEN")
+		log_seperator()
+		log_warn("The user authentication has been aborted.")
+		log_seperator()
 		sys.exit(0)
 
-	log('[I] Successfully logged into user "{:s}".'.format(str(api.authenticated_user_name)), "GREEN")
+	log_info_green('Successfully logged into user "{:s}".'.format(str(api.authenticated_user_name)))
 	if show_cookie_expiry.title() == 'True' and not force_use_login_args:
 		try:
 			cookie_expiry = api.cookie_jar.auth_expires
-			log('[I] Cookie file expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')), "GREEN")
+			log_info_green('Cookie file expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')))
 		except AttributeError as e:
-			log('[W] An error occurred while getting the cookie file expiry date: {0!s}'.format(e), "YELLOW")
+			log_warn('An error occurred while getting the cookie file expiry date: {0!s}'.format(e))
 
-	seperator("GREEN")		
+	log_seperator()		
 	return api

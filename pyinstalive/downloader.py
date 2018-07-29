@@ -15,8 +15,8 @@ from instagram_private_api_extensions import live
 from instagram_private_api_extensions import replay
 
 from .comments import CommentsDownloader
-from .logger import log
-from .logger import seperator
+from .logger import log_seperator, supports_color, log_info_blue, log_info_green, log_warn, log_error, log_whiteline, log_plain
+
 
 
 def main(instagram_api_arg, download_arg, settings_arg):
@@ -77,10 +77,10 @@ def download_livestream(broadcast):
 			heartbeat_info = instagram_api.broadcast_heartbeat_and_viewercount(broadcast.get('id'))
 			viewers = broadcast.get('viewer_count', 0)
 			if sep:
-				seperator("GREEN")
-			log('[I] Viewers     : {:s} watching'.format(str(int(viewers))), "GREEN")
-			log('[I] Airing time : {:s}'.format(get_stream_duration(broadcast.get('published_time'))), "GREEN")
-			log('[I] Status      : {:s}'.format(heartbeat_info.get('broadcast_status').title()), "GREEN")
+				log_seperator()
+			log_info_green('Viewers     : {:s} watching'.format(str(int(viewers))))
+			log_info_green('Airing time : {:s}'.format(get_stream_duration(broadcast.get('published_time'))))
+			log_info_green('Status      : {:s}'.format(heartbeat_info.get('broadcast_status').title()))
 			return heartbeat_info.get('broadcast_status') not in ['active', 'interrupted']
 
 		mpd_url = (broadcast.get('dash_manifest')
@@ -99,37 +99,37 @@ def download_livestream(broadcast):
 			mpd_download_timeout=3,
 			download_timeout=3)
 	except Exception as e:
-		log('[E] Could not start downloading livestream: {:s}'.format(str(e)), "RED")
-		seperator("GREEN")
+		log_error('Could not start downloading livestream: {:s}'.format(str(e)))
+		log_seperator()
 		sys.exit(1)
 	try:
-		log('[I] Livestream found, beginning download...', "GREEN")
+		log_info_green('Livestream found, beginning download...')
 		broadcast_owner = broadcast.get('broadcast_owner', {}).get('username')
 		try:
 			broadcast_guest = broadcast.get('cobroadcasters', {})[0].get('username')
 		except:
 			broadcast_guest = None
 		if (broadcast_owner != user_to_download):
-			log('[I] This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner), "BLUE")
+			log_info_blue('This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner))
 			broadcast_guest = None
 		if broadcast_guest:
-			log('[I] This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest), "BLUE")
-		seperator("GREEN")
-		log('[I] Username    : {:s}'.format(user_to_download), "GREEN")
+			log_info_blue('This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest))
+		log_seperator()
+		log_info_green('Username    : {:s}'.format(user_to_download))
 		print_status(False)
-		log('[I] MPD URL     : {:s}'.format(mpd_url), "GREEN")
-		seperator("GREEN")
+		log_info_green('MPD URL     : {:s}'.format(mpd_url))
+		log_seperator()
 		open(os.path.join(output_dir, 'folder.lock'), 'a').close()
-		log('[I] Downloading livestream... press [CTRL+C] to abort.', "GREEN")
+		log_info_green('Downloading livestream... press [CTRL+C] to abort.')
 
 		if (settings.run_at_start is not "None"):
 			try:
 				thread = threading.Thread(target=run_command, args=(settings.run_at_start,))
 				thread.daemon = True
 				thread.start()
-				log("[I] Command executed: \033[94m{:s}".format(settings.run_at_start), "GREEN")
+				log_info_green("Command executed: \033[94m{:s}".format(settings.run_at_start))
 			except Exception as e:
-				log('[W] Could not execute command: {:s}'.format(str(e)), "YELLOW")
+				log_warn('Could not execute command: {:s}'.format(str(e)))
 
 
 		comment_thread_worker = None
@@ -139,21 +139,25 @@ def download_livestream(broadcast):
 				comment_thread_worker = threading.Thread(target=get_live_comments, args=(instagram_api, broadcast, comments_json_file, broadcast_downloader,))
 				comment_thread_worker.start()
 			except Exception as e:
-				log('[E] An error occurred while downloading comments: {:s}'.format(str(e)), "RED")
+				log_error('An error occurred while downloading comments: {:s}'.format(str(e)))
 		broadcast_downloader.run()
-		seperator("GREEN")
-		log('[I] The livestream has ended.\n[I] Download duration : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
-		seperator("GREEN")
+		log_seperator()
+		log_info_green('The livestream has ended.\n[I] Download duration : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)))
+		log_seperator()
 		stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
 	except KeyboardInterrupt:
-		seperator("GREEN")
-		log('[I] The download has been aborted by the user.\n[I] Download duration : {}\n[I] Stream duration   : {}\n[I] Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time)), get_stream_duration(broadcast.get('published_time')), get_stream_duration(int(settings.current_time), broadcast)), "YELLOW")
-		seperator("GREEN")
+		log_seperator()
+		log_info_blue('The download has been aborted by the user.')
+		log_seperator()
+		log_info_green('Download duration : {}'.format(get_stream_duration(int(settings.current_time))))
+		log_info_green('Stream duration   : {}'.format(get_stream_duration(broadcast.get('published_time'))))
+		log_info_green('Missing (approx.) : {}'.format(get_stream_duration(int(settings.current_time), broadcast)))
+		log_seperator()
 		if not broadcast_downloader.is_aborted:
 			broadcast_downloader.stop()
 			stitch_video(broadcast_downloader, broadcast, comment_thread_worker)
 	except Exception as e:
-		log("[E] Could not download livestream: {:s}".format(str(e)), "RED")
+		log_error("Could not download livestream: {:s}".format(str(e)))
 		try:
 		    os.remove(os.path.join(output_dir, 'folder.lock'))
 		except Exception:
@@ -166,7 +170,7 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 		live_folder_path = "{:s}_downloads".format(live_mp4_file.split('.mp4')[0])
 
 		if comment_thread_worker and comment_thread_worker.is_alive():
-			log("[I] Waiting for comment downloader to end cycle...", "GREEN")
+			log_info_green("Waiting for comment downloader to end cycle...")
 			comment_thread_worker.join()
 
 		if (settings.run_at_finish is not "None"):
@@ -174,17 +178,17 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				thread = threading.Thread(target=run_command, args=(settings.run_at_finish,))
 				thread.daemon = True
 				thread.start()
-				log("[I] Command executed: \033[94m{:s}".format(settings.run_at_finish), "GREEN")
+				log_info_green("Command executed: \033[94m{:s}".format(settings.run_at_finish))
 			except Exception as e:
-				log('[W] Could not execute command: {:s}'.format(str(e)), "YELLOW")
+				log_warn('Could not execute command: {:s}'.format(str(e)))
 
-		log('[I] Stitching downloaded files into video...', "GREEN")		
+		log_info_green('Stitching downloaded files into video...')		
 		try:
 			if settings.clear_temp_files.title() == "True":
 				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=True)
 			else:
 				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=False)
-			log('[I] Successfully stitched downloaded files into video.', "GREEN")
+			log_info_green('Successfully stitched downloaded files into video.')
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
@@ -193,28 +197,28 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				try:
 					shutil.rmtree(live_folder_path)
 				except Exception as e:
-					log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
-			seperator("GREEN")
+					log_error("Could not remove temp folder: {:s}".format(str(e)))
+			log_seperator()
 			sys.exit(0)
 		except ValueError as e:
-			log('[E] Could not stitch downloaded files: {:s}\n[E] Likely the download duration was too short and no temp files were saved.'.format(str(e)), "RED")
-			seperator("GREEN")
+			log_error('Could not stitch downloaded files: {:s}\n[E] Likely the download duration was too short and no temp files were saved.'.format(str(e)))
+			log_seperator()
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
 			    pass
 			sys.exit(1)
 		except Exception as e:
-			log('[E] Could not stitch downloaded files: {:s}'.format(str(e)), "RED")
-			seperator("GREEN")
+			log_error('Could not stitch downloaded files: {:s}'.format(str(e)))
+			log_seperator()
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
 			    pass
 			sys.exit(1)
 	except KeyboardInterrupt:
-			log('[I] Aborted stitching process, no video was created.', "YELLOW")
-			seperator("GREEN")
+			log_info_blue('Aborted stitching process, no video was created.')
+			log_seperator()
 			try:
 			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
@@ -228,42 +232,42 @@ def get_user_info(user_to_download):
 		user_res = instagram_api.username_info(user_to_download)
 		user_id = user_res.get('user', {}).get('pk')
 	except ClientConnectionError as cce:
-		log('[E] Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, cce.code, str(cce)), "RED")
+		log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, cce.code, str(cce)))
 		if "getaddrinfo failed" in str(cce):
-			log('[E] Could not resolve host, check your internet connection.', "RED")
+			log_error('Could not resolve host, check your internet connection.')
 		if "timed out" in str(cce):
-			log('[E] The connection timed out, check your internet connection.', "RED")
-		seperator("GREEN")
+			log_error('The connection timed out, check your internet connection.')
+		log_seperator()
 		sys.exit(1)
 	except ClientThrottledError as cte:
-		log('[E] Could not get user info for "{:s}": {:d} {:s}\n[E] You are making too many requests at this time.'.format(user_to_download, cte.code, str(cte)), "RED")
-		seperator("GREEN")
+		log_error('Could not get user info for "{:s}": {:d} {:s}\n[E] You are making too many requests at this time.'.format(user_to_download, cte.code, str(cte)))
+		log_seperator()
 		sys.exit(1)
 	except ClientError as ce:
-		log('[E] Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, ce.code, str(ce)), "RED")
+		log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, ce.code, str(ce)))
 		if ("Not Found") in str(ce):
-			log('[E] The specified user does not exist.', "RED")
-		seperator("GREEN")
+			log_error('The specified user does not exist.')
+		log_seperator()
 		sys.exit(1)
 	except Exception as e:
-		log('[E] Could not get user info for "{:s}": {:s}'.format(user_to_download, str(e)), "RED")
+		log_error('Could not get user info for "{:s}": {:s}'.format(user_to_download, str(e)))
 
-		seperator("GREEN")
+		log_seperator()
 		sys.exit(1)
 	except KeyboardInterrupt:
-		log('[W] Aborted getting user info for "{:s}", exiting...'.format(user_to_download), "YELLOW")
-		seperator("GREEN")
+		log_info_blue('Aborted getting user info for "{:s}", exiting...'.format(user_to_download))
+		log_seperator()
 		sys.exit(0)
-	log('[I] Getting info for "{:s}" successful.'.format(user_to_download), "GREEN")
+	log_info_green('Getting info for "{:s}" successful.'.format(user_to_download))
 	get_broadcasts_info(user_id)
 
 
 
 def get_broadcasts_info(user_id):
 	try:
-		seperator("GREEN")
-		log('[I] Checking for livestreams and replays...', "GREEN")
-		seperator("GREEN")
+		log_seperator()
+		log_info_green('Checking for livestreams and replays...')
+		log_seperator()
 		broadcasts = instagram_api.user_story_feed(user_id)
 
 		livestream = broadcasts.get('broadcast')
@@ -273,55 +277,55 @@ def get_broadcasts_info(user_id):
 			if livestream:
 				download_livestream(livestream)
 			else:
-				log('[I] There are no available livestreams.', "YELLOW")
+				log_info_green('There are no available livestreams.')
 		else:
-			log("[I] Livestream saving is disabled either with an argument or in the config file.", "BLUE")
+			log_info_blue("Livestream saving is disabled either with an argument or in the config file.")
 			
 
 		if settings.save_replays.title() == "True":
 			if replays:
-				seperator("GREEN")
-				log('[I] Replays found, beginning download...', "GREEN")
-				seperator("GREEN")
+				log_seperator()
+				log_info_green('Replays found, beginning download...')
+				log_seperator()
 				download_replays(replays)
 			else:
-				log('[I] There are no available replays.', "YELLOW")
+				log_info_green('There are no available replays.')
 		else:
-			seperator("GREEN")
-			log("[I] Replay saving is disabled either with an argument or in the config file.", "BLUE")
+			log_seperator()
+			log_info_blue("Replay saving is disabled either with an argument or in the config file.")
 
-		seperator("GREEN")
+		log_seperator()
 	except Exception as e:
-		log('[E] Could not finish checking: {:s}'.format(str(e)), "RED")
+		log_error('Could not finish checking: {:s}'.format(str(e)))
 		if "timed out" in str(e):
-			log('[E] The connection timed out, check your internet connection.', "RED")
-		seperator("GREEN")
+			log_error('The connection timed out, check your internet connection.')
+		log_seperator()
 		exit(1)
 	except KeyboardInterrupt:
-		log('[W] Aborted checking for livestreams and replays, exiting...'.format(user_to_download), "YELLOW")
-		seperator("GREEN")
+		log_info_blue('Aborted checking for livestreams and replays, exiting...'.format(user_to_download))
+		log_seperator()
 		sys.exit(1)
 	except ClientThrottledError as cte:
-		log('[E] Could not check because you are making too many requests at this time.', "RED")
-		seperator("GREEN")
+		log_error('Could not check because you are making too many requests at this time.')
+		log_seperator()
 		exit(1)
 
 def download_replays(broadcasts):
 	try:
 		try:
-			log('[I] Amount of replays    : {:s}'.format(str(len(broadcasts))), "GREEN")
+			log_info_green('Amount of replays    : {:s}'.format(str(len(broadcasts))))
 			for replay_index, broadcast in enumerate(broadcasts):
 				bc_dash_manifest = parseString(broadcast.get('dash_manifest')).getElementsByTagName('Period')
 				bc_duration_raw = bc_dash_manifest[0].getAttribute("duration")	
 				bc_hours = (bc_duration_raw.split("PT"))[1].split("H")[0]
 				bc_minutes = (bc_duration_raw.split("H"))[1].split("M")[0]
 				bc_seconds = ((bc_duration_raw.split("M"))[1].split("S")[0]).split('.')[0]
-				log('[I] Replay {:s} duration    : {:s} minutes and {:s} seconds'.format(str(replay_index + 1), bc_minutes, bc_seconds), "GREEN")
+				log_info_green('Replay {:s} duration    : {:s} minutes and {:s} seconds'.format(str(replay_index + 1), bc_minutes, bc_seconds))
 		except Exception as e:
-			log("[W] An error occurred while getting replay duration information: {:s}".format(str(e)))
-		seperator("GREEN")
-		log("[I] Downloading replays... press [CTRL+C] to abort.", "GREEN")
-		seperator("GREEN")
+			log_warn("An error occurred while getting replay duration information: {:s}".format(str(e)))
+		log_seperator()
+		log_info_green("Downloading replays... press [CTRL+C] to abort.")
+		log_seperator()
 		for replay_index, broadcast in enumerate(broadcasts):
 			exists = False
 
@@ -332,11 +336,11 @@ def download_replays(broadcasts):
 
 			for directory in directories:
 				if (str(broadcast.get('id')) in directory) and ("_live_" not in directory):
-					log("[W] Already downloaded a replay with ID '{:s}'.".format(str(broadcast.get('id'))), "YELLOW")
+					log_info_blue("Already downloaded a replay with ID '{:s}'.".format(str(broadcast.get('id'))))
 					exists = True
 			if not exists:
 				current = replay_index + 1
-				log("[I] Downloading replay {:s} of {:s} with ID '{:s}'...".format(str(current), str(len(broadcasts)), str(broadcast.get('id'))), "GREEN")
+				log_info_green("Downloading replay {:s} of {:s} with ID '{:s}'...".format(str(current), str(len(broadcasts)), str(broadcast.get('id'))))
 				current_time = str(int(time.time()))
 				output_dir = '{}{}_{}_{}_{}_replay_downloads'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
 				broadcast_downloader = replay.Downloader(
@@ -353,47 +357,47 @@ def download_replays(broadcasts):
 					replay_saved = broadcast_downloader.download(replay_mp4_file, cleartempfiles=False)
 
 				if settings.save_comments.title() == "True":
-					log("[I] Downloading replay comments...", "GREEN")
+					log_info_green("Downloading replay comments...")
 					try:
 						get_replay_comments(instagram_api, broadcast, replay_json_file, broadcast_downloader)
 					except Exception as e:
-						log('[E] An error occurred while downloading comments: {:s}'.format(str(e)), "RED")
+						log_error('An error occurred while downloading comments: {:s}'.format(str(e)))
 
 				if (len(replay_saved) == 1):
-					log("[I] Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))), "GREEN")
+					log_info_green("Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))))
 					try:
 					    os.remove(os.path.join(output_dir, 'folder.lock'))
 					except Exception:
 					    pass
 
 					if (current != len(broadcasts)):
-						seperator("GREEN")
+						log_seperator()
 
 				else:
-					log("[W] No output video file was made, please merge the files manually if possible.", "YELLOW")
-					log("[W] Check if ffmpeg is available by running ffmpeg in your terminal/cmd prompt.", "YELLOW")
-					log("", "GREEN")
+					log_warn("No output video file was made, please merge the files manually if possible.")
+					log_warn("Check if ffmpeg is available by running ffmpeg in your terminal/cmd prompt.")
+					log_whiteline()
 
-		seperator("GREEN")
-		log("[I] Finished downloading all available replays.", "GREEN")
-		seperator("GREEN")
+		log_seperator()
+		log_info_green("Finished downloading all available replays.")
+		log_seperator()
 		sys.exit(0)
 	except Exception as e:
-		log('[E] Could not save replay: {:s}'.format(str(e)), "RED")
-		seperator("GREEN")
+		log_error('Could not save replay: {:s}'.format(str(e)))
+		log_seperator()
 		try:
 		    os.remove(os.path.join(output_dir, 'folder.lock'))
 		except Exception:
 		    pass
 		sys.exit(1)
 	except KeyboardInterrupt:
-		seperator("GREEN")
-		log('[I] The download has been aborted by the user, exiting...', "YELLOW")
-		seperator("GREEN")
+		log_seperator()
+		log_info_blue('The download has been aborted by the user, exiting...')
+		log_seperator()
 		try:
 			shutil.rmtree(output_dir)
 		except Exception as e:
-			log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
+			log_error("Could not remove temp folder: {:s}".format(str(e)))
 			sys.exit(1)
 		sys.exit(0)
 
@@ -412,24 +416,24 @@ def get_replay_comments(instagram_api, broadcast, comments_json_file, broadcast_
 					comments_downloader.comments, broadcast.get('published_time'), comments_log_file,
 					comments_delay=0)
 				if total_comments == 1:
-					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
-					seperator("GREEN")
+					log_info_green("Successfully saved 1 comment to logfile.")
+					log_seperator()
 					return True
 				else:
 					if comment_errors:
-						log("[W] Successfully saved {:s} comments to logfile but {:s} comments are (partially) missing.".format(str(total_comments), str(comment_errors)), "YELLOW")
+						log_warn("Successfully saved {:s} comments to logfile but {:s} comments are (partially) missing.".format(str(total_comments), str(comment_errors)))
 					else:
-						log("[I] Successfully saved {:s} comments to logfile.".format(str(total_comments)), "GREEN")
-					seperator("GREEN")
+						log_info_green("Successfully saved {:s} comments to logfile.".format(str(total_comments)))
+					log_seperator()
 					return True
 			else:
-				log("[I] There are no available comments to save.", "GREEN")
+				log_info_green("There are no available comments to save.")
 				return False
 		except Exception as e:
-			log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
+			log_error('Could not save comments to logfile: {:s}'.format(str(e)))
 			return False
 	except KeyboardInterrupt as e:
-		log("[W] Downloading replay comments has been aborted.", "YELLOW")
+		log_info_blue("Downloading replay comments has been aborted.")
 		return False
 
 
@@ -448,7 +452,7 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 				first_comment_created_at = comments_downloader.get_live(first_comment_created_at)
 		except ClientError as e:
 			if not 'media has been deleted' in e.error_response:
-				log("[W] Comment collection ClientError: %d %s" % (e.code, e.error_response), "YELLOW")
+				log_warn("Comment collection ClientError: %d %s" % (e.code, e.error_response))
 
 		try:
 			if comments_downloader.comments:
@@ -458,23 +462,23 @@ def get_live_comments(instagram_api, broadcast, comments_json_file, broadcast_do
 					comments_downloader.comments, settings.current_time, comments_log_file,
 					comments_delay=broadcast_downloader.initial_buffered_duration)
 				if len(comments_downloader.comments) == 1:
-					log("[I] Successfully saved 1 comment to logfile.", "GREEN")
-					seperator("GREEN")
+					log_info_green("Successfully saved 1 comment to logfile.")
+					log_seperator()
 					return True
 				else:
 					if comment_errors:
-						log("[W] Successfully saved {:s} comments to logfile but {:s} comments are (partially) missing.".format(str(total_comments), str(comment_errors)), "YELLOW")
+						log_warn("Successfully saved {:s} comments to logfile but {:s} comments are (partially) missing.".format(str(total_comments), str(comment_errors)))
 					else:
-						log("[I] Successfully saved {:s} comments to logfile.".format(str(total_comments)), "GREEN")
-					seperator("GREEN")
+						log_info_green("Successfully saved {:s} comments to logfile.".format(str(total_comments)))
+					log_seperator()
 					return True
 			else:
-				log("[I] There are no available comments to save.", "GREEN")
+				log_info_green("There are no available comments to save.")
 				return False
-				seperator("GREEN")
+				log_seperator()
 		except Exception as e:
-			log('[E] Could not save comments to logfile: {:s}'.format(str(e)), "RED")
+			log_error('Could not save comments to logfile: {:s}'.format(str(e)))
 			return False
 	except KeyboardInterrupt as e:
-		log("[W] Downloading livestream comments has been aborted.", "YELLOW")
+		log_info_blue("Downloading livestream comments has been aborted.")
 		return False

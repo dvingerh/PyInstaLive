@@ -5,29 +5,6 @@ from .settings import settings
 
 sep = "-" * 70
 
-def colors(state):
-	color = ''
-
-	if (state == 'BLUE'):
-		color = '\033[94m'
-
-	if (state == 'GREEN'):
-		color = '\033[92m'
-
-	if (state == 'YELLOW'):
-		color = '\033[93m'
-
-	if (state == 'RED'):
-		color = '\033[91m'
-
-	if (state == 'ENDC'):
-		color = '\033[0m'
-
-	if (state == 'WHITE'):
-		color = '\033[0m'
-
-	return color
-
 def supports_color():
 	"""
 	from https://github.com/django/django/blob/master/django/core/management/color.py
@@ -44,30 +21,95 @@ def supports_color():
 		return "No", False
 	return "Yes", True
 
-def log(string, color):
-	if supports_color()[1] == False:
-		print(string)
-	else:
-		print('\033[1m{}{}{}'.format(colors(color), string, colors("ENDC")))
+
+def log_seperator():
+	print(sep + "\033[0m")
 	if settings.log_to_file == 'True':
 		try:
-			with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
-				no_ansi = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
-				f.write("{:s}\n".format(no_ansi.sub('', string)))
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write(sep + '\n')
 				f.close()
 		except:
 			pass
 	sys.stdout.flush()
 
-def seperator(color):
+
+
+
+
+def log_info_green(string):
 	if supports_color()[1] == False:
-		print(sep)
+		print(string)
 	else:
-		print('\033[1m{}{}{}'.format(colors(color), sep, colors("ENDC")))
+		print('[\033[92mI\033[0m] {:s}\033[0m'.format(string))
 	if settings.log_to_file == 'True':
 		try:
-			with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
-				f.write("{:s}\n".format(sep))
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write("[I] {:s}\n".format(string))
+				f.close()
+		except:
+			pass
+	sys.stdout.flush()
+
+def log_info_blue(string):
+	if supports_color()[1] == False:
+		print(string)
+	else:
+		print('[\033[94mI\033[0m] {:s}\033[0m'.format(string))
+	if settings.log_to_file == 'True':
+		try:
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write("[I] {:s}\n".format(string))
+				f.close()
+		except:
+			pass
+	sys.stdout.flush()
+
+def log_warn(string):
+	if supports_color()[1] == False:
+		print(string)
+	else:
+		print('[\033[93mW\033[0m] {:s}\033[0m'.format(string))
+	if settings.log_to_file == 'True':
+		try:
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write("[I] {:s}\n".format(string))
+				f.close()
+		except:
+			pass
+	sys.stdout.flush()
+
+def log_error(string):
+	if supports_color()[1] == False:
+		print(string)
+	else:
+		print('[\033[91mE\033[0m] {:s}\033[0m'.format(string))
+	if settings.log_to_file == 'True':
+		try:
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write("[I] {:s}\n".format(string))
+				f.close()
+		except:
+			pass
+	sys.stdout.flush()
+
+def log_whiteline():
+	print("")
+	if settings.log_to_file == 'True':
+		try:
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write("\n")
+				f.close()
+		except:
+			pass
+	sys.stdout.flush()
+
+def log_plain(string):
+	print(string)
+	if settings.log_to_file == 'True':
+		try:
+			with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
+				f.write("    {:s}\n".format(string))
 				f.close()
 		except:
 			pass

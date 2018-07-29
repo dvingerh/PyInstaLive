@@ -18,8 +18,8 @@ except ImportError:
 	from urllib.error import URLError
 	from http.client import HTTPException
 
-from .logger import log
-from .logger import seperator
+from .logger import log_seperator, supports_color, log_info_blue, log_info_green, log_warn, log_error, log_whiteline, log_plain
+
 from instagram_private_api import ClientError
 
 """
@@ -58,12 +58,12 @@ class CommentsDownloader(object):
 			self.comments = comments_collected
 
 		except (SSLError, timeout, URLError, HTTPException, SocketError) as e:
-			log('[W] Comment downloading error: %s' % e, "YELLOW")
+			log_warn('Comment downloading error: %s' % e)
 		except ClientError as e:
 			if e.code == 500:
-				log('[W] Comment downloading ClientError: %d %s' % (e.code, e.error_response), "YELLOW")
+				log_warn('Comment downloading ClientError: %d %s' % (e.code, e.error_response))
 			elif e.code == 400 and not e.msg:
-				log('[W] Comment downloading ClientError: %d %s' % (e.code, e.error_response), "YELLOW")
+				log_warn('Comment downloading ClientError: %d %s' % (e.code, e.error_response))
 			else:
 				raise e
 		finally:

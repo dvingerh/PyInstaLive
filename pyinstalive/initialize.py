@@ -10,9 +10,7 @@ import json
 
 from .auth import login
 from .downloader import main
-from .logger import log
-from .logger import seperator
-from .logger import supports_color
+from .logger import log_seperator, supports_color, log_info_blue, log_info_green, log_warn, log_error, log_whiteline, log_plain
 from .settings import settings
 
 script_version = "2.5.6"
@@ -37,11 +35,11 @@ def check_config_validity(config):
 		try:
 			settings.show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
 			if not settings.show_cookie_expiry in bool_values:
-				log("[W] Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)", "YELLOW")
+				log_warn("Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)")
 				settings.show_cookie_expiry = 'true'
 				has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)", "YELLOW")
+			log_warn("Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)")
 			settings.show_cookie_expiry = 'true'
 			has_thrown_errors = True
 
@@ -50,11 +48,11 @@ def check_config_validity(config):
 		try:
 			settings.clear_temp_files = config.get('pyinstalive', 'clear_temp_files').title()
 			if not settings.clear_temp_files in bool_values:
-				log("[W] Invalid or missing setting detected for 'clear_temp_files', using default value (True)", "YELLOW")
+				log_warn("Invalid or missing setting detected for 'clear_temp_files', using default value (True)")
 				settings.clear_temp_files = 'true'
 				has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'clear_temp_files', using default value (True)", "YELLOW")
+			log_warn("Invalid or missing setting detected for 'clear_temp_files', using default value (True)")
 			settings.clear_temp_files = 'true'
 			has_thrown_errors = True
 
@@ -63,22 +61,22 @@ def check_config_validity(config):
 		try:
 			settings.save_replays = config.get('pyinstalive', 'save_replays').title()
 			if not settings.save_replays in bool_values:
-				log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
+				log_warn("Invalid or missing setting detected for 'save_replays', using default value (True)")
 				settings.save_replays = 'true'
 				has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'save_replays', using default value (True)", "YELLOW")
+			log_warn("Invalid or missing setting detected for 'save_replays', using default value (True)")
 			settings.save_replays = 'true'
 			has_thrown_errors = True
 
 		try:
 			settings.save_lives = config.get('pyinstalive', 'save_lives').title()
 			if not settings.save_lives in bool_values:
-				log("[W] Invalid or missing setting detected for 'save_lives', using default value (True)", "YELLOW")
+				log_warn("Invalid or missing setting detected for 'save_lives', using default value (True)")
 				settings.save_lives = 'true'
 				has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'save_lives', using default value (True)", "YELLOW")
+			log_warn("Invalid or missing setting detected for 'save_lives', using default value (True)")
 			settings.save_lives = 'true'
 			has_thrown_errors = True
 
@@ -87,11 +85,11 @@ def check_config_validity(config):
 		try:
 			settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
 			if not settings.log_to_file in bool_values:
-				log("[W] Invalid or missing setting detected for 'log_to_file', using default value (False)", "YELLOW")
+				log_warn("Invalid or missing setting detected for 'log_to_file', using default value (False)")
 				settings.log_to_file = 'False'
 				has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'log_to_file', using default value (False)", "YELLOW")
+			log_warn("Invalid or missing setting detected for 'log_to_file', using default value (False)")
 			settings.log_to_file = 'False'
 			has_thrown_errors = True
 
@@ -102,7 +100,7 @@ def check_config_validity(config):
 			if not settings.run_at_start:
 				settings.run_at_start = "None"
 		except:
-			log("[W] Invalid or missing settings detected for 'run_at_start', using default value (None)", "YELLOW")
+			log_warn("Invalid or missing settings detected for 'run_at_start', using default value (None)")
 			settings.run_at_start = "None"
 			has_thrown_errors = True
 
@@ -113,7 +111,7 @@ def check_config_validity(config):
 			if not settings.run_at_finish:
 				settings.run_at_finish = "None"
 		except:
-			log("[W] Invalid or missing settings detected for 'run_at_finish', using default value (None)", "YELLOW")
+			log_warn("Invalid or missing settings detected for 'run_at_finish', using default value (None)")
 			settings.run_at_finish = "None"
 			has_thrown_errors = True
 
@@ -122,15 +120,16 @@ def check_config_validity(config):
 			settings.save_comments = config.get('pyinstalive', 'save_comments').title()
 			wide_build = sys.maxunicode > 65536
 			if sys.version.split(' ')[0].startswith('2') and settings.save_comments == "True" and not wide_build:
-				log("[W] Your Python 2 build does not support wide unicode characters.\n[W] This means characters such as emojis will not be saved.", "YELLOW")
+				log_warn("Your Python 2 build does not support wide unicode characters.")
+				log_warn("This means characters such as emojis will not be saved.")
 				has_thrown_errors = True
 			else:
 				if not settings.show_cookie_expiry in bool_values:
-					log("[W] Invalid or missing setting detected for 'save_comments', using default value (False)", "YELLOW")
+					log_warn("Invalid or missing setting detected for 'save_comments', using default value (False)")
 					settings.save_comments = 'false'
 					has_thrown_errors = True
 		except:
-			log("[W] Invalid or missing setting detected for 'save_comments', using default value (False)", "YELLOW")
+			log_warn("Invalid or missing setting detected for 'save_comments', using default value (False)")
 			settings.save_comments = 'false'
 			has_thrown_errors = True
 
@@ -140,20 +139,20 @@ def check_config_validity(config):
 			if (os.path.exists(settings.save_path)):
 				pass
 			else:
-				log("[W] Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()), "YELLOW")
+				log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 				settings.save_path = os.getcwd()
 				has_thrown_errors = True
 
 			if not settings.save_path.endswith('/'):
 				settings.save_path = settings.save_path + '/'
 		except:
-			log("[W] Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()), "YELLOW")
+			log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 			settings.save_path = os.getcwd()
 			has_thrown_errors = True
 
 
 		if has_thrown_errors:
-			seperator("GREEN")
+			log_seperator()
 
 		return True
 	except Exception as e:
@@ -167,15 +166,15 @@ def show_info(config):
 		try:
 			config.read('pyinstalive.ini')
 		except Exception as e:
-			log("[E] Could not read configuration file: {:s}".format(str(e)), "RED")
-			seperator("GREEN")
+			log_error("Could not read configuration file: {:s}".format(str(e)))
+			log_seperator()
 	else:
 		new_config()
 		sys.exit(1)
 
 	if not check_config_validity(config):
-		log("[W] Config file is not valid, some information may be inaccurate.", "YELLOW")
-		log("", "GREEN")
+		log_warn("Config file is not valid, some information may be inaccurate.")
+		log_whiteline()
 
 	cookie_files = []
 	cookie_from_config = ''
@@ -192,59 +191,59 @@ def show_info(config):
 			if settings.username == file.replace(".json", ''):
 				cookie_from_config = file
 	except Exception as e:
-		log("[W] Could not check for cookie files: {:s}".format(str(e)), "YELLOW")
-		log("", "ENDC")
-	log("[I] To see all the available arguments, use the -h argument.", "BLUE")
-	log("", "GREEN")
-	log("[I] PyInstaLive version:    	{:s}".format(script_version), "GREEN")
-	log("[I] Python version:         	{:s}".format(python_version), "GREEN")
+		log_warn("Could not check for cookie files: {:s}".format(str(e)))
+		log_whiteline()
+	log_info_green("To see all the available arguments, use the -h argument.")
+	log_whiteline()
+	log_info_green("PyInstaLive version:    	{:s}".format(script_version))
+	log_info_green("Python version:         	{:s}".format(python_version))
 	if not check_ffmpeg():
-		log("[E] FFmpeg framework:       	Not found", "RED")
+		log_error("FFmpeg framework:       	Not found")
 	else:
-		log("[I] FFmpeg framework:       	Available", "GREEN")
+		log_info_green("FFmpeg framework:       	Available")
 
 	if (len(cookie_from_config) > 0):
-		log("[I] Cookie files:            	{:s} ({:s} matches config user)".format(str(len(cookie_files)), cookie_from_config), "GREEN")
+		log_info_green("Cookie files:            	{:s} ({:s} matches config user)".format(str(len(cookie_files)), cookie_from_config))
 	elif len(cookie_files) > 0:
-		log("[I] Cookie files:            	{:s}".format(str(len(cookie_files))), "GREEN")
+		log_info_green("Cookie files:            	{:s}".format(str(len(cookie_files))))
 	else:
-		log("[W] Cookie files:            	None found", "YELLOW")
+		log_warn("Cookie files:            	None found")
 
-	log("[I] CLI supports color:     	{:s}".format(str(supports_color()[0])), "GREEN")
-	log("[I] File to run at start:       {:s}".format(settings.run_at_start), "GREEN")
-	log("[I] File to run at finish:      {:s}".format(settings.run_at_finish), "GREEN")
-	log("", "GREEN")
+	log_info_green("CLI supports color:     	{:s}".format(str(supports_color()[0])))
+	log_info_green("File to run at start:       {:s}".format(settings.run_at_start))
+	log_info_green("File to run at finish:      {:s}".format(settings.run_at_finish))
+	log_whiteline()
 
 
 	if os.path.exists('pyinstalive.ini'):
-		log("[I] Config file:", "GREEN")
-		log("", "GREEN")
+		log_info_green("Config file:")
+		log_whiteline()
 		with open('pyinstalive.ini') as f:
 			for line in f:
-				log("    {:s}".format(line.rstrip()), "YELLOW")
+				log_plain("    {:s}".format(line.rstrip()))
 	else:
-		log("[E] Config file:	    	Not found", "RED")
-	log("", "GREEN")
-	log("[I] End of PyInstaLive information screen.", "GREEN")
-	seperator("GREEN")
+		log_error("Config file:	    	Not found")
+	log_whiteline()
+	log_info_green("End of PyInstaLive information screen.")
+	log_seperator()
 
 
 
 def new_config():
 	try:
 		if os.path.exists('pyinstalive.ini'):
-			log("[I] A configuration file is already present:", "GREEN")
-			log("", "GREEN")
+			log_info_green("A configuration file is already present:")
+			log_whiteline()
 			with open('pyinstalive.ini') as f:
 				for line in f:
-					log("    {:s}".format(line.rstrip()), "YELLOW")
-			log("", "GREEN")
-			log("[I] To create a default config file, delete 'pyinstalive.ini' and ", "GREEN")
-			log("    run this script again.", "GREEN")
-			seperator("GREEN")
+					log_plain("    {:s}".format(line.rstrip()))
+			log_whiteline()
+			log_info_green("To create a default config file, delete 'pyinstalive.ini' and ")
+			log_plain("    run this script again.")
+			log_seperator()
 		else:
 			try:
-				log("[W] Could not find configuration file, creating a default one...", "YELLOW")
+				log_warn("Could not find configuration file, creating a default one...")
 				config_template = """
 [pyinstalive]
 username = johndoe
@@ -262,27 +261,27 @@ log_to_file = false
 				config_file = open("pyinstalive.ini", "w")
 				config_file.write(config_template.strip())
 				config_file.close()
-				log("[W] Edit the created 'pyinstalive.ini' file and run this script again.", "YELLOW")
-				seperator("GREEN")
+				log_warn("Edit the created 'pyinstalive.ini' file and run this script again.")
+				log_seperator()
 				sys.exit(0)
 			except Exception as e:
-				log("[E] Could not create default config file: {:s}".format(str(e)), "RED")
-				log("[W] You must manually create and edit it with the following template: ", "YELLOW")
-				log("", "GREEN")
+				log_error("Could not create default config file: {:s}".format(str(e)))
+				log_warn("You must manually create and edit it with the following template: ")
+				log_whiteline()
 				for line in config_template.strip().splitlines():
-					log("    {:s}".format(line.rstrip()), "YELLOW")
-				log("", "GREEN")
-				log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
-				seperator("GREEN")
+					log_plain("    {:s}".format(line.rstrip()))
+				log_whiteline()
+				log_warn("Save it as 'pyinstalive.ini' and run this script again.")
+				log_seperator()
 	except Exception as e:
-		log("[E] An error occurred: {:s}".format(str(e)), "RED")
-		log("[W] If you don't have a configuration file, you must", "YELLOW")
-		log("    manually create and edit it with the following template: ", "YELLOW")
-		log("", "GREEN")
-		log(config_template, "YELLOW")
-		log("", "GREEN")
-		log("[W] Save it as 'pyinstalive.ini' and run this script again.", "YELLOW")
-		seperator("GREEN")
+		log_error("An error occurred: {:s}".format(str(e)))
+		log_warn("If you don't have a configuration file, you must")
+		log_plain("    manually create and edit it with the following template: ")
+		log_whiteline()
+		log_plain(config_template)
+		log_whiteline()
+		log_warn("Save it as 'pyinstalive.ini' and run this script again.")
+		log_seperator()
 
 
 
@@ -291,7 +290,7 @@ def clean_download_dir():
 	error_count = 0
 	lock_count = 0
 
-	log('[I] Cleaning up temporary files and folders...', "GREEN")
+	log_info_green(' Cleaning up temporary files and folders...')
 	try:
 		if sys.version.split(' ')[0].startswith('2'):
 			directories = (os.walk(settings.save_path).next()[1])
@@ -307,31 +306,31 @@ def clean_download_dir():
 						shutil.rmtree(settings.save_path + directory)
 						dir_delcount += 1
 					except Exception as e:
-						log("[E] Could not remove temp folder: {:s}".format(str(e)), "RED")
+						log_error("Could not remove temp folder: {:s}".format(str(e)))
 						error_count += 1
 				else:
 					lock_count += 1
-		seperator("GREEN")
-		log('[I] The cleanup has finished.', "YELLOW")
+		log_seperator()
+		log_info_green(' The cleanup has finished.')
 		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
-			log('[I] No folders were removed.', "YELLOW")
-			seperator("GREEN")
+			log_info_green(' No folders were removed.')
+			log_seperator()
 			return
-		log('[I] Folders removed:     {:d}'.format(dir_delcount), "YELLOW")
-		log('[I] Locked folders:      {:d}'.format(lock_count), "YELLOW")
-		log('[I] Errors:              {:d}'.format(error_count), "YELLOW")
-		seperator("GREEN")
+		log_info_green(' Folders removed:     {:d}'.format(dir_delcount))
+		log_info_green(' Locked folders:      {:d}'.format(lock_count))
+		log_info_green(' Errors:              {:d}'.format(error_count))
+		log_seperator()
 	except KeyboardInterrupt as e:
-		seperator("GREEN")
-		log("[W] The cleanup has been aborted.", "YELLOW")
+		log_seperator()
+		log_warn("The cleanup has been aborted.")
 		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
-			log('[I] No folders were removed.', "YELLOW")
-			seperator("GREEN")
+			log_info_green(' No folders were removed.')
+			log_seperator()
 			return
-		log('[I] Folders removed:     {:d}'.format(dir_delcount), "YELLOW")
-		log('[I] Locked folders:      {:d}'.format(lock_count), "YELLOW")
-		log('[I] Errors:              {:d}'.format(error_count), "YELLOW")
-		seperator("GREEN")
+		log_info_green(' Folders removed:     {:d}'.format(dir_delcount))
+		log_info_green(' Locked folders:      {:d}'.format(lock_count))
+		log_info_green(' Errors:              {:d}'.format(error_count))
+		log_seperator()
 
 def run():
 	logging.disable(logging.CRITICAL)
@@ -359,7 +358,7 @@ def run():
 	parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
 
 
-	args, unknown = parser.parse_known_args()
+	args, unknown_args = parser.parse_known_args()
 
 
 	try:
@@ -370,10 +369,8 @@ def run():
 		elif settings.log_to_file == "True":
 			if args.download:
 				settings.user_to_download = args.download
-			else:
-				settings.user_to_download = "log"
 			try:
-				with open("pyinstalive_{:s}.log".format(settings.user_to_download),"a+") as f:
+				with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
 					f.write("\n")
 					f.close()
 			except:
@@ -382,20 +379,20 @@ def run():
 		settings.log_to_file = 'False'
 		pass # Pretend nothing happened
 
-	seperator("GREEN")
-	log('PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')), "GREEN")
-	seperator("GREEN")
+	log_seperator()
+	log_info_blue('PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')))
+	log_seperator()
 
-	if unknown:
-		log("[E] The following invalid argument(s) were provided: ", "RED") 
-		log('', "GREEN") 
-		log('    ' + ' '.join(unknown), "YELLOW") 
-		log('', "GREEN")
+	if unknown_args:
+		log_error("The following invalid argument(s) were provided: ") 
+		log_whiteline() 
+		log_info_blue('    ' + ' '.join(unknown_args)) 
+		log_whiteline()
 		if (supports_color()[1] == True):
-			log("[I] \033[94mpyinstalive -h\033[92m can be used to display command help.", "GREEN")
+			log_info_green("'pyinstalive -h' can be used to display command help.")
 		else:
-			log("[I] pyinstalive -h can be used to display command help.", "GREEN")
-		seperator("GREEN")
+			log_plain("pyinstalive -h can be used to display command help.")
+		log_seperator()
 		exit(1)
 
 	if (args.info) or (not
@@ -419,8 +416,8 @@ def run():
 		try:
 			config.read('pyinstalive.ini')
 		except Exception:
-			log("[E] Could not read configuration file.", "RED")
-			seperator("GREEN")
+			log_error("Could not read configuration file.")
+			log_seperator()
 	else:
 		new_config()
 		sys.exit(1)
@@ -433,8 +430,8 @@ def run():
 				sys.exit(0)
 
 			if not check_ffmpeg():
-				log("[E] Could not find ffmpeg, the script will now exit. ", "RED")
-				seperator("GREEN")
+				log_error("Could not find ffmpeg, the script will now exit. ")
+				log_seperator()
 				sys.exit(1)
 
 			if (args.noreplays):
@@ -444,43 +441,43 @@ def run():
 				settings.save_lives = "False"
 
 			if settings.save_lives == "False" and settings.save_replays == "False":
-				log("[W] Script will not run because both live and replay saving is disabled.", "YELLOW")
-				seperator("GREEN")
+				log_warn("Script will not run because both live and replay saving is disabled.")
+				log_seperator()
 				sys.exit(1)
 
 			if not args.download:
-				log("[W] Missing --download argument. Please specify an Instagram username.", "YELLOW")
-				seperator("GREEN")
+				log_warn("Missing --download argument. Please specify an Instagram username.")
+				log_seperator()
 				sys.exit(1)
 
 
 			if (args.username is not None) and (args.password is not None):
 				api = login(args.username, args.password, settings.show_cookie_expiry, True)
 			elif (args.username is not None) or (args.password is not None):
-				log("[W] Missing --username or --password argument, falling back to config file...", "YELLOW")
+				log_warn("Missing --username or --password argument, falling back to config file...")
 				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-					log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
-					seperator("GREEN")
+					log_error("Username or password are missing. Please check your configuration settings and try again.")
+					log_seperator()
 					sys.exit(1)
 				else:
 					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 			else:
 				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-					log("[E] Username or password are missing. Please check your configuration settings and try again.", "RED")
-					seperator("GREEN")
+					log_error("Username or password are missing. Please check your configuration settings and try again.")
+					log_seperator()
 					sys.exit(1)
 				else:
 					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 
 			main(api, args.download, settings)
 		except Exception as e:
-			log("[E] Could not finish pre-download checks:  {:s}".format(str(e)), "RED")
-			seperator("GREEN")
+			log_error("Could not finish pre-download checks:  {:s}".format(str(e)))
+			log_seperator()
 		except KeyboardInterrupt as ee:
-			log("[W] Pre-download checks have been aborted, exiting...", "YELLOW")
-			seperator("GREEN")
+			log_warn("Pre-download checks have been aborted, exiting...")
+			log_seperator()
 
 	else:
-		log("[E] The configuration file is not valid. Please check your configuration settings and try again.", "RED")
-		seperator("GREEN")
+		log_error("The configuration file is not valid. Please check your configuration settings and try again.")
+		log_seperator()
 		sys.exit(1)
