@@ -311,7 +311,7 @@ def clean_download_dir():
 		log_seperator()
 		log_info_green('The cleanup has finished.')
 		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
-			log_info_green(' No folders were removed.')
+			log_info_green('No folders were removed.')
 			log_seperator()
 			return
 		log_info_green('Folders removed:     {:d}'.format(dir_delcount))
