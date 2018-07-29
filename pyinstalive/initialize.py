@@ -238,8 +238,7 @@ def new_config():
 				for line in f:
 					log_plain("    {:s}".format(line.rstrip()))
 			log_whiteline()
-			log_info_green("To create a default config file, delete 'pyinstalive.ini' and ")
-			log_plain("    run this script again.")
+			log_info_green("To create a default config file, delete 'pyinstalive.ini' and run this script again.")
 			log_seperator()
 		else:
 			try:
@@ -275,8 +274,7 @@ log_to_file = false
 				log_seperator()
 	except Exception as e:
 		log_error("An error occurred: {:s}".format(str(e)))
-		log_warn("If you don't have a configuration file, you must")
-		log_plain("    manually create and edit it with the following template: ")
+		log_warn("If you don't have a configuration file, manually create and edit one with the following template:")
 		log_whiteline()
 		log_plain(config_template)
 		log_whiteline()
@@ -290,7 +288,7 @@ def clean_download_dir():
 	error_count = 0
 	lock_count = 0
 
-	log_info_green(' Cleaning up temporary files and folders...')
+	log_info_green('Cleaning up temporary files and folders...')
 	try:
 		if sys.version.split(' ')[0].startswith('2'):
 			directories = (os.walk(settings.save_path).next()[1])
@@ -311,25 +309,25 @@ def clean_download_dir():
 				else:
 					lock_count += 1
 		log_seperator()
-		log_info_green(' The cleanup has finished.')
+		log_info_green('The cleanup has finished.')
 		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
 			log_info_green(' No folders were removed.')
 			log_seperator()
 			return
-		log_info_green(' Folders removed:     {:d}'.format(dir_delcount))
-		log_info_green(' Locked folders:      {:d}'.format(lock_count))
-		log_info_green(' Errors:              {:d}'.format(error_count))
+		log_info_green('Folders removed:     {:d}'.format(dir_delcount))
+		log_info_green('Locked folders:      {:d}'.format(lock_count))
+		log_info_green('Errors:              {:d}'.format(error_count))
 		log_seperator()
 	except KeyboardInterrupt as e:
 		log_seperator()
 		log_warn("The cleanup has been aborted.")
 		if dir_delcount == 0 and error_count == 0 and lock_count == 0:
-			log_info_green(' No folders were removed.')
+			log_info_green('No folders were removed.')
 			log_seperator()
 			return
-		log_info_green(' Folders removed:     {:d}'.format(dir_delcount))
-		log_info_green(' Locked folders:      {:d}'.format(lock_count))
-		log_info_green(' Errors:              {:d}'.format(error_count))
+		log_info_green('Folders removed:     {:d}'.format(dir_delcount))
+		log_info_green('Locked folders:      {:d}'.format(lock_count))
+		log_info_green('Errors:              {:d}'.format(error_count))
 		log_seperator()
 
 def run():
