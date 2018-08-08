@@ -28,7 +28,7 @@ def supports_color():
 
 def log_seperator():
 	try:
-		print(sep + "\033[0m")
+		print(sep)
 		if settings.log_to_file == 'True':
 			try:
 				with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
