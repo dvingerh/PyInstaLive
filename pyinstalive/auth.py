@@ -46,30 +46,28 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 	device_id = None
 	try:
 		if force_use_login_args:
-			log_info_green("Overriding standard login with -u and -p arguments...")
+			log_info_blue("Overriding configuration file login with -u and -p arguments...")
+			log_seperator()
+		cookie_file = "{}.json".format(username)
+		if not os.path.isfile(cookie_file):
+			# settings file does not exist
+			log_warn('Unable to find cookie file: {0!s}'.format(cookie_file))
+			log_info_green('Creating a new cookie file...')
+
+			# login new
 			api = Client(
-				username, password)
+				username, password,
+				on_login=lambda x: onlogin_callback(x, cookie_file))
 		else:
-			cookie_file = "{}.json".format(username)
-			if not os.path.isfile(cookie_file):
-				# settings file does not exist
-				log_warn('Unable to find cookie file: {0!s}'.format(cookie_file))
-				log_info_green('Creating a new cookie file...')
+			with open(cookie_file) as file_data:
+				cached_settings = json.load(file_data, object_hook=from_json)
+			# log_info_green('Using settings file: {0!s}'.format(cookie_file))
 
-				# login new
-				api = Client(
-					username, password,
-					on_login=lambda x: onlogin_callback(x, cookie_file))
-			else:
-				with open(cookie_file) as file_data:
-					cached_settings = json.load(file_data, object_hook=from_json)
-				# log_info_green('Using settings file: {0!s}'.format(cookie_file))
-
-				device_id = cached_settings.get('device_id')
-				# reuse auth cached_settings
-				api = Client(
-					username, password,
-					settings=cached_settings)
+			device_id = cached_settings.get('device_id')
+			# reuse auth cached_settings
+			api = Client(
+				username, password,
+				settings=cached_settings)
 
 	except (ClientCookieExpiredError) as e:
 		log_warn('The current cookie file for "{:s}" has expired, creating a new one...'.format(username))
