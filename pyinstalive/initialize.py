@@ -100,7 +100,7 @@ def check_config_validity(config):
 			if not settings.run_at_start:
 				settings.run_at_start = "None"
 		except:
-			log_warn("Invalid or missing settings detected for 'run_at_start', using default value (None)")
+			log_warn("Invalid or missing settings detected for 'run_at_start', using default value (empty)")
 			settings.run_at_start = "None"
 			has_thrown_errors = True
 
@@ -111,7 +111,7 @@ def check_config_validity(config):
 			if not settings.run_at_finish:
 				settings.run_at_finish = "None"
 		except:
-			log_warn("Invalid or missing settings detected for 'run_at_finish', using default value (None)")
+			log_warn("Invalid or missing settings detected for 'run_at_finish', using default value (empty)")
 			settings.run_at_finish = "None"
 			has_thrown_errors = True
 
@@ -452,16 +452,16 @@ def run():
 			if (args.username is not None) and (args.password is not None):
 				api = login(args.username, args.password, settings.show_cookie_expiry, True)
 			elif (args.username is not None) or (args.password is not None):
-				log_warn("Missing --username or --password argument, falling back to config file...")
+				log_warn("Missing --username or --password argument, falling back to configuration file...")
 				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-					log_error("Username or password are missing. Please check your configuration settings and try again.")
+					log_error("Username or password are missing. Please check your configuration file and try again.")
 					log_seperator()
 					sys.exit(1)
 				else:
 					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
 			else:
 				if (not len(settings.username) > 0) or (not len(settings.password) > 0):
-					log_error("Username or password are missing. Please check your configuration settings and try again.")
+					log_error("Username or password are missing. Please check your configuration file and try again.")
 					log_seperator()
 					sys.exit(1)
 				else:
@@ -476,6 +476,6 @@ def run():
 			log_seperator()
 
 	else:
-		log_error("The configuration file is not valid. Please check your configuration settings and try again.")
+		log_error("The configuration file is not valid. Please double-check and try again.")
 		log_seperator()
 		sys.exit(1)
