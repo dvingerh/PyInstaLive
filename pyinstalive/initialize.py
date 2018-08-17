@@ -9,7 +9,7 @@ import shutil
 import json
 
 from .auth import login
-from .downloader import main
+from .downloader import start_single, start_multiple
 from .logger import log_seperator, supports_color, log_info_blue, log_info_green, log_warn, log_error, log_whiteline, log_plain
 from .settings import settings
 
@@ -21,6 +21,14 @@ def check_ffmpeg():
 	try:
 		FNULL = open(os.devnull, 'w')
 		subprocess.call(["ffmpeg"], stdout=FNULL, stderr=subprocess.STDOUT)
+		return True
+	except OSError as e:
+		return False
+
+def check_pyinstalive():
+	try:
+		FNULL = open(os.devnull, 'w')
+		subprocess.call(["pyinstalive"], stdout=FNULL, stderr=subprocess.STDOUT)
 		return True
 	except OSError as e:
 		return False
@@ -343,6 +351,8 @@ def run():
 	parser.add_argument('-nr', '--noreplays', dest='noreplays', action='store_true', help="When used, do not check for any available replays.")
 	parser.add_argument('-nl', '--nolives', dest='nolives', action='store_true', help="When used, do not check for any available livestreams.")
 	parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="PyInstaLive will clean the current download folder of all leftover files.")
+	parser.add_argument('-df', '--downloadfollowing', dest='downloadfollowing', action='store_true', help="PyInstaLive will check for available livestreams and replays from users the account used to login follows.")
+
 
 	# Workaround to 'disable' argument abbreviations
 	parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
@@ -352,8 +362,12 @@ def run():
 	parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE') 
 	parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--downloadfollowinx', help=argparse.SUPPRESS, metavar='IGNORE')
+
 	parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('-dx', help=argparse.SUPPRESS, metavar='IGNORE')
+
 
 
 	args, unknown_args = parser.parse_known_args()
@@ -397,6 +411,7 @@ def run():
 	args.username and not
 	args.password and not
 	args.download and not
+	args.downloadfollowing and not
 	args.info and not
 	args.config and not
 	args.noreplays and not
@@ -443,8 +458,13 @@ def run():
 				log_seperator()
 				sys.exit(1)
 
-			if not args.download:
-				log_warn("Missing --download argument. Please specify an Instagram username.")
+			if not args.download and not args.downloadfollowing:
+				log_warn("Neither argument -d or -df was passed. Please use one of the two and try again.")
+				log_seperator()
+				sys.exit(1)
+
+			if args.download and args.downloadfollowing:
+				log_warn("You can't pass both the -d and -df arguments. Please use one of the two and try again.")
 				log_seperator()
 				sys.exit(1)
 
@@ -466,8 +486,19 @@ def run():
 					sys.exit(1)
 				else:
 					api = login(settings.username, settings.password, settings.show_cookie_expiry, False)
-
-			main(api, args.download, settings)
+			if args.download and not args.downloadfollowing:
+				start_single(api, args.download, settings)
+			if not args.download and args.downloadfollowing:
+				if check_pyinstalive():
+					start_multiple(api, settings, "pyinstalive")
+				else:
+					log_warn("You probably ran PyInstaLive as a script module with the -m argument.")
+					log_warn("PyInstaLive should be properly installed when using the -df argument.")
+					log_seperator()
+					if python_version[0] == 3:
+						start_multiple(api, settings, "python3 -m pyinstalive")
+					else:
+						start_multiple(api, settings, "python -m pyinstalive")
 		except Exception as e:
 			log_error("Could not finish pre-download checks:  {:s}".format(str(e)))
 			log_seperator()

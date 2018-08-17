@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import shlex
+import json
 
 from xml.dom.minidom import parse, parseString
 
@@ -19,7 +20,7 @@ from .logger import log_seperator, supports_color, log_info_blue, log_info_green
 
 
 
-def main(instagram_api_arg, download_arg, settings_arg):
+def start_single(instagram_api_arg, download_arg, settings_arg):
 	global instagram_api
 	global user_to_download
 	global broadcast
@@ -29,14 +30,64 @@ def main(instagram_api_arg, download_arg, settings_arg):
 	user_to_download = download_arg
 	get_user_info(user_to_download)
 
+def start_multiple(instagram_api_arg, settings_arg, proc_arg):
+	try:
+		log_info_green("Checking following users for any livestreams or replays...")
+		broadcast_f_list = instagram_api_arg.reels_tray()
+		usernames_available = []
+		if broadcast_f_list['broadcasts']:
+			for broadcast_f in broadcast_f_list['broadcasts']:
+				username = broadcast_f['broadcast_owner']['username']
+				if username not in usernames_available:
+					usernames_available.append(username)
+
+		if broadcast_f_list.get('post_live', {}).get('post_live_items', []):
+			for broadcast_r in broadcast_f_list.get('post_live', {}).get('post_live_items', []):
+				for broadcast_f in broadcast_r.get("broadcasts", []):
+					username = broadcast_f['broadcast_owner']['username']
+					if username not in usernames_available:
+						usernames_available.append(username)
+		log_seperator()
+		if usernames_available:
+			log_info_green("The following users have available livestreams or replays:")
+			log_info_green(', '.join(usernames_available))
+			log_seperator()
+			for index, user in enumerate(usernames_available):
+				try:
+					log_info_green("Launching daemon process for '{:s}'...".format(user))
+					start_result = run_command("{:s} -d {:s}".format(proc_arg, user))
+					if start_result:
+						log_info_green("Could not start processs: {:s}".format(str(start_result)))
+					else:
+						log_info_green("Process started successfully.")
+
+					log_seperator()
+					time.sleep(2)
+				except Exception as e:
+					log_error("Could not start processs: {:s}".format(str(e)))
+				except KeyboardInterrupt:
+					log_info_blue('The process launching has been aborted by the user.')
+					log_seperator()				
+					exit(0)
+	except Exception as e:
+		log_error("Could not finish checking following users: {:s}".format(str(e)))
+		exit(1)
+	except KeyboardInterrupt:
+		log_seperator()
+		log_info_blue('The checking process has been aborted by the user.')
+		log_seperator()
+		exit(0)
+	#open("reels.json", "w").write(json.dumps(following_broadcasts))
+
 
 
 def run_command(command):
 	try:
 		FNULL = open(os.devnull, 'w')
 		subprocess.Popen(shlex.split(command), stdout=FNULL, stderr=subprocess.STDOUT)
+		return False
 	except Exception as e:
-		pass
+		return str(e)
 
 
 
@@ -161,9 +212,9 @@ def download_livestream(broadcast):
 	except Exception as e:
 		log_error("Could not download livestream: {:s}".format(str(e)))
 		try:
-		    os.remove(os.path.join(output_dir, 'folder.lock'))
+			os.remove(os.path.join(output_dir, 'folder.lock'))
 		except Exception:
-		    pass
+			pass
 
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
@@ -192,9 +243,9 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				broadcast_downloader.stitch(live_mp4_file, cleartempfiles=False)
 			log_info_green('Successfully stitched downloaded files into video.')
 			try:
-			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
+				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
-			    pass
+				pass
 			if settings.clear_temp_files.title() == "True":
 				try:
 					shutil.rmtree(live_folder_path)
@@ -207,25 +258,25 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 			log_error('Likely the download duration was too short and no temp files were saved.')
 			log_seperator()
 			try:
-			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
+				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
-			    pass
+				pass
 			sys.exit(1)
 		except Exception as e:
 			log_error('Could not stitch downloaded files: {:s}'.format(str(e)))
 			log_seperator()
 			try:
-			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
+				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
-			    pass
+				pass
 			sys.exit(1)
 	except KeyboardInterrupt:
 			log_info_blue('Aborted stitching process, no video was created.')
 			log_seperator()
 			try:
-			    os.remove(os.path.join(live_folder_path, 'folder.lock'))
+				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
-			    pass
+				pass
 			sys.exit(0)
 
 
@@ -370,9 +421,9 @@ def download_replays(broadcasts):
 				if (len(replay_saved) == 1):
 					log_info_green("Finished downloading replay {:s} of {:s}.".format(str(current), str(len(broadcasts))))
 					try:
-					    os.remove(os.path.join(output_dir, 'folder.lock'))
+						os.remove(os.path.join(output_dir, 'folder.lock'))
 					except Exception:
-					    pass
+						pass
 
 					if (current != len(broadcasts)):
 						log_seperator()
@@ -390,9 +441,9 @@ def download_replays(broadcasts):
 		log_error('Could not save replay: {:s}'.format(str(e)))
 		log_seperator()
 		try:
-		    os.remove(os.path.join(output_dir, 'folder.lock'))
+			os.remove(os.path.join(output_dir, 'folder.lock'))
 		except Exception:
-		    pass
+			pass
 		sys.exit(1)
 	except KeyboardInterrupt:
 		log_seperator()
