@@ -19,7 +19,7 @@
 
 - ```-cl``` or ```--clean```  **—**  When this argument is passed, PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
 
-- ```-df``` or ```--downloadfollowing```  **—**  When this argument is passed, PyInstaLive will check if any users from your following list have any available livestreams or replays and start a daemon process running PyInstaLive in the background for those that do. You cannot cancel the launched processes or start them with any extra arguments. It's recommended to enable ```log_to_file``` when using this argument. (Exeprimental, use at own risk.)
+- ```-df``` or ```--downloadfollowing```  **—**  When this argument is passed, PyInstaLive will check if any users from your following list have any available livestreams or replays and start a daemon process running PyInstaLive in the background for those that do. You cannot cancel the launched processes or start them with any extra arguments. It's recommended to enable ```log_to_file``` when using this argument. (Experimental, use at own risk.)
 
 
 # Default configuration file
