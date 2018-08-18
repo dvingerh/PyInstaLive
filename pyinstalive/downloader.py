@@ -28,6 +28,16 @@ def start_single(instagram_api_arg, download_arg, settings_arg):
 	settings = settings_arg
 	instagram_api = instagram_api_arg
 	user_to_download = download_arg
+	try:
+		if not os.path.isfile(os.path.join(settings.save_path, user_to_download + '.lock')):
+			open(os.path.join(settings.save_path, user_to_download + '.lock'), 'a').close()
+		else:
+			log_warn("Lock file is already present for this user, there is probably another download ongoing!")
+			log_warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user_to_download + '.lock'))
+			log_seperator()
+			sys.exit(1)
+	except Exception:
+		log_warn("Lock file could not be created. Downloads started from -df might cause problems!")
 	get_user_info(user_to_download)
 
 def start_multiple(instagram_api_arg, settings_arg, proc_arg):
@@ -52,7 +62,7 @@ def start_multiple(instagram_api_arg, settings_arg, proc_arg):
 			log_info_green("The following users have available livestreams or replays:")
 			log_info_green(', '.join(usernames_available))
 			log_seperator()
-			for index, user in enumerate(usernames_available):
+			for user in usernames_available:
 				try:
 					log_info_green("Launching daemon process for '{:s}'...".format(user))
 					start_result = run_command("{:s} -d {:s}".format(proc_arg, user))
@@ -61,23 +71,22 @@ def start_multiple(instagram_api_arg, settings_arg, proc_arg):
 					else:
 						log_info_green("Process started successfully.")
 
-					log_seperator()
+					log_seperator()	
 					time.sleep(2)
 				except Exception as e:
 					log_error("Could not start processs: {:s}".format(str(e)))
 				except KeyboardInterrupt:
 					log_info_blue('The process launching has been aborted by the user.')
 					log_seperator()				
-					exit(0)
+					sys.exit(0)
 	except Exception as e:
 		log_error("Could not finish checking following users: {:s}".format(str(e)))
-		exit(1)
+		sys.exit(1)
 	except KeyboardInterrupt:
 		log_seperator()
 		log_info_blue('The checking process has been aborted by the user.')
 		log_seperator()
-		exit(0)
-	#open("reels.json", "w").write(json.dumps(following_broadcasts))
+		sys.exit(0)
 
 
 
@@ -152,13 +161,17 @@ def download_livestream(broadcast):
 	except Exception as e:
 		log_error('Could not start downloading livestream: {:s}'.format(str(e)))
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(1)
 	try:
 		log_info_green('Livestream found, beginning download...')
 		broadcast_owner = broadcast.get('broadcast_owner', {}).get('username')
 		try:
 			broadcast_guest = broadcast.get('cobroadcasters', {})[0].get('username')
-		except:
+		except Exception:
 			broadcast_guest = None
 		if (broadcast_owner != user_to_download):
 			log_info_blue('This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner))
@@ -215,6 +228,10 @@ def download_livestream(broadcast):
 			os.remove(os.path.join(output_dir, 'folder.lock'))
 		except Exception:
 			pass
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 
 
 def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
@@ -246,6 +263,10 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
 				pass
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
 			if settings.clear_temp_files.title() == "True":
 				try:
 					shutil.rmtree(live_folder_path)
@@ -261,6 +282,10 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
 				pass
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
 			sys.exit(1)
 		except Exception as e:
 			log_error('Could not stitch downloaded files: {:s}'.format(str(e)))
@@ -269,12 +294,20 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 				os.remove(os.path.join(live_folder_path, 'folder.lock'))
 			except Exception:
 				pass
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
 			sys.exit(1)
 	except KeyboardInterrupt:
 			log_info_blue('Aborted stitching process, no video was created.')
 			log_seperator()
 			try:
 				os.remove(os.path.join(live_folder_path, 'folder.lock'))
+			except Exception:
+				pass
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
 			except Exception:
 				pass
 			sys.exit(0)
@@ -292,26 +325,45 @@ def get_user_info(user_to_download):
 		if "timed out" in str(cce):
 			log_error('The connection timed out, check your internet connection.')
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(1)
 	except ClientThrottledError as cte:
 		log_error('Could not get user info for "{:s}": {:d} {:s}.'.format(user_to_download, cte.code, str(cte)))
 		log_error('You are making too many requests at this time.')
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(1)
 	except ClientError as ce:
 		log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, ce.code, str(ce)))
 		if ("Not Found") in str(ce):
 			log_error('The specified user does not exist.')
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(1)
 	except Exception as e:
 		log_error('Could not get user info for "{:s}": {:s}'.format(user_to_download, str(e)))
-
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(1)
 	except KeyboardInterrupt:
 		log_info_blue('Aborted getting user info for "{:s}", exiting...'.format(user_to_download))
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(0)
 	log_info_green('Getting info for "{:s}" successful.'.format(user_to_download))
 	get_broadcasts_info(user_id)
@@ -350,20 +402,36 @@ def get_broadcasts_info(user_id):
 			log_info_blue("Replay saving is disabled either with an argument or in the config file.")
 
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 	except Exception as e:
 		log_error('Could not finish checking: {:s}'.format(str(e)))
 		if "timed out" in str(e):
 			log_error('The connection timed out, check your internet connection.')
 		log_seperator()
-		exit(1)
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
+		sys.exit(1)
 	except KeyboardInterrupt:
 		log_info_blue('Aborted checking for livestreams and replays, exiting...'.format(user_to_download))
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(1)
 	except ClientThrottledError as cte:
 		log_error('Could not check because you are making too many requests at this time.')
 		log_seperator()
-		exit(1)
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
+		sys.exit(1)
 
 def download_replays(broadcasts):
 	try:
@@ -436,12 +504,20 @@ def download_replays(broadcasts):
 		log_seperator()
 		log_info_green("Finished downloading all available replays.")
 		log_seperator()
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(0)
 	except Exception as e:
 		log_error('Could not save replay: {:s}'.format(str(e)))
 		log_seperator()
 		try:
 			os.remove(os.path.join(output_dir, 'folder.lock'))
+		except Exception:
+			pass
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
 		except Exception:
 			pass
 		sys.exit(1)
@@ -454,6 +530,10 @@ def download_replays(broadcasts):
 		except Exception as e:
 			log_error("Could not remove temp folder: {:s}".format(str(e)))
 			sys.exit(1)
+		try:
+			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+		except Exception:
+			pass
 		sys.exit(0)
 
 
