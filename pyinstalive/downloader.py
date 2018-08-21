@@ -79,6 +79,10 @@ def start_multiple(instagram_api_arg, settings_arg, proc_arg):
 					log_info_blue('The process launching has been aborted by the user.')
 					log_seperator()				
 					sys.exit(0)
+		else:
+			log_info_green("There are currently no available livestreams or replays.")
+			log_seperator()
+			sys.exit(0)
 	except Exception as e:
 		log_error("Could not finish checking following users: {:s}".format(str(e)))
 		sys.exit(1)
