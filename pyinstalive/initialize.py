@@ -495,7 +495,7 @@ def run():
 					log_warn("You probably ran PyInstaLive as a script module with the -m argument.")
 					log_warn("PyInstaLive should be properly installed when using the -df argument.")
 					log_seperator()
-					if python_version[0] == 3:
+					if python_version[0] == "3":
 						start_multiple(api, settings, "python3 -m pyinstalive")
 					else:
 						start_multiple(api, settings, "python -m pyinstalive")
