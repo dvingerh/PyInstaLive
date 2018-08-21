@@ -64,13 +64,16 @@ def start_multiple(instagram_api_arg, settings_arg, proc_arg):
 			log_seperator()
 			for user in usernames_available:
 				try:
-					log_info_green("Launching daemon process for '{:s}'...".format(user))
-					start_result = run_command("{:s} -d {:s}".format(proc_arg, user))
-					if start_result:
-						log_info_green("Could not start processs: {:s}".format(str(start_result)))
+					if os.path.isfile(os.path.join(settings_arg.save_path, user + '.lock')):
+						log_warn("Lock file is already present for '{:s}', there is probably another download ongoing!".format(user))
+						log_warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
 					else:
-						log_info_green("Process started successfully.")
-
+						log_info_green("Launching daemon process for '{:s}'...".format(user))
+						start_result = run_command("{:s} -d {:s}".format(proc_arg, user))
+						if start_result:
+							log_info_green("Could not start processs: {:s}".format(str(start_result)))
+						else:
+							log_info_green("Process started successfully.")
 					log_seperator()	
 					time.sleep(2)
 				except Exception as e:
