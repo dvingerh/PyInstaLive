@@ -46,7 +46,7 @@ def log_info_green(string):
 		if supports_color()[1] == False:
 			print(string)
 		else:
-			print('[\033[92mI\033[0m] {:s}\033[0m'.format(string))
+			print('[\x1B[1;32;40mI\x1B[0m] {:s}\x1B[0m'.format(string))
 		if settings.log_to_file == 'True':
 			try:
 				with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
@@ -64,7 +64,7 @@ def log_info_blue(string):
 		if supports_color()[1] == False:
 			print(string)
 		else:
-			print('[\033[94mI\033[0m] {:s}\033[0m'.format(string))
+			print('[\x1B[1;34;40mI\x1B[0m] {:s}\x1B[0m'.format(string))
 		if settings.log_to_file == 'True':
 			try:
 				with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
@@ -82,7 +82,7 @@ def log_warn(string):
 		if supports_color()[1] == False:
 			print(string)
 		else:
-			print('[\033[93mW\033[0m] {:s}\033[0m'.format(string))
+			print('[\x1B[1;33;40mW\x1B[0m] {:s}\x1B[0m'.format(string))
 		if settings.log_to_file == 'True':
 			try:
 				with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
@@ -100,7 +100,7 @@ def log_error(string):
 		if supports_color()[1] == False:
 			print(string)
 		else:
-			print('[\033[91mE\033[0m] {:s}\033[0m'.format(string))
+			print('[\x1B[1;31;40mE\x1B[0m] {:s}\x1B[0m'.format(string))
 		if settings.log_to_file == 'True':
 			try:
 				with open("pyinstalive{:s}.log".format("_" + settings.user_to_download if len(settings.user_to_download) > 0 else ".default"),"a+") as f:
