@@ -103,10 +103,10 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 	except ClientError as e:
 		log_seperator()
 		try:
-			log_error('Unexpected exception: {0!s}'.format(e.msg))
-			log_error('Message: {1!s}'.format(json.loads(e.error_response).get("message", "Additional error information not available.")))
-			log_error('Code: {2:d}'.format(e.code))
-			log_error('Full response:\n{3!s}'.format(e.error_response))
+			log_error('Unexpected exception: {:s}'.format(e.msg))
+			log_error('Message: {:s}'.format(json.loads(e.error_response).get("message", "Additional error information not available.")))
+			log_error('Code: {:d}'.format(e.code))
+			log_error('Full response:\n{:s}'.format(e.error_response))
 			log_whiteline()
 		except Exception as ee:
 			log_error('An error occurred while trying to handle a previous exception.')
@@ -124,7 +124,7 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 			log_warn("Please delete your cookie file '{}.json' and try again.".format(username))
 		else:
 			log_seperator()
-			log_error('Unexpected exception: {0!s}'.format(e))
+			log_error('Unexpected exception: {:s}'.format(e))
 		log_seperator()
 		sys.exit(99)
 	except KeyboardInterrupt as e:
@@ -137,9 +137,9 @@ def login(username, password, show_cookie_expiry, force_use_login_args):
 	if show_cookie_expiry.title() == 'True' and not force_use_login_args:
 		try:
 			cookie_expiry = api.cookie_jar.auth_expires
-			log_info_green('Cookie file expiry date: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')))
+			log_info_green('Cookie file expiry date: {:s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')))
 		except AttributeError as e:
-			log_warn('An error occurred while getting the cookie file expiry date: {0!s}'.format(e))
+			log_warn('An error occurred while getting the cookie file expiry date: {:s}'.format(str(e)))
 
 	log_seperator()		
 	return api
