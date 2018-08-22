@@ -13,7 +13,7 @@ This CLI script enables you to download any ongoing Instagram livestreams as wel
 
 ## Features
 
-- Download ongoing livestreams (also detects livestreams in which the user is live with the livestream owner)
+- Download ongoing livestreams (also detects livestreams in which the user is a guest of someone else's livestream)
 - Download available replays
 - Download livestream and replay comments
 - Run a command when starting and/or finishing a download (Experimental)
