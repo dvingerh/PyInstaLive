@@ -13,7 +13,7 @@ from .downloader import start_single, start_multiple
 from .logger import log_seperator, supports_color, log_info_blue, log_info_green, log_warn, log_error, log_whiteline, log_plain
 from .settings import settings
 
-script_version = "2.5.6@master"
+script_version = "2.5.7"
 python_version = sys.version.split(' ')[0]
 bool_values = {'True', 'False'}
 

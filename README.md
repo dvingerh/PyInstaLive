@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 2.5.6](https://img.shields.io/badge/Version-2.5.6-orange.svg?longCache=true&style=flat)
+![Version 2.5.7](https://img.shields.io/badge/Version-2.5.7-orange.svg?longCache=true&style=flat)
 
 This CLI script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
 
@@ -57,15 +57,15 @@ In case it doesn't work or you just prefer building PyInstaLive from source foll
 
 Run the following command in Command Prompt (might need to be run as administrator on Windows) or a terminal:
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.6 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.7 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **2.5.6**) run the following command:
+To update PyInstaLive to the latest version (currently **2.5.7**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.6 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@2.5.7 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -118,7 +118,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 > pyinstalive -d "janedoe"
 
 ----------------------------------------------------------------------
-PYINSTALIVE (SCRIPT V2.5.6 - PYTHON V3.6.3) - 06:45:30 PM
+PYINSTALIVE (SCRIPT V2.5.7 - PYTHON V3.6.3) - 06:45:30 PM
 ----------------------------------------------------------------------
 [I] Successfully logged into user "johndoe".
 [I] Cookie file expiry date: 2018-09-01 at 04:38:08 PM
