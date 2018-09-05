@@ -21,7 +21,12 @@ This means you are making too many requests to Instagram and is usually the case
 
 ### How do I download livestreams of multiple users at the same time?
 
-#### Note: Continuously checking for livestreams with a batch file is considered suspicious behaviour by Instagram. Use a timeout as large as possible to decrease the chances of your account, device or IP from getting flagged as suspicious and getting blocked as a result of that. Use the scripts below at your own risk.
+#### Option 1 - Checking your following users
+
+You can use the `--downloadfollowing` function to check for available livestreams and replays from your following user list. Read the [Help Documents](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md) for more information.
+
+#### Option 2 - Using external scripts
+##### Note: Continuously checking for livestreams with an external script is considered suspicious behaviour by Instagram. Use a timeout as large as possible to decrease the chances of your account, device or IP from getting flagged as suspicious and getting blocked as a result of that. Use the scripts below at your own risk.
 
 ###### Windows
 
@@ -29,7 +34,7 @@ This means you are making too many requests to Instagram and is usually the case
 ```batch
 cd C:\PyInstaLive
 :loop
-pyinstalive -u "username" -p "password" -r "live-username"
+pyinstalive -u "username" -p "password" -d "live-username"
 timeout 10 > nul
 goto loop
 ```
@@ -43,7 +48,7 @@ Make sure there is a configuration file called pyinstalive.ini in the directory 
 while true
 do
     cd /home/default/PyInstaLive/
-    pyinstalive -u "username" -p "password" -r "live-username"
+    pyinstalive -u "username" -p "password" -d "live-username"
     sleep 10
 done
 ```
