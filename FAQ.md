@@ -4,8 +4,7 @@
 ### I'm unable to log in, what do I do?
 Login errors such as `Challenge required` are usually caused by one of the following:
 
-- You have entered invalid account credentials.
-- You are using PyInstaLive from a different location/IP address compared to where you are usually logged in. (This includes things like your phone's 4G network vs your home's internet connection)
+- You are using PyInstaLive from a different location, device or IP address compared to where you are usually logged in. (This means  things like your phone's 4G network vs your home's internet connection)
 - Your IP address or account has been flagged as spam or suspicious.
 
 The reasons above are things I have no control over, so there's no direct way for me to solve your problem. You can try checking out the URL which you can find in the response text you'll be able to see when such errors occur:
@@ -13,7 +12,7 @@ The reasons above are things I have no control over, so there's no direct way fo
 (Code: 400, Response: {"message": "challenge_required", "challenge": {"url": "https://i.instagram.com/challenge/XXXXX/XXXX/", "api_path": "/challenge/XXXXX/XXXXXX/", "lock": true, "logout": false, "native_flow": true}, "status": "fail", "error_type": "checkpoint_challenge_required"})
 ```
 
-If that doesn't help you out either I recommend creating a new temporary Instagram account (on the device and internet connection you will be using PyInstaLive with) and use that instead.
+If that doesn't help you out either, create a new temporary Instagram account (on the device and internet connection you will be using PyInstaLive with) and use that instead.
 
 ### I get a Rate Limit related error, how do I solve this?
 This means you are making too many requests to Instagram and is usually the case when you try to check and download livestreams of multiple users at the same time by using a script (as seen below). Increase the timeout for the scripts or decrease the amount of users you are checking.
