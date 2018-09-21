@@ -164,7 +164,8 @@ def download_livestream(broadcast):
 			duplicate_etag_retry=30,
 			callback_check=print_status,
 			mpd_download_timeout=3,
-			download_timeout=3)
+			download_timeout=3,
+			ffmpeg_binary=settings.ffmpeg_path)
 	except Exception as e:
 		log_error('Could not start downloading livestream: {:s}'.format(str(e)))
 		log_seperator()
@@ -476,7 +477,8 @@ def download_replays(broadcasts):
 				broadcast_downloader = replay.Downloader(
 					mpd=broadcast.get('dash_manifest'),
 					output_dir=output_dir,
-					user_agent=instagram_api.user_agent)
+					user_agent=instagram_api.user_agent,
+					ffmpeg_binary=settings.ffmpeg_path)
 				open(os.path.join(output_dir, 'folder.lock'), 'a').close()
 				replay_mp4_file = '{}{}_{}_{}_{}_replay.mp4'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
 				replay_json_file = os.path.join(output_dir, '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_download, broadcast.get('id'), settings.current_time))

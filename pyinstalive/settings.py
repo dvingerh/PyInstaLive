@@ -5,6 +5,7 @@ class settings:
 	username = ""
 	password = ""
 	save_path = "/"
+	ffmpeg_path = None
 	show_cookie_expiry = "true"
 	clear_temp_files = "false"
 	current_time = str(int(time.time()))

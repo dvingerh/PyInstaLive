@@ -29,6 +29,7 @@
 username = johndoe
 password = grapefruits
 save_path = 
+ffmpeg_path = 
 show_cookie_expiry = true
 clear_temp_files = false
 save_lives = true
@@ -44,6 +45,9 @@ log_to_file = false
 ```password```  **—**  Instagram password to login with.
 
 ```save_path```  **—**  Path to the folder where downloaded Instagram livestreams and replays will be saved. PyInstaLive must have permission to write files to this folder. If left empty, PyInstaLive will attempt to fall back to the folder where it's being run from.
+
+```ffmpeg_path```  **—**  User-defined path to the FFmpeg binary. If left empty, PyInstaLive will fall back to the system's environment variable.
+
 
 ```show_cookie_expiry```  **—**  When set to True, PyInstaLive will show when the current cookie used to login will expire.
 

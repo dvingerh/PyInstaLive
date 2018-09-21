@@ -20,7 +20,10 @@ bool_values = {'True', 'False'}
 def check_ffmpeg():
 	try:
 		FNULL = open(os.devnull, 'w')
-		subprocess.call(["ffmpeg"], stdout=FNULL, stderr=subprocess.STDOUT)
+		if settings.ffmpeg_path == None:
+			subprocess.call(["ffmpeg"], stdout=FNULL, stderr=subprocess.STDOUT)
+		else:
+			subprocess.call([settings.ffmpeg_path], stdout=FNULL, stderr=subprocess.STDOUT)
 		return True
 	except OSError as e:
 		return False
@@ -159,6 +162,22 @@ def check_config_validity(config):
 			has_thrown_errors = True
 
 
+		try:
+			settings.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
+
+			if (os.path.exists(settings.ffmpeg_path)):
+				log_info_blue("Overriding FFmpeg path: {:s}".format(settings.ffmpeg_path))
+				log_seperator()
+			else:
+				log_warn("Invalid or missing setting detected for 'ffmpeg_path', falling back to environment variable.")
+				settings.ffmpeg_path = None
+				has_thrown_errors = True
+		except:
+			log_warn("Invalid or missing setting detected for 'ffmpeg_path', falling back to environment variable.")
+			settings.ffmpeg_path = None
+			has_thrown_errors = True
+
+
 		if has_thrown_errors:
 			log_seperator()
 
@@ -256,6 +275,7 @@ def new_config():
 username = johndoe
 password = grapefruits
 save_path = {:s}
+ffmpeg_path = 
 show_cookie_expiry = true
 clear_temp_files = false
 save_lives = true

@@ -92,6 +92,7 @@ Here is an example of a valid configuration file:
 username = johndoe
 password = grapefruits
 save_path = 
+ffmpeg_path = 
 show_cookie_expiry = true
 clear_temp_files = false
 save_lives = true

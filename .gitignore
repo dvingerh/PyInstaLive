@@ -51,3 +51,5 @@ pyinstalive_win\.py
 
 
 win_building/
+
+*.exe
