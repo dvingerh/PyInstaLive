@@ -16,3 +16,4 @@ class settings:
 	run_at_finish = "None"
 	save_comments = "true"
 	log_to_file = "false"
+	custom_ini_path = 'pyinstalive.ini'

@@ -189,9 +189,9 @@ def check_config_validity(config):
 
 
 def show_info(config):
-	if os.path.exists('pyinstalive.ini'):
+	if os.path.exists(settings.custom_ini_path):
 		try:
-			config.read('pyinstalive.ini')
+			config.read(settings.custom_ini_path)
 		except Exception as e:
 			log_error("Could not read configuration file: {:s}".format(str(e)))
 			log_seperator()
@@ -242,10 +242,10 @@ def show_info(config):
 	log_whiteline()
 
 
-	if os.path.exists('pyinstalive.ini'):
+	if os.path.exists(settings.custom_ini_path):
 		log_info_green("Config file:")
 		log_whiteline()
-		with open('pyinstalive.ini') as f:
+		with open(settings.custom_ini_path) as f:
 			for line in f:
 				log_plain("    {:s}".format(line.rstrip()))
 	else:
@@ -258,10 +258,10 @@ def show_info(config):
 
 def new_config():
 	try:
-		if os.path.exists('pyinstalive.ini'):
+		if os.path.exists(settings.custom_ini_path):
 			log_info_green("A configuration file is already present:")
 			log_whiteline()
-			with open('pyinstalive.ini') as f:
+			with open(settings.custom_ini_path) as f:
 				for line in f:
 					log_plain("    {:s}".format(line.rstrip()))
 			log_whiteline()
@@ -285,7 +285,7 @@ run_at_finish =
 save_comments = false
 log_to_file = false
 				""".format(os.getcwd())
-				config_file = open("pyinstalive.ini", "w")
+				config_file = open(settings.custom_ini_path, "w")
 				config_file.write(config_template.strip())
 				config_file.close()
 				log_warn("Edit the created 'pyinstalive.ini' file and run this script again.")
@@ -372,7 +372,7 @@ def run():
 	parser.add_argument('-nl', '--nolives', dest='nolives', action='store_true', help="When used, do not check for any available livestreams.")
 	parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="PyInstaLive will clean the current download folder of all leftover files.")
 	parser.add_argument('-df', '--downloadfollowing', dest='downloadfollowing', action='store_true', help="PyInstaLive will check for available livestreams and replays from users the account used to login follows.")
-
+	parser.add_argument('-ip', '--inipath', dest='inipath', type=str, required=False, help="Path to a PyInstaLive configuration file.")
 
 	# Workaround to 'disable' argument abbreviations
 	parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
@@ -383,18 +383,22 @@ def run():
 	parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE') 
 	parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('--downloadfollowinx', help=argparse.SUPPRESS, metavar='IGNORE')
+	parser.add_argument('--inipatx', help=argparse.SUPPRESS, metavar='IGNORE')
+
 
 	parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
 	parser.add_argument('-dx', help=argparse.SUPPRESS, metavar='IGNORE')
-
+	parser.add_argument('-ix', help=argparse.SUPPRESS, metavar='IGNORE')
 
 
 	args, unknown_args = parser.parse_known_args()
 
+	if args.inipath and os.path.exists(args.inipath):
+			settings.custom_ini_path = args.inipath
 
 	try:
-		config.read('pyinstalive.ini')
+		config.read(settings.custom_ini_path)
 		settings.log_to_file = config.get('pyinstalive', 'log_to_file').title()
 		if not settings.log_to_file in bool_values:
 			settings.log_to_file = 'False'
@@ -414,6 +418,13 @@ def run():
 	log_seperator()
 	log_info_blue('PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')))
 	log_seperator()
+
+	if args.inipath and settings.custom_ini_path != 'pyinstalive.ini':
+		log_info_blue("Overriding config path: {:s}".format(args.inipath))
+		log_seperator()
+	elif args.inipath and settings.custom_ini_path == 'pyinstalive.ini':
+		log_warn("Custom config path does not exist, falling back to default folder: {:s}".format(os.getcwd()))
+		log_seperator()
 
 	if unknown_args:
 		log_error("The following invalid argument(s) were provided: ") 
@@ -444,10 +455,9 @@ def run():
 		new_config()
 		sys.exit(0)
 
-
-	if os.path.exists('pyinstalive.ini'):
+	if os.path.exists(settings.custom_ini_path):
 		try:
-			config.read('pyinstalive.ini')
+			config.read(settings.custom_ini_path)
 		except Exception:
 			log_error("Could not read configuration file.")
 			log_seperator()
@@ -519,9 +529,6 @@ def run():
 						start_multiple(api, settings, "python3 -m pyinstalive")
 					else:
 						start_multiple(api, settings, "python -m pyinstalive")
-		except Exception as e:
-			log_error("Could not finish pre-download checks:  {:s}".format(str(e)))
-			log_seperator()
 		except KeyboardInterrupt as ee:
 			log_warn("Pre-download checks have been aborted, exiting...")
 			log_seperator()
