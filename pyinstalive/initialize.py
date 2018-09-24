@@ -150,7 +150,7 @@ def check_config_validity(config, args=None):
 					settings.save_path = args.savepath
 					log_info_blue("Overriding save path: {:s}".format(args.savepath))
 					log_seperator()
-				elif args.savepath != config.get('pyinstalive', 'save_path'):
+				elif (args.savepath) and (args.savepath != config.get('pyinstalive', 'save_path')):
 					log_warn("Custom save path does not exist, falling back to path specified in config.")
 					settings.save_path = config.get('pyinstalive', 'save_path')
 					log_seperator()
