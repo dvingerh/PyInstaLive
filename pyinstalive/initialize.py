@@ -164,14 +164,14 @@ def check_config_validity(config):
 
 		try:
 			settings.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
-
-			if (os.path.exists(settings.ffmpeg_path)):
+			if (len(settings.ffmpeg_path) > 1) and (os.path.exists(settings.ffmpeg_path)):
 				log_info_blue("Overriding FFmpeg path: {:s}".format(settings.ffmpeg_path))
 				log_seperator()
 			else:
-				log_warn("Invalid or missing setting detected for 'ffmpeg_path', falling back to environment variable.")
+				if (len(settings.ffmpeg_path) > 1):
+					log_warn("Invalid setting detected for 'ffmpeg_path', falling back to environment variable.")
+					has_thrown_errors = True
 				settings.ffmpeg_path = None
-				has_thrown_errors = True
 		except:
 			log_warn("Invalid or missing setting detected for 'ffmpeg_path', falling back to environment variable.")
 			settings.ffmpeg_path = None
