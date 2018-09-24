@@ -324,10 +324,11 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 
 def get_user_info(user_to_download):
 	is_user_id = False
-	if ((type(eval(user_to_download)) == int)):
+	try:
+		user_id = int(user_to_download)
 		is_user_id = True
+	except ValueError:
 		user_id = user_to_download
-	else:
 		try:
 			user_res = instagram_api.username_info(user_to_download)
 			user_id = user_res.get('user', {}).get('pk')
@@ -379,7 +380,7 @@ def get_user_info(user_to_download):
 				pass
 			sys.exit(0)
 	if is_user_id:
-		log_info_green('Getting info for "{:s}" successful. (assumed user Id as input)'.format(user_to_download))
+		log_info_green('Getting info for "{:s}" successful. (assumed input is Id)'.format(user_to_download))
 	else:
 		log_info_green('Getting info for "{:s}" successful.'.format(user_to_download))
 	get_broadcasts_info(user_id)
