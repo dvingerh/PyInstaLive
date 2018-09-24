@@ -169,10 +169,14 @@ def check_config_validity(config, args=None):
 				log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 				settings.save_path = os.getcwd()
 				has_thrown_errors = True
+				if not settings.save_path.endswith('/'):
+					settings.save_path = settings.save_path + '/'
 		except Exception as e:
 			log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 			settings.save_path = os.getcwd()
 			has_thrown_errors = True
+			if not settings.save_path.endswith('/'):
+				settings.save_path = settings.save_path + '/'
 
 
 		try:
