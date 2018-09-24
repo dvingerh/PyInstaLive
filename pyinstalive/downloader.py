@@ -40,7 +40,7 @@ def start_single(instagram_api_arg, download_arg, settings_arg):
 		log_warn("Lock file could not be created. Downloads started from -df might cause problems!")
 	get_user_info(user_to_download)
 
-def start_multiple(instagram_api_arg, settings_arg, proc_arg):
+def start_multiple(instagram_api_arg, settings_arg, proc_arg, initialargs_arg):
 	try:
 		log_info_green("Checking following users for any livestreams or replays...")
 		broadcast_f_list = instagram_api_arg.reels_tray()
@@ -69,10 +69,14 @@ def start_multiple(instagram_api_arg, settings_arg, proc_arg):
 						log_warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
 					else:
 						log_info_green("Launching daemon process for '{:s}'...".format(user))
-						if settings_arg.custom_config_path == 'pyinstalive.ini':
+						if not initialargs_arg.savepath and not initialargs_arg.configpath:
 							start_result = run_command("{:s} -d {:s}".format(proc_arg, user))
-						else:
+						elif initialargs_arg.savepath and initialargs_arg.configpath:
 							start_result = run_command("{:s} -d {:s} -cp '{:s}' -sp '{:s}'".format(proc_arg, user, settings_arg.custom_config_path, settings_arg.save_path))
+						elif initialargs_arg.savepath:
+							start_result = run_command("{:s} -d {:s} -sp '{:s}'".format(proc_arg, user, settings_arg.save_path))
+						elif initialargs_arg.configpath:
+							start_result = run_command("{:s} -d {:s} -cp '{:s}'".format(proc_arg, user, settings_arg.custom_config_path))
 						if start_result:
 							log_info_green("Could not start processs: {:s}".format(str(start_result)))
 						else:

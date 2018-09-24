@@ -169,7 +169,7 @@ def check_config_validity(config, args=None):
 				log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 				settings.save_path = os.getcwd()
 				has_thrown_errors = True
-		except:
+		except Exception as e:
 			log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 			settings.save_path = os.getcwd()
 			has_thrown_errors = True
@@ -538,15 +538,15 @@ def run():
 				start_single(api, args.download, settings)
 			if not args.download and args.downloadfollowing:
 				if check_pyinstalive():
-					start_multiple(api, settings, "pyinstalive")
+					start_multiple(api, settings, "pyinstalive", args)
 				else:
 					log_warn("You probably ran PyInstaLive as a script module with the -m argument.")
 					log_warn("PyInstaLive should be properly installed when using the -df argument.")
 					log_seperator()
 					if python_version[0] == "3":
-						start_multiple(api, settings, "python3 -m pyinstalive")
+						start_multiple(api, settings, "python3 -m pyinstalive", args)
 					else:
-						start_multiple(api, settings, "python -m pyinstalive")
+						start_multiple(api, settings, "python -m pyinstalive", args)
 		except KeyboardInterrupt as ee:
 			log_warn("Pre-download checks have been aborted, exiting...")
 			log_seperator()
