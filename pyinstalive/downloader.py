@@ -323,57 +323,65 @@ def stitch_video(broadcast_downloader, broadcast, comment_thread_worker):
 
 
 def get_user_info(user_to_download):
-	try:
-		user_res = instagram_api.username_info(user_to_download)
-		user_id = user_res.get('user', {}).get('pk')
-	except ClientConnectionError as cce:
-		log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, cce.code, str(cce)))
-		if "getaddrinfo failed" in str(cce):
-			log_error('Could not resolve host, check your internet connection.')
-		if "timed out" in str(cce):
-			log_error('The connection timed out, check your internet connection.')
-		log_seperator()
+	is_user_id = False
+	if ((type(eval(user_to_download)) == int)):
+		is_user_id = True
+		user_id = user_to_download
+	else:
 		try:
-			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
-		except Exception:
-			pass
-		sys.exit(1)
-	except ClientThrottledError as cte:
-		log_error('Could not get user info for "{:s}": {:d} {:s}.'.format(user_to_download, cte.code, str(cte)))
-		log_error('You are making too many requests at this time.')
-		log_seperator()
-		try:
-			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
-		except Exception:
-			pass
-		sys.exit(1)
-	except ClientError as ce:
-		log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, ce.code, str(ce)))
-		if ("Not Found") in str(ce):
-			log_error('The specified user does not exist.')
-		log_seperator()
-		try:
-			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
-		except Exception:
-			pass
-		sys.exit(1)
-	except Exception as e:
-		log_error('Could not get user info for "{:s}": {:s}'.format(user_to_download, str(e)))
-		log_seperator()
-		try:
-			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
-		except Exception:
-			pass
-		sys.exit(1)
-	except KeyboardInterrupt:
-		log_info_blue('Aborted getting user info for "{:s}", exiting...'.format(user_to_download))
-		log_seperator()
-		try:
-			os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
-		except Exception:
-			pass
-		sys.exit(0)
-	log_info_green('Getting info for "{:s}" successful.'.format(user_to_download))
+			user_res = instagram_api.username_info(user_to_download)
+			user_id = user_res.get('user', {}).get('pk')
+		except ClientConnectionError as cce:
+			log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, cce.code, str(cce)))
+			if "getaddrinfo failed" in str(cce):
+				log_error('Could not resolve host, check your internet connection.')
+			if "timed out" in str(cce):
+				log_error('The connection timed out, check your internet connection.')
+			log_seperator()
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
+			sys.exit(1)
+		except ClientThrottledError as cte:
+			log_error('Could not get user info for "{:s}": {:d} {:s}.'.format(user_to_download, cte.code, str(cte)))
+			log_error('You are making too many requests at this time.')
+			log_seperator()
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
+			sys.exit(1)
+		except ClientError as ce:
+			log_error('Could not get user info for "{:s}": {:d} {:s}'.format(user_to_download, ce.code, str(ce)))
+			if ("Not Found") in str(ce):
+				log_error('The specified user does not exist.')
+			log_seperator()
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
+			sys.exit(1)
+		except Exception as e:
+			log_error('Could not get user info for "{:s}": {:s}'.format(user_to_download, str(e)))
+			log_seperator()
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
+			sys.exit(1)
+		except KeyboardInterrupt:
+			log_info_blue('Aborted getting user info for "{:s}", exiting...'.format(user_to_download))
+			log_seperator()
+			try:
+				os.remove(os.path.join(settings.save_path, user_to_download + '.lock'))
+			except Exception:
+				pass
+			sys.exit(0)
+	if is_user_id:
+		log_info_green('Getting info for "{:s}" successful. (assumed user Id as input)'.format(user_to_download))
+	else:
+		log_info_green('Getting info for "{:s}" successful.'.format(user_to_download))
 	get_broadcasts_info(user_id)
 
 
