@@ -145,12 +145,14 @@ def check_config_validity(config, args=None):
 			has_thrown_errors = True
 
 		try:
-			if args:
-				if (args.savepath) and (os.path.exists(args.savepath)) and (args.savepath != config.get('pyinstalive', 'save_path')):
+			if args and args.savepath:
+				args.savepath = args.savepath.replace("\"", "")
+				print(args.savepath)
+				if (os.path.exists(args.savepath)) and (args.savepath != config.get('pyinstalive', 'save_path')):
 					settings.save_path = args.savepath
 					log_info_blue("Overriding save path: {:s}".format(args.savepath))
 					log_seperator()
-				elif (args.savepath) and (args.savepath != config.get('pyinstalive', 'save_path')):
+				elif (args.savepath != config.get('pyinstalive', 'save_path')):
 					log_warn("Custom save path does not exist, falling back to path specified in config.")
 					settings.save_path = config.get('pyinstalive', 'save_path')
 					log_seperator()
@@ -159,15 +161,15 @@ def check_config_validity(config, args=None):
 			else:
 				settings.save_path = config.get('pyinstalive', 'save_path')
 
+			if not settings.save_path.endswith('/'):
+				settings.save_path = settings.save_path + '/'
+
 			if (os.path.exists(settings.save_path)):
 				pass
 			else:
 				log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 				settings.save_path = os.getcwd()
 				has_thrown_errors = True
-
-			if not settings.save_path.endswith('/'):
-				settings.save_path = settings.save_path + '/'
 		except:
 			log_warn("Invalid or missing setting detected for 'save_path', falling back to path: {:s}".format(os.getcwd()))
 			settings.save_path = os.getcwd()
