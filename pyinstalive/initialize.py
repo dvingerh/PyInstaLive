@@ -146,8 +146,7 @@ def check_config_validity(config, args=None):
 
 		try:
 			if args and args.savepath:
-				args.savepath = args.savepath.replace("\"", "")
-				print(args.savepath)
+				args.savepath = args.savepath.replace("\"", "").replace("'", "")
 				if (os.path.exists(args.savepath)) and (args.savepath != config.get('pyinstalive', 'save_path')):
 					settings.save_path = args.savepath
 					log_info_blue("Overriding save path: {:s}".format(args.savepath))
@@ -408,7 +407,10 @@ def run():
 
 	args, unknown_args = parser.parse_known_args()
 
-	if args.configpath and os.path.exists(args.configpath):
+
+	if args.configpath:
+		args.configpath = args.configpath.replace("\"", "").replace("'", "")
+		if os.path.exists(args.configpath):
 			settings.custom_config_path = args.configpath
 
 	try:
