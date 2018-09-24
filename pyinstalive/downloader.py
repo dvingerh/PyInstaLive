@@ -72,7 +72,7 @@ def start_multiple(instagram_api_arg, settings_arg, proc_arg):
 						if settings_arg.custom_ini_path == 'pyinstalive.ini':
 							start_result = run_command("{:s} -d {:s}".format(proc_arg, user))
 						else:
-							start_result = run_command("{:s} -d {:s} -ip '{:s}'".format(proc_arg, user, settings_arg.custom_ini_path))
+							start_result = run_command("{:s} -d {:s} -ip '{:s}' -sp '{:s}'".format(proc_arg, user, settings_arg.custom_ini_path, settings_arg.save_path))
 						if start_result:
 							log_info_green("Could not start processs: {:s}".format(str(start_result)))
 						else:

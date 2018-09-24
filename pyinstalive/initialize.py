@@ -37,7 +37,7 @@ def check_pyinstalive():
 		return False
 
 
-def check_config_validity(config):
+def check_config_validity(config, args=None):
 	try:
 		has_thrown_errors = False
 		settings.username = config.get('pyinstalive', 'username')
@@ -145,7 +145,19 @@ def check_config_validity(config):
 			has_thrown_errors = True
 
 		try:
-			settings.save_path = config.get('pyinstalive', 'save_path')
+			if args:
+				if (args.savepath) and (os.path.exists(args.savepath)) and (args.savepath != config.get('pyinstalive', 'save_path')):
+					settings.save_path = args.savepath
+					log_info_blue("Overriding save path: {:s}".format(args.savepath))
+					log_seperator()
+				elif args.savepath != config.get('pyinstalive', 'save_path'):
+					log_warn("Custom save path does not exist, falling back to path specified in config.")
+					settings.save_path = config.get('pyinstalive', 'save_path')
+					log_seperator()
+				else:
+					settings.save_path = config.get('pyinstalive', 'save_path')
+			else:
+				settings.save_path = config.get('pyinstalive', 'save_path')
 
 			if (os.path.exists(settings.save_path)):
 				pass
@@ -373,6 +385,7 @@ def run():
 	parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="PyInstaLive will clean the current download folder of all leftover files.")
 	parser.add_argument('-df', '--downloadfollowing', dest='downloadfollowing', action='store_true', help="PyInstaLive will check for available livestreams and replays from users the account used to login follows.")
 	parser.add_argument('-ip', '--inipath', dest='inipath', type=str, required=False, help="Path to a PyInstaLive configuration file.")
+	parser.add_argument('-sp', '--savepath', dest='savepath', type=str, required=False, help="Path to folder where PyInstaLive should save livestreams and replays.")
 
 	# Workaround to 'disable' argument abbreviations
 	parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
@@ -423,7 +436,7 @@ def run():
 		log_info_blue("Overriding config path: {:s}".format(args.inipath))
 		log_seperator()
 	elif args.inipath and settings.custom_ini_path == 'pyinstalive.ini':
-		log_warn("Custom config path does not exist, falling back to default folder: {:s}".format(os.getcwd()))
+		log_warn("Custom config path does not exist, falling back to path: {:s}".format(os.getcwd()))
 		log_seperator()
 
 	if unknown_args:
@@ -447,7 +460,9 @@ def run():
 	args.config and not
 	args.noreplays and not
 	args.nolives and not
-	args.clean):
+	args.clean and not
+	args.inipath and not
+	args.savepath):
 		show_info(config)
 		sys.exit(0)
 	
@@ -466,7 +481,7 @@ def run():
 		sys.exit(1)
 
 
-	if check_config_validity(config):
+	if check_config_validity(config, args):
 		try:
 			if (args.clean):
 				clean_download_dir()

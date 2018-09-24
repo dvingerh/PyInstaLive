@@ -1,10 +1,11 @@
 import time
+import os
 
 class settings:
 	user_to_download = ""
 	username = ""
 	password = ""
-	save_path = "/"
+	save_path = os.getcwd()
 	ffmpeg_path = None
 	show_cookie_expiry = "true"
 	clear_temp_files = "false"
