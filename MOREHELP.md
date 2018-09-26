@@ -7,7 +7,7 @@
 
 - ```-p``` or ```--password```  **—**  Instagram password to login with. Requires:  ```--username```, ```--download```.
 
-- ```-d``` or ```--download```  **—**  The username of the user whose livestream or replay you want to save.
+- ```-d``` or ```--download```  **—**  The username or user Id of the user whose livestream or replay you want to save.
 
 - ```-r``` or ```--record```  **—**  The username of the user whose livestream or replay you want to save (legacy).
 
@@ -20,6 +20,11 @@
 - ```-cl``` or ```--clean```  **—**  When this argument is passed, PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
 
 - ```-df``` or ```--downloadfollowing```  **—**  When this argument is passed, PyInstaLive will check if any users from your following list have any available livestreams or replays and start a daemon process running PyInstaLive in the background for those that do. You cannot cancel the launched processes or start them with any extra arguments. It's recommended to enable ```log_to_file``` when using this argument. (Experimental, use at own risk.)
+
+- ```-cp``` or ```--configpath```  **—**  Passing this argument along with a valid path to a different configuration file will override the default path.
+
+- ```-sp``` or ```--saavepath```  **—**  Passing this argument along with a valid path to a different folder will override the path specified in the configuration file.
+
 
 
 # Default configuration file
