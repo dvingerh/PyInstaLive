@@ -312,6 +312,7 @@ run_at_start =
 run_at_finish = 
 save_comments = false
 log_to_file = false
+use_locks = true
 				""".format(os.getcwd())
 				config_file = open(settings.custom_config_path, "w")
 				config_file.write(config_template.strip())
