@@ -101,6 +101,7 @@ run_at_start =
 run_at_finish =
 save_comments = false
 log_to_file = false
+use_locks = true
 ```
 
 #### Example
