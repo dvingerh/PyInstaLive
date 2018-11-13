@@ -18,3 +18,4 @@ class settings:
 	save_comments = "true"
 	log_to_file = "false"
 	custom_config_path = 'pyinstalive.ini'
+	use_locks = "false"

@@ -44,6 +44,17 @@ def check_config_validity(config, args=None):
 		settings.password = config.get('pyinstalive', 'password')
 
 		try:
+			settings.use_locks = config.get('pyinstalive', 'use_locks').title()
+			if not settings.use_locks in bool_values:
+				log_warn("Invalid or missing setting detected for 'use_locks', using default value (True)")
+				settings.use_locks = 'true'
+				has_thrown_errors = True
+		except:
+			log_warn("Invalid or missing setting detected for 'use_locks', using default value (True)")
+			settings.use_locks = 'true'
+			has_thrown_errors = True
+
+		try:
 			settings.show_cookie_expiry = config.get('pyinstalive', 'show_cookie_expiry').title()
 			if not settings.show_cookie_expiry in bool_values:
 				log_warn("Invalid or missing setting detected for 'show_cookie_expiry', using default value (True)")
@@ -541,6 +552,9 @@ def run():
 			if args.download and not args.downloadfollowing:
 				start_single(api, args.download, settings)
 			if not args.download and args.downloadfollowing:
+				if settings.use_locks.title() == "False":
+					log_warn("The use of lock files is disabled, this might cause trouble!")
+					log_seperator()
 				if check_pyinstalive():
 					start_multiple(api, settings, "pyinstalive", args)
 				else:

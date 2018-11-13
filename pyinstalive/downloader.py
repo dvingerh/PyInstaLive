@@ -30,7 +30,8 @@ def start_single(instagram_api_arg, download_arg, settings_arg):
 	user_to_download = download_arg
 	try:
 		if not os.path.isfile(os.path.join(settings.save_path, user_to_download + '.lock')):
-			open(os.path.join(settings.save_path, user_to_download + '.lock'), 'a').close()
+			if settings.use_locks.title() == "True":
+				open(os.path.join(settings.save_path, user_to_download + '.lock'), 'a').close()
 		else:
 			log_warn("Lock file is already present for this user, there is probably another download ongoing!")
 			log_warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user_to_download + '.lock'))
@@ -198,7 +199,8 @@ def download_livestream(broadcast):
 		print_status(False)
 		log_info_green('MPD URL     : {:s}'.format(mpd_url))
 		log_seperator()
-		open(os.path.join(output_dir, 'folder.lock'), 'a').close()
+		if settings.use_locks.title() == "True":
+			open(os.path.join(output_dir, 'folder.lock'), 'a').close()
 		log_info_green('Downloading livestream... press [CTRL+C] to abort.')
 
 		if (settings.run_at_start is not "None"):
@@ -495,7 +497,8 @@ def download_replays(broadcasts):
 					output_dir=output_dir,
 					user_agent=instagram_api.user_agent,
 					ffmpeg_binary=settings.ffmpeg_path)
-				open(os.path.join(output_dir, 'folder.lock'), 'a').close()
+				if settings.use_locks.title() == "True":
+					open(os.path.join(output_dir, 'folder.lock'), 'a').close()
 				replay_mp4_file = '{}{}_{}_{}_{}_replay.mp4'.format(settings.save_path, settings.current_date, user_to_download, broadcast.get('id'), settings.current_time)
 				replay_json_file = os.path.join(output_dir, '{}_{}_{}_{}_replay_comments.json'.format(settings.current_date, user_to_download, broadcast.get('id'), settings.current_time))
 

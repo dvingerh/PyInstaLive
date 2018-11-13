@@ -53,3 +53,7 @@ pyinstalive_win\.py
 win_building/
 
 *.exe
+
+pildev\.ini
+
+pildev/
