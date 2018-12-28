@@ -71,4 +71,4 @@ use_locks = true
 
 ```log_to_file```  **—**  When set to true, PyInstaLive will save all its console logs to a text file. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the file will be named `pyinstalive.default.log`.
 
-```save_comments```  **—**  When set to true, PyInstaLive will create several .lock files to prevent duplicate downloads from starting for the same user if you are running PyInstaLive using some form of automation such as batch/shell loops.
+```use_locks```  **—**  When set to true, PyInstaLive will create several .lock files to prevent duplicate downloads from starting for the same user if you are running PyInstaLive using some form of automation such as batch/shell loops.
