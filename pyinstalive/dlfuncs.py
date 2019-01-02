@@ -310,7 +310,7 @@ def download_replays():
                 replay_mp4_file = '{}{}_{}_{}_replay.mp4'.format(pil.dl_path, pil.datetime_compat,
                                                                  pil.dl_user, pil.livestream_obj.get('id'))
 
-                comments_json_file = '{}{}_{}_{}_live_comments.json'.format(pil.dl_path, pil.datetime_compat,
+                comments_json_file = '{}{}_{}_{}_replay_comments.json'.format(pil.dl_path, pil.datetime_compat,
                                                                             pil.dl_user, pil.livestream_obj.get('id'))
 
                 pil.comment_thread_worker = threading.Thread(target=get_replay_comments, args=(comments_json_file,))
@@ -335,11 +335,9 @@ def download_replays():
 
         logger.separator()
         logger.info("Finished downloading all available replays.")
-        logger.separator()
         helpers.remove_lock()
     except Exception as e:
         logger.error('Could not save replay: {:s}'.format(str(e)))
-        logger.separator()
         helpers.remove_lock()
     except KeyboardInterrupt:
         logger.separator()

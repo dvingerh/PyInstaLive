@@ -28,9 +28,17 @@ def validate_inputs(config, args, unknown_args):
     try:
         config.read(pil.config_path)
 
+        if args.download:
+            pil.dl_user = args.download
+        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing:
+            logger.banner()
+            logger.error("Missing --download argument. This argument is required.")
+            logger.separator()
+            return False
+
         if helpers.bool_str_parse(config.get('pyinstalive', 'log_to_file')) == "Invalid":
-            pil.log_to_file = False
-            error_arr.append(['log_to_file', 'False'])
+            pil.log_to_file = True
+            error_arr.append(['log_to_file', 'True'])
         elif helpers.bool_str_parse(config.get('pyinstalive', 'log_to_file')):
             pil.log_to_file = True
         else:
@@ -146,13 +154,6 @@ def validate_inputs(config, args, unknown_args):
             for error in error_arr:
                 logger.warn("Invalid value for '{:s}'. Using default value: {:s}".format(error[0], error[1]))
                 logger.separator()
-
-        if args.download:
-            pil.dl_user = args.download
-        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing:
-            logger.error("Missing --download argument. This argument is required.")
-            logger.separator()
-            return False
 
         if args.info:
             helpers.show_info()
