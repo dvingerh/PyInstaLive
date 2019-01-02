@@ -57,3 +57,7 @@ win_building/
 pildev\.ini
 
 pildev/
+
+\.idea/
+
+*.txt

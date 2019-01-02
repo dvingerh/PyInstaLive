@@ -1,4 +1,7 @@
-from .initialize import run
+try:  # Python 2
+    from startup import run
+except ImportError:  # Python 3
+    from .startup import run
 
 
 def main():
