@@ -1,7 +1,11 @@
 # PyInstaLive
-![Version ](https://img.shields.io/badge/Version-3.0.0-orange.svg?longCache=true&style=flat)
+![Version 3.0.0](https://img.shields.io/badge/Version-3.0.0-orange.svg)
+![Python 2.7, 3.5](https://img.shields.io/badge/Python-2.7%2C%203.5%2B-3776ab.svg)
 
 This Python script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
+
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+
 
 ## Table of Contents
 - [Features](https://github.com/notcammy/PyInstaLive#features)
@@ -11,11 +15,15 @@ This Python script enables you to download any ongoing Instagram livestreams as 
 - [Notes](https://github.com/notcammy/PyInstaLive#notes)
 - [Help](https://github.com/notcammy/PyInstaLive#help)
 
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+
 ## Main Features
 
-- Download ongoing livestreams (also detects livestreams in which the user is a guest of someone else's livestream)
-- Download available replays
-- Download livestream and replay comments
+PyInstaLive is capable of downloading:
+- Ongoing livestreams (also detects livestreams where the specified user is being guested).
+- Saved replays.
+- Livestream and replay comments.
+- Available livestreams and replays from your following user feed, concurrently.
 
 ![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
@@ -31,11 +39,6 @@ This Python script enables you to download any ongoing Instagram livestreams as 
 
 ## Prerequisites
 
-#### Windows (using the executable)
-- [ffmpeg](https://ffmpeg.org/download.html)
-- [Universal C Runtime Update](https://support.microsoft.com/en-gb/help/2999226/update-for-universal-c-runtime-in-windows) (If not using Windows 10)
-
-#### Linux & Windows (not using the executable)
 - [ffmpeg](https://ffmpeg.org/download.html)
 - [Git](https://git-scm.com/downloads)
 - [Python 2.7.x or 3.5>=](https://www.python.org/downloads/)
@@ -157,7 +160,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 
 - Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` argument. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
 
-- If the script is ran and there are available replays as well as an ongoing Instagram livestream, only the livestream will be downloaded. Run the script again after the livestream has ended to download the available replays. Alternatively you can set `save_lives` to `False` in the configuration file or pass the `--nolives` argument to skip downloading of livestreams.
+![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 
 ## Help
