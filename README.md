@@ -93,17 +93,17 @@ Here is an example of a valid configuration file:
 [pyinstalive]
 username = johndoe
 password = grapefruits
-save_path = 
+download_path = 
+download_lives = True
+download_replays = True
+download_comments = true
+show_cookie_expiry = True
+log_to_file = True
 ffmpeg_path = 
-show_cookie_expiry = true
-clear_temp_files = false
-save_lives = true
-save_replays = true
 run_at_start =
 run_at_finish =
-save_comments = false
-log_to_file = false
-use_locks = true
+use_locks = True
+clear_temp_files = False
 ```
 
 #### Example
