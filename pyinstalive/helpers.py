@@ -33,8 +33,8 @@ def strepochtime():
     return str(int(time.time()))
 
 
-def strdatetime_compat(epochtime):
-    return time.strftime('%m%d%Y_{:s}'.format(epochtime))
+def strdatetime_compat():
+    return time.strftime('%Y%m%d')
 
 
 def command_exists(command):

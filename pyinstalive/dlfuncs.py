@@ -133,8 +133,8 @@ def merge_segments():
             except Exception as e:
                 logger.warn('Could not execute command: {:s}'.format(str(e)))
 
-        live_mp4_file = '{}{}_{}_{}_live.mp4'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.livestream_obj.get('id'))
+        live_mp4_file = '{}{}_{}_{}_{}_live.mp4'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
+                                                     pil.livestream_obj.get('id'), pil.epochtime)
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
@@ -189,8 +189,8 @@ def download_livestream():
                    or pil.livestream_obj.get('dash_abr_playback_url')
                    or pil.livestream_obj.get('dash_playback_url'))
 
-        pil.live_folder_path = '{}{}_{}_{}_live_downloads'.format(pil.dl_path, pil.datetime_compat,
-                                                                  pil.dl_user, pil.livestream_obj.get('id'))
+        pil.live_folder_path = '{}{}_{}_{}_{}_live_downloads'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
+                                                     pil.livestream_obj.get('id'), pil.epochtime)
         pil.broadcast_downloader = live.Downloader(
             mpd=mpd_url,
             output_dir=pil.live_folder_path,
@@ -236,8 +236,8 @@ def download_livestream():
 
         if pil.dl_comments:
             try:
-                comments_json_file = '{}{}_{}_{}_live_comments.json'.format(pil.dl_path, pil.datetime_compat,
-                                                                            pil.dl_user, pil.livestream_obj.get('id'))
+                comments_json_file = '{}{}_{}_{}_{}_live_comments.json'.format(
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
                 pil.comment_thread_worker = threading.Thread(target=get_live_comments, args=(comments_json_file,))
                 pil.comment_thread_worker.start()
             except Exception as e:
@@ -298,8 +298,8 @@ def download_replays():
                 logger.info(
                     "Downloading replay {:s} of {:s} with ID '{:s}'.".format(str(current), str(len(pil.replays_obj)),
                                                                                str(replay_obj.get('id'))))
-                pil.live_folder_path = '{}{}_{}_{}_replay_downloads'.format(pil.dl_path, pil.datetime_compat,
-                                                                            pil.dl_user, pil.livestream_obj.get('id'))
+                pil.live_folder_path = '{}{}_{}_{}_{}_replay_downloads'.format(
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
                 broadcast_downloader = replay.Downloader(
                     mpd=replay_obj.get('dash_manifest'),
                     output_dir=pil.live_folder_path,
@@ -307,11 +307,11 @@ def download_replays():
                     ffmpeg_binary=pil.ffmpeg_path)
                 if pil.use_locks:
                     helpers.create_lock_folder()
-                replay_mp4_file = '{}{}_{}_{}_replay.mp4'.format(pil.dl_path, pil.datetime_compat,
-                                                                 pil.dl_user, pil.livestream_obj.get('id'))
+                replay_mp4_file = '{}{}_{}_{}_{}_replay.mp4'.format(
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
 
-                comments_json_file = '{}{}_{}_{}_replay_comments.json'.format(pil.dl_path, pil.datetime_compat,
-                                                                            pil.dl_user, pil.livestream_obj.get('id'))
+                comments_json_file = '{}{}_{}_{}_{}_replay_comments.json'.format(
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
 
                 pil.comment_thread_worker = threading.Thread(target=get_replay_comments, args=(comments_json_file,))
 

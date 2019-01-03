@@ -61,7 +61,7 @@ def initialize():
     replays_obj = None
     broadcast_downloader = None
     epochtime = helpers.strepochtime()
-    datetime_compat = helpers.strdatetime_compat(epochtime)
+    datetime_compat = helpers.strdatetime_compat()
     live_folder_path = ""
     use_locks = True
     comment_thread_worker = None
