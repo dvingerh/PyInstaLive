@@ -2,12 +2,13 @@ from setuptools import setup
 
 __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
-__version__ = '3.0.0'
+__version__ = '3.0.1'
 
 _api_version = '1.5.7'
 _api_extensions_version = '0.3.8'
 
-long_description = 'This CLI script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on another script that has now been discontinued.'
+long_description = 'This Python script enables you to download any ongoing Instagram livestreams as well as any ' \
+				   'available replays. It is based on another script that has now been discontinued. '
 
 setup(
 	name='pyinstalive',
@@ -36,7 +37,8 @@ setup(
 	include_package_data=True,
 	platforms='any',
 	long_description=long_description,
-	keywords='instagram-livestream-recorder record-instagram-livestreams live instagram record livestream video recorder downloader download save',
+	keywords='instagram-livestream-recorder record-instagram-livestreams live instagram record livestream video '
+			 'recorder downloader download save',
 	description='This script enables you to download Instagram livestreams and replays.',
 	classifiers=[
 		'Environment :: Console',
