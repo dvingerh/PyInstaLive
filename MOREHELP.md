@@ -66,6 +66,6 @@ clear_temp_files = False
 
 ```run_at_finish```  **—**  Command to run when PyInstaLive finishes downloading a livestream. Leave empty to disable. (Experimental feature) 
 
-```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded as well as the folders which contained these files. Replay folders created by PyInstaLive will not be deleted because they are used to determine if a replay has already been downloaded.
+```use_locks```  **—**  When set to true, PyInstaLive will create several .lock files to prevent duplicate downloads from starting for the same user if you are running PyInstaLive using some form of automation such as batch/shell loops.
 
-```save_comments```  **—**  When set to true, PyInstaLive will create several .lock files to prevent duplicate downloads from starting for the same user if you are running PyInstaLive using some form of automation such as batch/shell loops.
+```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded as well as the folders which contained these files. Replay folders created by PyInstaLive will not be deleted because they are used to determine if a replay has already been downloaded.
