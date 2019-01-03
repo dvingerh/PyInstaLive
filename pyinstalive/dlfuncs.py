@@ -380,9 +380,11 @@ def download_following():
                         logger.warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
                     else:
                         logger.info("Launching daemon process for '{:s}'.".format(user))
-                        start_result = helpers.run_command("pyinstalive -d {:s} -cp '{:s}' -dp '{:s}'".format(user, pil.config_path, pil.dl_path))
+                        start_result = helpers.run_command("python3 -m pyinstalive -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s}".format(
+                            user, pil.config_path, pil.dl_path,
+                            '--no-lives' if not pil.dl_lives else '', '--no-replays' if not pil.dl_replays else ''))
                         if start_result:
-                            logger.warn("Could not start processs: {:s}".format(str(start_result)))
+                            logger.warn("Could not start process: {:s}".format(str(start_result)))
                         else:
                             logger.info("Process started successfully.")
                     logger.separator()
