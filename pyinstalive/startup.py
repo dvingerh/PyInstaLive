@@ -30,9 +30,14 @@ def validate_inputs(config, args, unknown_args):
 
         if args.download:
             pil.dl_user = args.download
+            if args.downloadfollowing:
+                logger.banner()
+                logger.warn("Please use either argument --download or --download-following, not both.")
+                logger.separator()
+                return False
         elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing:
             logger.banner()
-            logger.error("Missing --download argument. This argument is required.")
+            logger.error("Missing --download or --download-following argument, please use either of the two.")
             logger.separator()
             return False
 
