@@ -37,7 +37,7 @@ def assemble(user_called=True):
         ass_segment_dir = pil.assemble_arg.split('.')[0]
         broadcast_info = {}
         if not os.path.isdir(ass_segment_dir) or not os.listdir(ass_segment_dir):
-            logger.error('Segment directory does not exist or is empty: %s' % ass_segment_dir)
+            logger.error('The segment directory does not exist or does not contain any files: %s' % ass_segment_dir)
             logger.separator()
             return
         if not os.path.isfile(ass_json_file):
@@ -51,10 +51,9 @@ def assemble(user_called=True):
                 broadcast_info = json.load(info_file)
 
         if broadcast_info.get('broadcast_status', '') == 'post_live':
-            logger.error('Segments from replay downloads cannot be assembled.')
+            logger.error('Video segment files from replay downloads cannot be assembled.')
             return
 
-        logger.info("Assembling video segments from folder: {}".format(ass_segment_dir))
         stream_id = str(broadcast_info['id'])
 
         segment_meta = broadcast_info.get('segments', {})
@@ -73,8 +72,15 @@ def assemble(user_called=True):
         video_stream_format = 'assembled_source_{0}_{1}_m4a.tmp'
         video_stream = ''
         audio_stream = ''
-        for segment in all_segments:
 
+        if not all_segments:
+            logger.error("No video segment files have been found in the specified folder.")
+            logger.separator()
+            return
+        else:
+            logger.info("Assembling video segment files from specified folder: {}".format(ass_segment_dir))
+
+        for segment in all_segments:
             if not os.path.isfile(segment.replace('.m4v', '.m4a')):
                 logger.warn('Audio segment not found: {0!s}'.format(segment.replace('.m4v', '.m4a')))
                 continue
