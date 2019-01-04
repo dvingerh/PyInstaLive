@@ -117,12 +117,13 @@ def assemble(user_called=True):
                 '-i', source['audio'],
                 '-i', source['video'],
                 '-c:v', 'copy', '-c:a', 'copy', ass_mp4_file]
-            fnull = open(os.devnull, 'w')
+            #fnull = open(os.devnull, 'w')
+            fnull = None
             exit_code = subprocess.call(cmd, stdout=fnull, stderr=subprocess.STDOUT)
             if exit_code != 0:
                 logger.warn("FFmpeg exit code not '0' but '{:d}'.".format(exit_code))
-            logger.separator()
-            logger.info('The video file has been generated: %s' % os.path.basename(ass_mp4_file))
+            else:
+                logger.info('The video file has been generated: %s' % os.path.basename(ass_mp4_file))
             if user_called:
                 logger.separator()
     except Exception as e:
