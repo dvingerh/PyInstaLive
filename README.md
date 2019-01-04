@@ -57,7 +57,7 @@ In case it doesn't work or you just prefer building PyInstaLive from source foll
 
 #### Installing
 
-Run the following command in your command line (might need to be run as administrator on Windows) or a terminal:
+Run the following command in your command line (might need to be run as administrator on Windows):
 ```bash
 pip install git+https://github.com/notcammy/PyInstaLive.git@3.0.2 --process-dependency-links
 ```
