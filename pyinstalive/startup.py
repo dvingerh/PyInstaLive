@@ -124,6 +124,18 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.dl_comments = False
 
+        if args.nolives:
+            pil.dl_lives = False
+
+        if args.noreplays:
+            pil.dl_replays = False
+
+        if not pil.dl_lives and not pil.dl_replays:
+            logger.error("You have disabled both livestream and replay downloading.")
+            logger.error("Please enable at least one of them and try again.")
+            logger.separator()
+            return False
+
         if pil.ffmpeg_path:
             if not os.path.isfile(pil.ffmpeg_path):
                 pil.ffmpeg_path = None
@@ -148,12 +160,6 @@ def validate_inputs(config, args, unknown_args):
             else:
                 logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.dl_path))
                 logger.separator()
-
-        if args.nolives:
-            pil.dl_lives = False
-
-        if args.noreplays:
-            pil.dl_replays = False
 
         if error_arr:
             for error in error_arr:
