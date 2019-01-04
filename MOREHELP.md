@@ -19,10 +19,11 @@
 
 - ```-df``` or ```--download-following```  **—**  PyInstaLive will check if any users from your following list have any available livestreams or replays and start a daemon process running PyInstaLive in the background for those that do. You cannot cancel the launched processes or start them with any extra arguments. It's recommended to enable ```log_to_file``` when using this argument. (Experimental, use at own risk.)
 
-- ```-cp``` or ```--config-path```  **—**  Passing this argument along with a valid path to a different configuration file will override the default path.
+- ```-cp``` or ```--config-path```  **—**  Passing this argument along with a valid path to a different configuration file will override the default path used by PyInstaLive (the current directory you are executing the script in).
 
 - ```-dp``` or ```--download-path```  **—**  Passing this argument along with a valid path to a different folder will override the path specified in the configuration file.
 
+-```-as``` or ```--assemble```  **—** PyInstaLive will try to generate a video file from a given segments file directory or its accompanied JSON file (when available). 
 
 
 # Default configuration file
