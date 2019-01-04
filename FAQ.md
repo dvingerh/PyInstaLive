@@ -59,3 +59,20 @@ Use the scripts provided in the previous question, they'll infinitely run the Py
 
 No. This is because livestream_dl is no longer being maintained and as such uses an older version of libraries required by PyInstaLive. Installing PyInstaLive and livestream_dl on different Python versions (2/3) will probably work though.
 
+### PyInstaLive failed to generate a video file after the download has ended. What do I do?
+
+Don't get your hopes up because manually generating a video file has no guarantee of success, but read below for instructions on what you can do in case this has happened to you.
+
+If it failed to generate a video file from a **livestream** you have two options:
+* Use the `--assemble` command as described in the [FAQ](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md#commands).
+
+If that didn't work, you can still attempt to concatenate the segment files yourself:
+
+* Open the segment video directory in your command line.
+  * Windows: `copy /b *.m4v video.mp4 && copy /b *.m4a audio.mp4 && ffmpeg -i video.mp4 -i audio.mp4 -c copy output.mp4`
+  * Linux: `cat  *.m4v > video.mp4 && cat  *.m4a > audio.mp4 && ffmpeg -i video.mp4 -i audio.mp4 -c copy output.mp4`
+
+##
+
+If it failed to generate a video file from a **replay** you can try the following:
+- Open the segment video directory in your command line and run `ffmpeg -i video.mp4 -i audio.mp4 -c copy output.mp4`.
