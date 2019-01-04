@@ -12,7 +12,13 @@ except ImportError:
 
 def start():
     if pil.args.downloadfollowing:
-        if not helpers.command_exists("pyinstalive"):
+        if not pil.dl_lives:
+            logger.binfo("Livestream downloading is disabled either with an argument or in the config file.")
+            logger.separator()
+        if not pil.dl_replays:
+            logger.binfo("Replay downloading is disabled either with an argument or in the config file.")
+            logger.separator()
+        if helpers.command_exists("pyinstalive"):
             logger.error("PyInstaLive must be properly installed when using the -df argument.")
             logger.separator()
         else:

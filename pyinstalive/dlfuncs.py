@@ -352,27 +352,37 @@ def download_replays():
 
 def download_following():
     try:
-        logger.info("Checking following users for any livestreams or replays.")
+        is_checking = ''
+        if pil.dl_lives and pil.dl_replays:
+            is_checking = 'livestreams or replays'
+        elif pil.dl_lives and not pil.dl_replays:
+            is_checking = 'livestreams'
+        elif not pil.dl_lives and pil.dl_replays:
+            is_checking = 'replays'
+        logger.info("Checking following users for any {:s}.".format(is_checking))
         broadcast_f_list = pil.ig_api.reels_tray()
-        usernames_available = []
-        if broadcast_f_list['broadcasts']:
+        usernames_available_livestreams = []
+        usernames_available_replays = []
+        if broadcast_f_list['broadcasts'] and pil.dl_lives:
             for broadcast_f in broadcast_f_list['broadcasts']:
                 username = broadcast_f['broadcast_owner']['username']
-                if username not in usernames_available:
-                    usernames_available.append(username)
+                if username not in usernames_available_livestreams:
+                    usernames_available_livestreams.append(username)
 
-        if broadcast_f_list.get('post_live', {}).get('post_live_items', []):
+        if broadcast_f_list.get('post_live', {}).get('post_live_items', []) and pil.dl_replays:
             for broadcast_r in broadcast_f_list.get('post_live', {}).get('post_live_items', []):
                 for broadcast_f in broadcast_r.get("broadcasts", []):
                     username = broadcast_f['broadcast_owner']['username']
-                    if username not in usernames_available:
-                        usernames_available.append(username)
+                    if username not in usernames_available_replays:
+                        usernames_available_replays.append(username)
         logger.separator()
-        if usernames_available:
-            logger.info("The following users have available livestreams or replays:")
-            logger.info(', '.join(usernames_available))
+        available_total = list(usernames_available_livestreams)
+        available_total.extend(x for x in usernames_available_replays if x not in available_total)
+        if available_total:
+            logger.info("The following users have available {:s}.".format(is_checking))
+            logger.info(', '.join(available_total))
             logger.separator()
-            for user in usernames_available:
+            for user in available_total:
                 try:
                     if os.path.isfile(os.path.join(pil.dl_path, user + '.lock')):
                         logger.warn("Lock file is already present for '{:s}', there is probably another download "
@@ -395,7 +405,7 @@ def download_following():
                     logger.binfo('The process launching has been aborted by the user.')
                     logger.separator()
         else:
-            logger.info("There are currently no available livestreams or replays.")
+            logger.info("There are currently no available {:s}.".format(is_checking))
             logger.separator()
     except Exception as e:
         logger.error("Could not finish checking following users: {:s}".format(str(e)))
