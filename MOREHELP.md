@@ -23,7 +23,7 @@
 
 - ```-dp``` or ```--download-path```  **—**  Passing this argument along with a valid path to a different folder will override the path specified in the configuration file.
 
--```-as``` or ```--assemble```  **—** PyInstaLive will try to generate a video file from a given segments file directory or its accompanied JSON file (when available). 
+- ```-as``` or ```--assemble```  **—** PyInstaLive will try to generate a video file from a given segments file directory or its accompanied JSON file (when available). 
 
 
 # Default configuration file
