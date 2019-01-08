@@ -280,12 +280,22 @@ def create_lock_folder():
 
 
 def remove_lock():
+    download_folder_lock = os.path.join(pil.dl_path, pil.dl_user + '.lock')
+    temp_folder_lock = os.path.join(pil.live_folder_path, 'folder.lock')
+    lock_paths = [download_folder_lock, temp_folder_lock]
+    for lock in lock_paths:
+        try:
+            os.remove(lock)
+        except Exception:
+            pass
+
+
+def remove_temp_folder():
     try:
-        os.remove(os.path.join(pil.dl_path, pil.dl_user + '.lock'))
-        os.remove(os.path.join(pil.live_folder_path, 'folder.lock'))
-    except Exception:
-        pass
+        shutil.rmtree(pil.live_folder_path)
+    except Exception as e:
+        logger.error("Could not remove segment folder: {:s}".format(str(e)))
 
 
-def check_lock_file():
+def download_folder_has_lockfile():
     return os.path.isfile(os.path.join(pil.dl_path, pil.dl_user + '.lock'))

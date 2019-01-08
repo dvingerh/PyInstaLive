@@ -24,7 +24,7 @@ def start():
         else:
             dlfuncs.download_following()
     else:
-        if not helpers.check_lock_file():
+        if not helpers.download_folder_has_lockfile():
             helpers.create_lock_user()
             checking_self = pil.dl_user == pil.ig_api.authenticated_user_name
             if dlfuncs.get_broadcasts_info():

@@ -148,6 +148,8 @@ def merge_segments():
         try:
             pil.broadcast_downloader.stitch(live_mp4_file, cleartempfiles=pil.clear_temp_files)
             logger.info('Successfully merged downloaded files into video.')
+            if pil.clear_temp_files:
+                helpers.remove_temp_folder()
             helpers.remove_lock()
         except ValueError as e:
             logger.separator()
@@ -316,7 +318,8 @@ def download_replays():
                 pil.comment_thread_worker = threading.Thread(target=get_replay_comments, args=(comments_json_file,))
 
                 broadcast_downloader.download(replay_mp4_file, cleartempfiles=pil.clear_temp_files)
-
+                if pil.clear_temp_files:
+                    helpers.remove_temp_folder()
                 if pil.dl_comments:
                     logger.info("Downloading replay comments.")
                     try:
@@ -325,10 +328,7 @@ def download_replays():
                         logger.error('An error occurred while downloading comments: {:s}'.format(str(e)))
 
                 logger.info("Finished downloading replay {:s} of {:s}.".format(str(current), str(len(pil.replays_obj))))
-                try:
-                    os.remove(os.path.join(pil.live_folder_path, 'folder.lock'))
-                except Exception:
-                    pass
+                helpers.remove_lock()
 
                 if current != len(pil.replays_obj):
                     logger.separator()
@@ -343,10 +343,7 @@ def download_replays():
         logger.separator()
         logger.binfo('The download has been aborted by the user, exiting.')
         logger.separator()
-        try:
-            shutil.rmtree(pil.live_folder_path)
-        except Exception as e:
-            logger.error("Could not remove segment folder: {:s}".format(str(e)))
+        helpers.remove_temp_folder()
         helpers.remove_lock()
 
 
