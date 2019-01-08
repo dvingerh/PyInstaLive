@@ -50,10 +50,7 @@ Make sure all tools are accessible via command line (added to your PATH if on Wi
 
 ## Installation
 
-If you run Windows you can try out the Windows build available [here](https://github.com/notcammy/PyInstaLive/releases).
-In case it doesn't work or you just prefer building PyInstaLive from source follow the instructions below.
-
-*Tip — You can easily add the executable to your PATH as well by copying it to the Windows installation folder.*
+*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command (e.g. **@3.0.3**).*
 
 #### Installing
 
@@ -72,13 +69,13 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@3.0.3 --process-depe
 
 #### Specific versions
 
-If you want to install a specific version of PyInstaLive when for example the newest version contains a bug, you can specify the version tag in the install command:
+If you want to install a specific version of PyInstaLive when for example the newest version contains a bug, you can specify a different version tag in the install command:
 
 ```bash
 pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0 --process-dependency-links
 ```
 
-Use the version number you want after the **@** symbol (e.g **2.2.0**).
+Use the version number you want after the **@** symbol (e.g **@2.2.0**).
 
 ![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
@@ -86,7 +83,7 @@ Use the version number you want after the **@** symbol (e.g **2.2.0**).
 
 Make sure there is a configuration file called ``pyinstalive.ini`` in the directory you want to run PyInstaLive from.
 
-You can run ```pyinstalive -c``` to automatically generate a default configuration file if one is not present.
+PyInstaLive will automatically generate a default configuration file for you to edit if one is not present already.
 
 Here is an example of a valid configuration file:
 ```ini
