@@ -379,28 +379,7 @@ def download_following():
             logger.info("The following users have available {:s}.".format(is_checking))
             logger.info(', '.join(available_total))
             logger.separator()
-            for user in available_total:
-                try:
-                    if os.path.isfile(os.path.join(pil.dl_path, user + '.lock')):
-                        logger.warn("Lock file is already present for '{:s}', there is probably another download "
-                                    "ongoing!".format(user))
-                        logger.warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
-                    else:
-                        logger.info("Launching daemon process for '{:s}'.".format(user))
-                        start_result = helpers.run_command("pyinstalive -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s}".format(
-                            user, pil.config_path, pil.dl_path,
-                            '--no-lives' if not pil.dl_lives else '', '--no-replays' if not pil.dl_replays else ''))
-                        if start_result:
-                            logger.warn("Could not start process: {:s}".format(str(start_result)))
-                        else:
-                            logger.info("Process started successfully.")
-                    logger.separator()
-                    time.sleep(2)
-                except Exception as e:
-                    logger.warn("Could not start processs: {:s}".format(str(e)))
-                except KeyboardInterrupt:
-                    logger.binfo('The process launching has been aborted by the user.')
-                    logger.separator()
+            iterate_users(available_total)
         else:
             logger.info("There are currently no available {:s}.".format(is_checking))
             logger.separator()
@@ -410,6 +389,33 @@ def download_following():
         logger.separator()
         logger.binfo('The checking process has been aborted by the user.')
         logger.separator()
+
+
+def iterate_users(user_list):
+    for user in user_list:
+        try:
+            if os.path.isfile(os.path.join(pil.dl_path, user + '.lock')):
+                logger.warn("Lock file is already present for '{:s}', there is probably another download "
+                            "ongoing!".format(user))
+                logger.warn(
+                    "If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
+            else:
+                logger.info("Launching daemon process for '{:s}'.".format(user))
+                start_result = helpers.run_command("pyinstalive -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s}".format(
+                    user, pil.config_path, pil.dl_path,
+                    '--no-lives' if not pil.dl_lives else '', '--no-replays' if not pil.dl_replays else ''))
+                if start_result:
+                    logger.warn("Could not start process: {:s}".format(str(start_result)))
+                else:
+                    logger.info("Process started successfully.")
+            logger.separator()
+            time.sleep(2)
+        except Exception as e:
+            logger.warn("Could not start process: {:s}".format(str(e)))
+        except KeyboardInterrupt:
+            logger.binfo('The process launching has been aborted by the user.')
+            logger.separator()
+            break
 
 
 def get_live_comments(comments_json_file):

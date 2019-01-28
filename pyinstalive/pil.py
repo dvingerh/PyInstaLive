@@ -16,6 +16,7 @@ def initialize():
     global ig_user
     global ig_pass
     global dl_user
+    global dl_batchusers
     global dl_path
     global dl_lives
     global dl_replays
@@ -45,6 +46,7 @@ def initialize():
     ig_user = ""
     ig_pass = ""
     dl_user = ""
+    dl_batchusers = []
     dl_path = os.getcwd()
     dl_lives = True
     dl_replays = True

@@ -12,6 +12,7 @@ try:
     import helpers
     import downloader
     import assembler
+    import dlfuncs
     from constants import Constants
 except ImportError:
     from . import pil
@@ -20,6 +21,7 @@ except ImportError:
     from . import helpers
     from . import downloader
     from . import assembler
+    from . import dlfuncs
     from .constants import Constants
 
 
@@ -30,14 +32,14 @@ def validate_inputs(config, args, unknown_args):
 
         if args.download:
             pil.dl_user = args.download
-            if args.downloadfollowing:
+            if args.downloadfollowing or args.batchfile:
                 logger.banner()
-                logger.warn("Please use either argument --download or --download-following, not both.")
+                logger.warn("Please use only one download method. Use -h for more information.")
                 logger.separator()
                 return False
-        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing:
+        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile:
             logger.banner()
-            logger.error("Missing --download or --download-following argument, please use either of the two.")
+            logger.error("Please use a download method. Use -h for more information.")
             logger.separator()
             return False
 
@@ -50,6 +52,21 @@ def validate_inputs(config, args, unknown_args):
             pil.log_to_file = False
 
         logger.banner()
+
+        if args.batchfile:
+            if os.path.isfile(args.batchfile):
+                pil.dl_batchusers = [user.rstrip('\n') for user in open(args.batchfile)]
+                if not pil.dl_batchusers:
+                    logger.error("The specified file is empty.")
+                    logger.separator()
+                    return False
+                else:
+                    logger.info("Downloading {:d} users from batch file.".format(len(pil.dl_batchusers)))
+                    logger.separator()
+            else:
+                logger.error('The specified file does not exist.')
+                logger.separator()
+                return False
 
         if unknown_args:
             pil.uargs = unknown_args
@@ -199,6 +216,8 @@ def run():
                         help="Instagram password to login with.")
     parser.add_argument('-d', '--download', dest='download', type=str, required=False,
                         help="The username of the user whose livestream or replay you want to save.")
+    parser.add_argument('-b,', '--batch-file', dest='batchfile', type=str, required=False,
+                        help="Read a text file of usernames to download livestreams or replays from.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
     parser.add_argument('-nr', '--no-replays', dest='noreplays', action='store_true',
                         help="When used, do not check for any available replays.")
@@ -248,5 +267,11 @@ def run():
             pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True)
 
         if pil.ig_api:
-            downloader.start()
-
+            if pil.dl_user:
+                downloader.start()
+            elif pil.dl_batchusers:
+                if not helpers.command_exists("pyinstalive"):
+                    logger.error("PyInstaLive must be properly installed when using the -b argument.")
+                    logger.separator()
+                else:
+                    dlfuncs.iterate_users(pil.dl_batchusers)
