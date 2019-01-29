@@ -267,7 +267,7 @@ def run():
             pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True)
 
         if pil.ig_api:
-            if pil.dl_user:
+            if pil.dl_user or pil.args.downloadfollowing:
                 downloader.start()
             elif pil.dl_batchusers:
                 if not helpers.command_exists("pyinstalive"):
