@@ -25,6 +25,7 @@
 
 - ```-as``` or ```--assemble```  **—** PyInstaLive will try to generate a video file from a given segments file directory or its accompanied JSON file (when available). 
 
+- ```-b``` or ```--batch-file```  **—** PyInstaLive will check the users inside a text file for any available livestreams or replays.
 
 # Default configuration file
 
