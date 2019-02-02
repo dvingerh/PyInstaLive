@@ -19,4 +19,5 @@ run_at_start =
 run_at_finish =
 use_locks = True
 clear_temp_files = False
+do_heartbeat = False
     """

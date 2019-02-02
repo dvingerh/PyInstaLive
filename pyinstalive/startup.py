@@ -117,6 +117,16 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.clear_temp_files = False
 
+        if helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')) == "Invalid":
+            pil.do_heartbeat = True
+            error_arr.append(['do_heartbeat', 'True'])
+        elif helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')):
+            pil.do_heartbeat = True
+        else:
+            pil.do_heartbeat = False
+            logger.warn("Getting livestream heartbeat disabled, this may cause degraded performance.")
+            logger.separator()
+
         if not args.nolives and helpers.bool_str_parse(config.get('pyinstalive', 'download_lives')) == "Invalid":
             pil.dl_lives = True
             error_arr.append(['download_lives', 'True'])

@@ -176,7 +176,8 @@ def merge_segments():
 def download_livestream():
     try:
         def print_status(sep=True):
-            heartbeat_info = pil.ig_api.broadcast_heartbeat_and_viewercount(pil.livestream_obj.get('id'))
+            if pil.do_heartbeat:
+                heartbeat_info = pil.ig_api.broadcast_heartbeat_and_viewercount(pil.livestream_obj.get('id'))
             viewers = pil.livestream_obj.get('viewer_count', 0)
             if sep:
                 logger.separator()
@@ -184,8 +185,11 @@ def download_livestream():
                 logger.info('Username    : {:s}'.format(pil.dl_user))
             logger.info('Viewers     : {:s} watching'.format(str(int(viewers))))
             logger.info('Airing time : {:s}'.format(get_stream_duration(0)))
-            logger.info('Status      : {:s}'.format(heartbeat_info.get('broadcast_status').title()))
-            return heartbeat_info.get('broadcast_status') not in ['active', 'interrupted']
+            if pil.do_heartbeat:
+                logger.info('Status      : {:s}'.format(heartbeat_info.get('broadcast_status').title()))
+                return heartbeat_info.get('broadcast_status') not in ['active', 'interrupted']
+            else:
+                return None
 
         mpd_url = (pil.livestream_obj.get('dash_manifest')
                    or pil.livestream_obj.get('dash_abr_playback_url')

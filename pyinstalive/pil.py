@@ -42,6 +42,7 @@ def initialize():
     global ffmpeg_path
     global clear_temp_files
     global has_guest
+    global do_heartbeat
     ig_api = None
     ig_user = ""
     ig_pass = ""
@@ -72,3 +73,4 @@ def initialize():
     ffmpeg_path = None
     clear_temp_files = False
     has_guest = None
+    do_heartbeat = False
