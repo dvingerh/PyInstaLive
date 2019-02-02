@@ -110,15 +110,15 @@ def get_broadcasts_info():
         logger.error('Could not finish checking: {:s}'.format(str(e)))
         if "timed out" in str(e):
             logger.error('The connection timed out, check your internet connection.')
-        logger.separator()
+        if "login_required" in str(e):
+            logger.error('Login cookie was loaded but user is not actually logged in. Delete the cookie file and try '
+                         'again.')
         return False
     except KeyboardInterrupt:
         logger.binfo('Aborted checking for livestreams and replays, exiting.'.format(pil.dl_user))
-        logger.separator()
         return False
     except ClientThrottledError as cte:
         logger.error('Could not check because you are making too many requests at this time.')
-        logger.separator()
         return False
 
 
