@@ -82,7 +82,7 @@ def validate_inputs(config, args, unknown_args):
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
         pil.args = args
         pil.config = config
-        pil.proxy = config.get('pyinstalive', 'proxy')
+        pil.proxy = config.get('pyinstalive', 'proxy', fallback=None)
 
         if args.configpath:
             pil.config_path = args.configpath

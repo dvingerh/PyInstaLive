@@ -45,6 +45,7 @@ run_at_finish =
 use_locks = True
 clear_temp_files = False
 do_heartbeat = True
+proxy = 
 ```
 
 ```username```  **—**  Instagram username to login with.
@@ -74,3 +75,7 @@ do_heartbeat = True
 ```clear_temp_files```  **—**  When set to True, PyInstaLive will delete all temporary files that were downloaded as well as the folders which contained these files. Replay folders created by PyInstaLive will not be deleted because they are used to determine if a replay has already been downloaded.
 
 ```do_heartbeat```  **—**  When set to True, PyInstaLive will check the livestream's active status. If set to False no checks will be conducted, and the logged in user will not show up as a viewer during the livestream. May cause degraded performance.
+
+```proxy```  **—**  When set, PyInstaLive will use the specified HTTP proxy. The format should be similar to http://user:pass@proxy.com:12345
+
+
