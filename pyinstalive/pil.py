@@ -74,3 +74,4 @@ def initialize():
     clear_temp_files = False
     has_guest = None
     do_heartbeat = False
+    proxy = None

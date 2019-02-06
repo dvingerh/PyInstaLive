@@ -82,6 +82,7 @@ def validate_inputs(config, args, unknown_args):
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
         pil.args = args
         pil.config = config
+        pil.proxy = config.get('pyinstalive', 'proxy')
 
         if args.configpath:
             pil.config_path = args.configpath
@@ -268,13 +269,13 @@ def run():
 
     if validate_inputs(config, args, unknown_args):
         if not args.username and not args.password:
-            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
+            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass, proxy=pil.proxy)
         elif (args.username and not args.password) or (args.password and not args.username):
             logger.warn("Missing --username or --password argument. Falling back to config file.")
             logger.separator()
-            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
+            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass, proxy=pil.proxy)
         elif args.username and args.password:
-            pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True)
+            pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True, proxy=pil.proxy)
 
         if pil.ig_api:
             if pil.dl_user or pil.args.downloadfollowing:
