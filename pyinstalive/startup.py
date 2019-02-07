@@ -4,6 +4,7 @@ import os
 import logging
 import platform
 import subprocess
+from urllib.parse import urlparse
 
 try:
     import pil
@@ -189,6 +190,12 @@ def validate_inputs(config, args, unknown_args):
                 logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.dl_path))
                 logger.separator()
 
+        if pil.proxy != None:
+            parsed_url = urlparse(pil.proxy)
+            if (not parsed_url.netloc or not parsed_url.scheme):
+                error_arr.append(['proxy', 'None'])
+                pil.proxy = None
+
         if error_arr:
             for error in error_arr:
                 logger.warn("Invalid value for '{:s}'. Using default value: {:s}".format(error[0], error[1]))
@@ -269,13 +276,13 @@ def run():
 
     if validate_inputs(config, args, unknown_args):
         if not args.username and not args.password:
-            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass, proxy=pil.proxy)
+            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
         elif (args.username and not args.password) or (args.password and not args.username):
             logger.warn("Missing --username or --password argument. Falling back to config file.")
             logger.separator()
-            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass, proxy=pil.proxy)
+            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
         elif args.username and args.password:
-            pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True, proxy=pil.proxy)
+            pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True)
 
         if pil.ig_api:
             if pil.dl_user or pil.args.downloadfollowing:

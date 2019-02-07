@@ -45,7 +45,7 @@ def onlogin_callback(api, cookie_file):
         logger.separator()
 
 
-def authenticate(username, password, force_use_login_args=False, proxy=None):
+def authenticate(username, password, force_use_login_args=False):
     ig_api = None
     try:
         if force_use_login_args:
@@ -60,7 +60,7 @@ def authenticate(username, password, force_use_login_args=False, proxy=None):
             # login new
             ig_api = Client(
                 username, password,
-                on_login=lambda x: onlogin_callback(x, cookie_file), proxy=proxy)
+                on_login=lambda x: onlogin_callback(x, cookie_file), proxy=pil.proxy)
         else:
             with open(cookie_file) as file_data:
                 cached_settings = json.load(file_data, object_hook=from_json)
@@ -71,7 +71,7 @@ def authenticate(username, password, force_use_login_args=False, proxy=None):
             try:
                 ig_api = Client(
                     username, password,
-                    settings=cached_settings, proxy=proxy)
+                    settings=cached_settings, proxy=pil.proxy)
 
             except ClientCookieExpiredError as e:
                 logger.warn('The current cookie file has expired, creating a new one.')
@@ -79,7 +79,7 @@ def authenticate(username, password, force_use_login_args=False, proxy=None):
                 ig_api = Client(
                     username, password,
                     device_id=device_id,
-                    on_login=lambda x: onlogin_callback(x, cookie_file), proxy=proxy)
+                    on_login=lambda x: onlogin_callback(x, cookie_file), proxy=pil.proxy)
 
     except (ClientLoginError, ClientError) as e:
         logger.separator()
