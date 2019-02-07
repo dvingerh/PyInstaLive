@@ -43,6 +43,7 @@ def initialize():
     global clear_temp_files
     global has_guest
     global do_heartbeat
+    global proxy
     ig_api = None
     ig_user = ""
     ig_pass = ""
@@ -74,3 +75,4 @@ def initialize():
     clear_temp_files = False
     has_guest = None
     do_heartbeat = False
+    proxy = None
