@@ -27,6 +27,8 @@
 
 - ```-b``` or ```--batch-file```  **—** PyInstaLive will check the users inside a text file for any available livestreams or replays.
 
+- ```-nhb``` or ```--no-heartbeat```  **—** Passing this argument means no livestream heartbeat checks will be conducted, and the logged in user will not show up as a viewer during the livestream. May cause degraded performance.
+
 # Default configuration file
 
 ```ini
