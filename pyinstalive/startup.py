@@ -190,9 +190,9 @@ def validate_inputs(config, args, unknown_args):
                 logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.dl_path))
                 logger.separator()
 
-        if pil.proxy != None and pil.proxy != '':
+        if pil.proxy and pil.proxy != '':
             parsed_url = urlparse(pil.proxy)
-            if (not parsed_url.netloc or not parsed_url.scheme):
+            if not parsed_url.netloc or not parsed_url.scheme:
                 error_arr.append(['proxy', 'None'])
                 pil.proxy = None
 
