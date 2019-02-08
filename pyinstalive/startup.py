@@ -122,11 +122,11 @@ def validate_inputs(config, args, unknown_args):
         if helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')) == "Invalid":
             pil.do_heartbeat = True
             error_arr.append(['do_heartbeat', 'True'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')):
+        if helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')):
             pil.do_heartbeat = True
-        else:
+        if args.noheartbeat or not helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')):
             pil.do_heartbeat = False
-            logger.warn("Getting livestream heartbeat disabled, this may cause degraded performance.")
+            logger.warn("Getting livestream heartbeat is disabled, this may cause degraded performance.")
             logger.separator()
 
         if not args.nolives and helpers.bool_str_parse(config.get('pyinstalive', 'download_lives')) == "Invalid":
@@ -252,6 +252,9 @@ def run():
     parser.add_argument('-df', '--download-following', dest='downloadfollowing', action='store_true',
                         help="PyInstaLive will check for available livestreams and replays from users the account "
                              "used to login follows.")
+    parser.add_argument('-nhb', '--no-heartbeat', dest='noheartbeat', action='store_true', help="Disable heartbeat "
+                                                                                                "check for "
+                                                                                                "livestreams.")
 
     # Workaround to 'disable' argument abbreviations
     parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
