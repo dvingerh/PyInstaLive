@@ -30,7 +30,7 @@ def _get_file_index(filename):
     return -1
 
 
-def assemble(user_called=True):
+def assemble(user_called=True, retry_with_zero_m4v=False):
     try:
         ass_json_file = pil.assemble_arg if pil.assemble_arg.endswith(".json") else pil.assemble_arg + ".json"
         ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(ass_json_file).replace("_downloads", "").replace(".json", ".mp4"))
@@ -72,6 +72,7 @@ def assemble(user_called=True):
         video_stream_format = 'assembled_source_{0}_{1}_m4a.tmp'
         video_stream = ''
         audio_stream = ''
+        has_skipped_zero_m4v = False
 
         if not all_segments:
             logger.error("No video segment files have been found in the specified folder.")
@@ -90,7 +91,8 @@ def assemble(user_called=True):
                 segment = os.path.join(
                     os.path.dirname(os.path.realpath(__file__)), 'repair', 'init.m4v')
 
-            if segment.endswith('-0.m4v'):
+            if segment.endswith('-0.m4v') and not retry_with_zero_m4v:
+                has_skipped_zero_m4v = True
                 continue
 
             video_stream = os.path.join(
@@ -122,6 +124,14 @@ def assemble(user_called=True):
             exit_code = subprocess.call(cmd, stdout=fnull, stderr=subprocess.STDOUT)
             if exit_code != 0:
                 logger.warn("FFmpeg exit code not '0' but '{:d}'.".format(exit_code))
+                if has_skipped_zero_m4v and not retry_with_zero_m4v:
+                    logger.binfo("*-0.m4v segment was detected but skipped, retrying to assemble video without "
+                                 "skipping it.")
+                    os.remove(source['audio'])
+                    os.remove(source['video'])
+                    logger.separator()
+                    assemble(user_called, retry_with_zero_m4v=True)
+                    return
             else:
                 logger.info('The video file has been generated: %s' % os.path.basename(ass_mp4_file))
             if user_called:
