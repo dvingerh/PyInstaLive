@@ -69,6 +69,10 @@ Accurately describe the issue you're experiencing with the script.
 ###### Steps to reproduce issue
 Specify the exact steps taken to reproduce the problem. If you can't reproduce the issue try to describe the steps you've taken that eventually resulted in the issue you have experienced.
 
+###### Log files
+Please attach the log file of the user you were trying to download (if applicable) and the `pyinstalive.default.log` log file.
+If any of the files exceed 10MB in size please use [WeTransfer](https://wetransfer.com/) or a similar service to upload these files.
+
 ##
 
 ### To ask a question, fill in the information below.
