@@ -1,7 +1,7 @@
 ### Please check the boxes below by filling [ ] with an x so it looks like [x].
 ###### Remove all spaces already present in the box.
 
-- [ ] I am using the latest version of PyInstaLive: 3.0.7.
+- [ ] I am using the latest version of PyInstaLive: 3.0.8.
 - [ ] I have installed either Python 2.7.x or 3.5+: `YOUR VERSION HERE`
 - [ ] I have read the [README](https://github.com/notcammy/pyinstalive/blob/master/README.md).
 - [ ] I have read the [FAQ](https://github.com/notcammy/pyinstalive/blob/master/FAQ.md).
@@ -26,11 +26,11 @@ Run ```pyinstalive --info``` and paste its output below. Don't forget to omit yo
 ```bash
 $ pyinstalive --info
 ---------------------------------------------------------------------------
-[I] PYINSTALIVE (SCRIPT V3.0.7 - PYTHON V3.6.3) - 01-02-2019 07:00:17 PM
+[I] PYINSTALIVE (SCRIPT V3.0.8 - PYTHON V3.6.3) - 01-02-2019 07:00:17 PM
 ---------------------------------------------------------------------------
 [I] To see all the available arguments, use the -h argument.
 
-[I] PyInstaLive version:        3.0.7
+[I] PyInstaLive version:        3.0.8
 [I] Python version:             3.6.3
 [I] FFmpeg framework:           Available
 [I] Cookie files:               2 (johndoe.json matches config user)
