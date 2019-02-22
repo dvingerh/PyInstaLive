@@ -4,7 +4,7 @@ __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
 __version__ = '3.0.7'
 
-_api_version = '1.5.7'
+_api_version = '1.6.0'
 _api_extensions_version = '0.3.8'
 
 long_description = 'This Python script enables you to download any ongoing Instagram livestreams as well as any ' \
