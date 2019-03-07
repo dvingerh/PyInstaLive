@@ -34,7 +34,7 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
     try:
         ass_json_file = pil.assemble_arg if pil.assemble_arg.endswith(".json") else pil.assemble_arg + ".json"
         ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(ass_json_file).replace("_downloads", "").replace(".json", ".mp4"))
-        ass_segment_dir = pil.assemble_arg.split('.')[0]
+        ass_segment_dir = pil.assemble_arg if not pil.assemble_arg.endswith(".json") else pil.assemble_arg.replace(".json", "")
         broadcast_info = {}
         if not os.path.isdir(ass_segment_dir) or not os.listdir(ass_segment_dir):
             logger.error('The segment directory does not exist or does not contain any files: %s' % ass_segment_dir)
@@ -48,7 +48,14 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
             broadcast_info['segments'] = {}
         else:
             with open(ass_json_file) as info_file:
-                broadcast_info = json.load(info_file)
+                try:
+                    broadcast_info = json.load(info_file)
+                except Exception as e:
+                    logger.warn("Could not decode json file, trying to continue without it.")
+                    ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
+                    broadcast_info['id'] = ass_stream_id
+                    broadcast_info['broadcast_status'] = "active"
+                    broadcast_info['segments'] = {}
 
         if broadcast_info.get('broadcast_status', '') == 'post_live':
             logger.error('Video segment files from replay downloads cannot be assembled.')
@@ -134,6 +141,8 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                     return
             else:
                 logger.info('The video file has been generated: %s' % os.path.basename(ass_mp4_file))
+                os.remove(source['audio'])
+                os.remove(source['video'])
             if user_called:
                 logger.separator()
     except Exception as e:
