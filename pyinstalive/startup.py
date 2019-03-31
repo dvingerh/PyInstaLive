@@ -4,9 +4,9 @@ import os
 import logging
 import platform
 import subprocess
-from urllib.parse import urlparse
 
 try:
+    from urllib.parse import urlparse
     import pil
     import auth
     import logger
@@ -16,6 +16,7 @@ try:
     import dlfuncs
     from constants import Constants
 except ImportError:
+    from urlparse import urlparse
     from . import pil
     from . import auth
     from . import logger
