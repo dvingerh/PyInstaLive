@@ -352,7 +352,6 @@ def download_replays():
     except KeyboardInterrupt:
         logger.separator()
         logger.binfo('The download has been aborted by the user, exiting.')
-        logger.separator()
         helpers.remove_temp_folder()
         helpers.remove_lock()
 
