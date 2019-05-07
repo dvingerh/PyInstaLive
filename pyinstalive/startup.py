@@ -179,10 +179,14 @@ def validate_inputs(config, args, unknown_args):
             if not os.path.isfile(pil.ffmpeg_path):
                 pil.ffmpeg_path = None
                 cmd = "where" if platform.system() == "Windows" else "which"
-                logger.warn("Custom ffmpeg binary path is invalid, falling back to default path: {:s}".format(
-                    subprocess.check_output([cmd, 'ffmpeg']).decode('UTF-8').rstrip()))
+                logger.warn("Custom FFmpeg binary path is invalid, falling back to environment variable.")
             else:
-                logger.binfo("Overriding ffmpeg binary path: {:s}".format(pil.ffmpeg_path))
+                logger.binfo("Overriding FFmpeg binary path: {:s}".format(pil.ffmpeg_path))
+        else:
+            if not helpers.command_exists('ffmpeg') and not args.info:
+                logger.error("FFmpeg framework not found, exiting.")
+                logger.separator()
+                return False
 
         if not pil.ig_user or not len(pil.ig_user):
             raise Exception("Invalid value for 'username'. This value is required.")

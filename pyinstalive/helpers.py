@@ -182,7 +182,7 @@ def show_info():
     logger.info("PyInstaLive version:        {:s}".format(Constants.SCRIPT_VER))
     logger.info("Python version:             {:s}".format(Constants.PYTHON_VER))
     if not command_exists("ffmpeg"):
-        logger.error("FFmpeg framework:        Not found")
+        logger.error("FFmpeg framework:           Not found")
     else:
         logger.info("FFmpeg framework:           Available")
 
