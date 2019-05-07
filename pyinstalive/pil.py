@@ -44,6 +44,7 @@ def initialize():
     global has_guest
     global do_heartbeat
     global proxy
+    global verbose
     ig_api = None
     ig_user = ""
     ig_pass = ""
@@ -76,3 +77,4 @@ def initialize():
     has_guest = None
     do_heartbeat = False
     proxy = None
+    verbose = False
