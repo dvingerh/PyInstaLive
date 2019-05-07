@@ -21,4 +21,5 @@ use_locks = True
 clear_temp_files = False
 do_heartbeat = False
 proxy =
+verbose = False
     """

@@ -82,6 +82,7 @@ def validate_inputs(config, args, unknown_args):
         pil.run_at_start = config.get('pyinstalive', 'run_at_start')
         pil.run_at_finish = config.get('pyinstalive', 'run_at_finish')
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
+        pil.verbose = config.get('pyinstalive', 'verbose')
         pil.args = args
         pil.config = config
         pil.proxy = config.get('pyinstalive', 'proxy')
@@ -103,6 +104,14 @@ def validate_inputs(config, args, unknown_args):
             pil.show_cookie_expiry = True
         else:
             pil.show_cookie_expiry = False
+
+        if helpers.bool_str_parse(config.get('pyinstalive', 'verbose')) == "Invalid":
+            pil.verbose = False
+            error_arr.append(['verbose', 'False'])
+        elif helpers.bool_str_parse(config.get('pyinstalive', 'verbose')):
+            pil.verbose = True
+        else:
+            pil.verbose = False
 
         if helpers.bool_str_parse(config.get('pyinstalive', 'use_locks')) == "Invalid":
             pil.use_locks = False
@@ -256,7 +265,9 @@ def run():
     parser.add_argument('-nhb', '--no-heartbeat', dest='noheartbeat', action='store_true', help="Disable heartbeat "
                                                                                                 "check for "
                                                                                                 "livestreams.")
-
+    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="PyInstaLive will output JSON "
+                                                                                     "responses and some misc "
+                                                                                     "variables.")
     # Workaround to 'disable' argument abbreviations
     parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')

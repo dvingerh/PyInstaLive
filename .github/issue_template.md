@@ -1,6 +1,7 @@
-### Please check the boxes below by filling [ ] with an x so it looks like [x].
-###### Remove all spaces already present in the box.
-
+## Fill in this template completely. Issues not following this template will be closed and ignored.
+#### Check the boxes below by filling `[ ]` with an `x` so it looks like `[x]`.
+#### Use the Preview button to ensure the template is filled in correctly.
+##
 - [ ] I am using the latest version of PyInstaLive: 3.1.0.
 - [ ] I have installed either Python 2.7.x or 3.5+: `YOUR VERSION HERE`
 - [ ] I have read the [README](https://github.com/notcammy/pyinstalive/blob/master/README.md).
@@ -59,7 +60,8 @@ $ pyinstalive --info
 ```
 
 ###### Command used
-Paste the command here that you are running. Don't forget to omit your **username** and **password**.
+Paste the command here that you are running. Don't forget to omit your **username** and **password**.  
+If you can reproduce the problem then, if possible, run the same command again with `--verbose` prior to uploading the log files.
 
 **Example:** ```pyinstalive -u "johndoe" -p "grapefruits" -d "justinbieber"```
 
@@ -69,9 +71,10 @@ Accurately describe the issue you're experiencing with the script.
 ###### Steps to reproduce issue
 Specify the exact steps taken to reproduce the problem. If you can't reproduce the issue try to describe the steps you've taken that eventually resulted in the issue you have experienced.
 
-###### Log files
-Please attach the log file of the user you were trying to download (if applicable) and the `pyinstalive.default.log` log file.
-If any of the files exceed 10MB in size please use [WeTransfer](https://wetransfer.com/) or a similar service to upload these files.
+###### Required dditional files
+Please attach the log file of the user you were trying to download (if applicable) and the `pyinstalive.default.log` log file.  
+If your issue is related to assembling segment files please also include the JSON file and a zipped segment files directory.  
+If any of these files exceed 10MB in size please use [WeTransfer](https://wetransfer.com/) or a similar service to upload these files.
 
 ##
 

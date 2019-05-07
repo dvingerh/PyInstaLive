@@ -54,6 +54,8 @@ class CommentsDownloader(object):
         try:
             comments_res = self.api.broadcast_comments(
                 self.broadcast.get('id'), last_comment_ts=first_comment_created_at)
+            if pil.verbose:
+                logger.plain(json.dumps(comments_res))
             comments = comments_res.get('comments', [])
             first_comment_created_at = (
                 comments[0]['created_at_utc'] if comments else int(time.time() - 5))
@@ -91,6 +93,8 @@ class CommentsDownloader(object):
             try:
                 comments_res = self.api.replay_broadcast_comments(
                     self.broadcast.get('id'), starting_offset=starting_offset, encoding_tag=encoding_tag)
+                if pil.verbose:
+                    logger.plain(json.dumps(comments_res))
                 starting_offset = comments_res.get('ending_offset', 0)
                 comments = comments_res.get('comments', [])
                 comments_collected.extend(comments)

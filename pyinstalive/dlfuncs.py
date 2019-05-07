@@ -64,6 +64,8 @@ def get_user_id():
     except ValueError:
         try:
             user_res = pil.ig_api.username_info(pil.dl_user)
+            if pil.verbose:
+                logger.plain(json.dumps(user_res))
             user_id = user_res.get('user', {}).get('pk')
         except ClientConnectionError as cce:
             logger.error(
@@ -101,6 +103,8 @@ def get_broadcasts_info():
         user_id = get_user_id()
         if user_id:
             broadcasts = pil.ig_api.user_story_feed(user_id)
+            if pil.verbose:
+                logger.plain(json.dumps(broadcasts))
             pil.livestream_obj = broadcasts.get('broadcast')
             pil.replays_obj = broadcasts.get('post_live_item', {}).get('broadcasts', [])
             return True
@@ -178,6 +182,8 @@ def download_livestream():
         def print_status(sep=True):
             if pil.do_heartbeat:
                 heartbeat_info = pil.ig_api.broadcast_heartbeat_and_viewercount(pil.livestream_obj.get('id'))
+                if pil.verbose:
+                    logger.plain(json.dumps(heartbeat_info))
             viewers = pil.livestream_obj.get('viewer_count', 0)
             if sep:
                 logger.separator()
@@ -362,6 +368,8 @@ def download_following():
             is_checking = 'replays'
         logger.info("Checking following users for any {:s}.".format(is_checking))
         broadcast_f_list = pil.ig_api.reels_tray()
+        if pil.verbose:
+            logger.plain(json.dumps(broadcast_f_list))
         usernames_available_livestreams = []
         usernames_available_replays = []
         if broadcast_f_list['broadcasts'] and pil.dl_lives:
