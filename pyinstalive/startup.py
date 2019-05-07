@@ -266,7 +266,8 @@ def run():
                                                                                                 "check for "
                                                                                                 "livestreams.")
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="PyInstaLive will output JSON "
-                                                                                     "responses.")
+                                                                                     "responses and some misc "
+                                                                                     "variables.")
     # Workaround to 'disable' argument abbreviations
     parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')
