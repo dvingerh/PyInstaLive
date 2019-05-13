@@ -197,9 +197,9 @@ def validate_inputs(config, args, unknown_args):
         if not pil.dl_path.endswith('/'):
             pil.dl_path = pil.dl_path + '/'
         if not pil.dl_path or not os.path.exists(pil.dl_path):
-            pil.dl_path = os.getcwd()
+            pil.dl_path = os.getcwd() + "/"
             if not args.dlpath:
-                error_arr.append(['download_path', os.getcwd()])
+                error_arr.append(['download_path', os.getcwd() + "/"])
             else:
                 logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.dl_path))
                 logger.separator()

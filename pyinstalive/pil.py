@@ -50,7 +50,7 @@ def initialize():
     ig_pass = ""
     dl_user = ""
     dl_batchusers = []
-    dl_path = os.getcwd()
+    dl_path = os.getcwd() + "/"
     dl_lives = True
     dl_replays = True
     dl_comments = True
