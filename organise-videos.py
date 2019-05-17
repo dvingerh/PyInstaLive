@@ -41,7 +41,6 @@ for username in usernames:
 # Move the videos into the folders
 for filename, username in filenames_to_usernames.items():
     shutil.move(filename, username)
-    # Can also do os.rename(filename, '{}/{}'.format(username, filename))
 
 num_videos_moved = len(filenames_to_usernames.keys())
 print("{} videos moved successfully.".format(num_videos_moved))
