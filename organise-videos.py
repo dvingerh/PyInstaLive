@@ -29,15 +29,7 @@ usernames = filenames_to_usernames.values()
 for username in usernames:
     if not os.path.isdir(username):
         os.mkdir(username)
-
-# We want a dictionary where the usernames are the keys and the associated folder paths are the keys.
-username_to_folder = {}
-
-# Populate the dictionary.
-for username in usernames:
-    folder_paths = current_dir_path + "\\" + username
-    username_to_folder[username] = folder_paths
-
+        
 # Move the videos into the folders
 for filename, username in filenames_to_usernames.items():
     shutil.move(filename, username)
