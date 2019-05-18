@@ -26,11 +26,14 @@ except ImportError:
     from . import dlfuncs
     from .constants import Constants
 
-
 def validate_inputs(config, args, unknown_args):
     error_arr = []
     try:
         config.read(pil.config_path)
+
+        if args.organize:
+            assembler.organize_videos()
+            return False
 
         if args.download:
             pil.dl_user = args.download
@@ -272,6 +275,9 @@ def run():
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="PyInstaLive will output JSON "
                                                                                      "responses and some misc "
                                                                                      "variables.")
+
+    parser.add_argument('-o', '--organize', action='store_true', help="Create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. Then move the video(s) of each user into their associated folder.")
+
     # Workaround to 'disable' argument abbreviations
     parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')
@@ -281,6 +287,7 @@ def run():
     parser.add_argument('--downloadfollowinx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--configpatx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
+    parser.add_argument('--organizx', help=argparse.SUPPRESS, metavar='IGNORE')
 
     parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
