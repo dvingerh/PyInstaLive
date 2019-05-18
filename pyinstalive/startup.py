@@ -15,6 +15,7 @@ try:
     import assembler
     import dlfuncs
     from constants import Constants
+    import organize
 except ImportError:
     from urllib.parse import urlparse
     from . import pil
@@ -25,6 +26,7 @@ except ImportError:
     from . import assembler
     from . import dlfuncs
     from .constants import Constants
+    from . import organize
 
 def validate_inputs(config, args, unknown_args):
     error_arr = []
@@ -32,7 +34,7 @@ def validate_inputs(config, args, unknown_args):
         config.read(pil.config_path)
 
         if args.organize:
-            assembler.organize_videos()
+            organize.organize_videos()
             return False
 
         if args.download:
