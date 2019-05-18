@@ -29,6 +29,8 @@
 
 - ```-nhb``` or ```--no-heartbeat```  **—** Passing this argument means no livestream heartbeat checks will be conducted, and the logged in user will not show up as a viewer during the livestream. May cause degraded performance.
 
+- ```-o``` or ```--organize```  **—** Passing this argument will create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. It will then move the video(s) of each user into their associated folder. 
+
 # Default configuration file
 
 ```ini
