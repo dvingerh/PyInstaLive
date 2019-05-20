@@ -53,9 +53,6 @@ def organize_videos():
             # Change the filenames to the format "[date] [time] [username] [live/replay].mp4"
             os.rename(filename, date + " " + username + " [" + time_from_unix_timestamp + "] " + live_or_replay)
 
-            # Note: I added a space before ".mp4" as this will separate the username from ".mp4"
-            # when I do .split() on line 67. 
-
         # Now that the files have been renamed, we need to rescan the files in the directory.
         current_dir_files = os.listdir()
 
