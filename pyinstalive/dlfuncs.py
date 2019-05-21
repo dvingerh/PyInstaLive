@@ -301,9 +301,15 @@ def download_replays():
             else:
                 directories = (os.walk(pil.dl_path).__next__()[1])
 
-            for directory in directories:
-                if pil.verbose:
+            if pil.verbose:
+                logger.separator()
+                logger.plain("Listing contents of the folder '{}':".format(pil.dl_path))
+                for directory in directories:
                     logger.plain(directory)
+                logger.separator()
+                logger.separator()
+
+            for directory in directories:
                 if (str(replay_obj.get('id')) in directory) and ("_live_" not in directory):
                     logger.binfo("Already downloaded a replay with ID '{:s}'.".format(str(replay_obj.get('id'))))
                     exists = True
