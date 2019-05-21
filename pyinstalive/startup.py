@@ -170,6 +170,9 @@ def validate_inputs(config, args, unknown_args):
         if args.noreplays:
             pil.dl_replays = False
 
+        if args.verbose:
+            pil.verbose = True
+
         if not pil.dl_lives and not pil.dl_replays:
             logger.error("You have disabled both livestream and replay downloading.")
             logger.error("Please enable at least one of them and try again.")
