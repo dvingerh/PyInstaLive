@@ -51,7 +51,7 @@ def get_stream_duration(duration_type):
         if stream_started_secs:
             stream_duration_str += ' and %d seconds' % stream_started_secs
         return stream_duration_str
-    except Exception as e:
+    except Exception:
         return "Not available"
 
 
@@ -110,6 +110,9 @@ def get_broadcasts_info():
             return True
         else:
             return False
+    except ClientThrottledError:
+        logger.error('Could not check because you are making too many requests at this time.')
+        return False
     except Exception as e:
         logger.error('Could not finish checking: {:s}'.format(str(e)))
         if "timed out" in str(e):
@@ -119,10 +122,7 @@ def get_broadcasts_info():
                          'again.')
         return False
     except KeyboardInterrupt:
-        logger.binfo('Aborted checking for livestreams and replays, exiting.'.format(pil.dl_user))
-        return False
-    except ClientThrottledError as cte:
-        logger.error('Could not check because you are making too many requests at this time.')
+        logger.binfo('Aborted checking for livestreams and replays, exiting.')
         return False
 
 
@@ -302,6 +302,8 @@ def download_replays():
                 directories = (os.walk(pil.dl_path).__next__()[1])
 
             for directory in directories:
+                if pil.verbose:
+                    logger.plain(directory)
                 if (str(replay_obj.get('id')) in directory) and ("_live_" not in directory):
                     logger.binfo("Already downloaded a replay with ID '{:s}'.".format(str(replay_obj.get('id'))))
                     exists = True
