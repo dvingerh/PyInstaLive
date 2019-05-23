@@ -296,21 +296,18 @@ def download_replays():
         for replay_index, replay_obj in enumerate(pil.replays_obj):
             exists = False
             pil.livestream_obj = replay_obj
-            if Constants.PYTHON_VER[0][0] == '2':
-                directories = (os.walk(pil.dl_path).next()[1])
-            else:
-                directories = (os.walk(pil.dl_path).__next__()[1])
+            dl_path_files = os.listdir(pil.dl_path)
 
             if pil.verbose:
                 logger.separator()
                 logger.plain("Listing contents of the folder '{}':".format(pil.dl_path))
-                for directory in directories:
-                    logger.plain(directory)
+                for dl_path_file in dl_path_files:
+                    logger.plain(dl_path_file)
                 logger.separator()
                 logger.separator()
 
-            for directory in directories:
-                if (str(replay_obj.get('id')) in directory) and ("_live_" not in directory):
+            for dl_path_file in dl_path_files:
+                if (str(replay_obj.get('id')) in dl_path_file) and ("_live_" not in dl_path_file) and (dl_path_file.endswith(".mp4")):
                     logger.binfo("Already downloaded a replay with ID '{:s}'.".format(str(replay_obj.get('id'))))
                     exists = True
             if not exists:
