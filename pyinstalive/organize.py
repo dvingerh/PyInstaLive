@@ -54,7 +54,7 @@ def organize_videos():
             os.rename(filename, date + " " + username + " [" + time_from_unix_timestamp + "] " + live_or_replay)
 
         # Now that the files have been renamed, we need to rescan the files in the directory.
-        current_dir_files = os.listdir(pil.dl_path)
+        download_path_files = os.listdir(pil.dl_path)
 
         new_filenames = [filename for filename in download_path_files if filename.split('.')[-1] in video_format]
 
