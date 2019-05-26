@@ -13,7 +13,7 @@ def organize_videos():
 
     try:
         # Make a variable equal to the names of the files in the current directory.
-        current_dir_files = os.listdir()
+        download_path_files = os.listdir(pil.dl_path)
 
         # Count the amount of files moved and not moved because they already exist etc.
         not_moved = 0
@@ -23,7 +23,7 @@ def organize_videos():
         video_format = ['mp4']
 
         # Find the MP4 files and save them in a variable called 'filenames'.
-        filenames = [filename for filename in current_dir_files
+        filenames = [filename for filename in download_path_files
             if filename.split('.')[-1] in video_format]
         
         if len(filenames) == 0:
@@ -56,7 +56,7 @@ def organize_videos():
         # Now that the files have been renamed, we need to rescan the files in the directory.
         current_dir_files = os.listdir()
 
-        new_filenames = [filename for filename in current_dir_files if filename.split('.')[-1] in video_format]
+        new_filenames = [filename for filename in download_path_files if filename.split('.')[-1] in video_format]
 
         # We want a dictionary where the filenames are the keys
         # and the usernames are the values.
