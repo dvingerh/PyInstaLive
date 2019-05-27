@@ -14,6 +14,7 @@ def organize_videos():
     try:
         # Make a variable equal to the names of the files in the current directory.
         download_path_files = os.listdir(pil.dl_path)
+        print(download_path_files)
 
         # Count the amount of files moved and not moved because they already exist etc.
         not_moved = 0
@@ -49,15 +50,24 @@ def organize_videos():
 
             # Get the last part of the filename ("live.mp4" or "replay.mp4").
             live_or_replay = filename_parts[-1]
+            
+            # The path of each original filename is as follows:
+            old_filename_path = os.path.join(pil.dl_path, filename)
 
-            # Change the filenames to the format "[date] [time] [username] [live/replay].mp4"
-            os.rename(filename, date + " " + username + " [" + time_from_unix_timestamp + "] " + live_or_replay)
+            # We want to change the format of each filename to:
+            new_filename_format = date + " " + username + " [" + time_from_unix_timestamp + "] " + live_or_replay
+
+            # The path of each new filename is as follows:
+            new_filename_path = os.path.join(pil.dl_path, new_filename_format)
+
+            # Change the filenames.
+            os.rename(old_filename_path, new_filename_path)
 
         # Now that the files have been renamed, we need to rescan the files in the directory.
         download_path_files = os.listdir(pil.dl_path)
 
         new_filenames = [filename for filename in download_path_files if filename.split('.')[-1] in video_format]
-
+        
         # We want a dictionary where the filenames are the keys
         # and the usernames are the values.
         filenames_to_usernames = {}
@@ -83,10 +93,11 @@ def organize_videos():
         # Move the videos into the folders
         for filename, username in filenames_to_usernames.items():
             filename_base = os.path.basename(filename)
+            source_path = os.path.join(pil.dl_path, filename)
             destination_path = os.path.join(pil.dl_path, username, filename_base)
             if not os.path.isfile(destination_path):
                 try:
-                    shutil.move(filename, destination_path)
+                    shutil.move(source_path, destination_path)
                     logger.info("Moved '{:s}' successfully.".format(filename_base))
                     has_moved += 1
                 except OSError as oe:
