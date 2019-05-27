@@ -14,7 +14,6 @@ def organize_videos():
     try:
         # Make a variable equal to the names of the files in the current directory.
         download_path_files = os.listdir(pil.dl_path)
-        print(download_path_files)
 
         # Count the amount of files moved and not moved because they already exist etc.
         not_moved = 0
