@@ -33,10 +33,6 @@ def validate_inputs(config, args, unknown_args):
     try:
         config.read(pil.config_path)
 
-        if args.organize:
-            organize.organize_videos()
-            return False
-
         if args.download:
             pil.dl_user = args.download
             if args.downloadfollowing or args.batchfile:
@@ -44,7 +40,7 @@ def validate_inputs(config, args, unknown_args):
                 logger.warn("Please use only one download method. Use -h for more information.")
                 logger.separator()
                 return False
-        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile:
+        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize:
             logger.banner()
             logger.error("Please use a download method. Use -h for more information.")
             logger.separator()
@@ -174,6 +170,9 @@ def validate_inputs(config, args, unknown_args):
         if args.noreplays:
             pil.dl_replays = False
 
+        if args.verbose:
+            pil.verbose = True
+
         if not pil.dl_lives and not pil.dl_replays:
             logger.error("You have disabled both livestream and replay downloading.")
             logger.error("Please enable at least one of them and try again.")
@@ -229,6 +228,9 @@ def validate_inputs(config, args, unknown_args):
         elif args.assemble:
             pil.assemble_arg = args.assemble
             assembler.assemble()
+            return False
+        elif args.organize:
+            organize.organize_videos()
             return False
 
         return True

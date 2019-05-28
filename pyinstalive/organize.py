@@ -27,7 +27,8 @@ def organize_videos():
             if filename.split('.')[-1] in video_format]
         
         if len(filenames) == 0:
-            print("No MP4 files in the current directory.")
+            logger.binfo("No files were found to organize.")
+            logger.separator()
             return
 
         for filename in filenames:

@@ -51,7 +51,7 @@ def get_stream_duration(duration_type):
         if stream_started_secs:
             stream_duration_str += ' and %d seconds' % stream_started_secs
         return stream_duration_str
-    except Exception as e:
+    except Exception:
         return "Not available"
 
 
@@ -110,6 +110,9 @@ def get_broadcasts_info():
             return True
         else:
             return False
+    except ClientThrottledError:
+        logger.error('Could not check because you are making too many requests at this time.')
+        return False
     except Exception as e:
         logger.error('Could not finish checking: {:s}'.format(str(e)))
         if "timed out" in str(e):
@@ -119,10 +122,7 @@ def get_broadcasts_info():
                          'again.')
         return False
     except KeyboardInterrupt:
-        logger.binfo('Aborted checking for livestreams and replays, exiting.'.format(pil.dl_user))
-        return False
-    except ClientThrottledError as cte:
-        logger.error('Could not check because you are making too many requests at this time.')
+        logger.binfo('Aborted checking for livestreams and replays, exiting.')
         return False
 
 
@@ -296,13 +296,18 @@ def download_replays():
         for replay_index, replay_obj in enumerate(pil.replays_obj):
             exists = False
             pil.livestream_obj = replay_obj
-            if Constants.PYTHON_VER[0][0] == '2':
-                directories = (os.walk(pil.dl_path).next()[1])
-            else:
-                directories = (os.walk(pil.dl_path).__next__()[1])
+            dl_path_files = os.listdir(pil.dl_path)
 
-            for directory in directories:
-                if (str(replay_obj.get('id')) in directory) and ("_live_" not in directory):
+            if pil.verbose:
+                logger.separator()
+                logger.plain("Listing contents of the folder '{}':".format(pil.dl_path))
+                for dl_path_file in dl_path_files:
+                    logger.plain(dl_path_file)
+                logger.separator()
+                logger.separator()
+
+            for dl_path_file in dl_path_files:
+                if (str(replay_obj.get('id')) in dl_path_file) and ("_live_" not in dl_path_file) and (dl_path_file.endswith(".mp4")):
                     logger.binfo("Already downloaded a replay with ID '{:s}'.".format(str(replay_obj.get('id'))))
                     exists = True
             if not exists:
