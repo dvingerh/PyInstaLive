@@ -31,6 +31,8 @@
 
 - ```-o``` or ```--organize```  **—** Passing this argument will create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. It will then move the video(s) of each user into their associated folder. 
 
+- ```-sm``` or ```--skip-merge```  **—** PyInstaLive will not merge any download livestream files when this argument is used.
+
 # Default configuration file
 
 ```ini
@@ -51,6 +53,7 @@ clear_temp_files = False
 do_heartbeat = True
 proxy = 
 verbose = False
+skip_merge = False
 ```
 
 ```username```  **—**  Instagram username to login with.

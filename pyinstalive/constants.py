@@ -22,4 +22,5 @@ clear_temp_files = False
 do_heartbeat = False
 proxy =
 verbose = False
+skip_merge = False
     """
