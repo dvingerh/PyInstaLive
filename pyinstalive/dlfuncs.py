@@ -148,10 +148,13 @@ def merge_segments():
         if pil.comment_thread_worker and pil.comment_thread_worker.is_alive():
             logger.info("Waiting for comment downloader to finish.")
             pil.comment_thread_worker.join()
-        logger.info('Merging downloaded files into video.')
         try:
-            pil.broadcast_downloader.stitch(live_mp4_file, cleartempfiles=pil.clear_temp_files)
-            logger.info('Successfully merged downloaded files into video.')
+            if not pil.skip_merge:
+                logger.info('Merging downloaded files into video.')
+                pil.broadcast_downloader.stitch(live_mp4_file, cleartempfiles=pil.clear_temp_files)
+                logger.info('Successfully merged downloaded files into video.')
+            else:
+                logger.binfo("Merging of downloaded files has been disabled.")
             if pil.clear_temp_files:
                 helpers.remove_temp_folder()
             helpers.remove_lock()
