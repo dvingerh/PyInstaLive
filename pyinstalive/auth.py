@@ -49,6 +49,9 @@ def authenticate(username, password, force_use_login_args=False):
     ig_api = None
     try:
         if force_use_login_args:
+            pil.ig_user = username
+            pil.ig_pass = password
+            pil.config_login_overridden = True
             logger.binfo("Overriding configuration file login with -u and -p arguments.")
             logger.separator()
         cookie_file = "{}.json".format(username)

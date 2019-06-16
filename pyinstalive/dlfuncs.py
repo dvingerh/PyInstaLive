@@ -412,13 +412,14 @@ def iterate_users(user_list):
                     "If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
             else:
                 logger.info("Launching daemon process for '{:s}'.".format(user))
-                start_result = helpers.run_command("pyinstalive -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s} {:s}".format(
+                start_result = helpers.run_command("pyinstalive -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s} {:s} {:s}".format(
                     user,
                     pil.config_path,
                     pil.dl_path,
                     '--no-lives' if not pil.dl_lives else '',
                     '--no-replays' if not pil.dl_replays else '',
-                    '--no-heartbeat' if not pil.do_heartbeat else ''))
+                    '--no-heartbeat' if not pil.do_heartbeat else '',
+                    '--username {:s} --password {:s}'.format(pil.ig_user, pil.ig_pass) if pil.config_login_overridden else None))
                 if start_result:
                     logger.warn("Could not start process: {:s}".format(str(start_result)))
                 else:
