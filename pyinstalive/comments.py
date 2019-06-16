@@ -123,7 +123,7 @@ class CommentsDownloader(object):
         python_version = sys.version.split(' ')[0]
         comments_timeline = {}
         wide_build = sys.maxunicode > 65536
-        for i, c in enumerate(comments):
+        for c in comments:
             if 'offset' in c:
                 for k in c.get('comment').keys():
                     c[k] = c.get('comment', {}).get(k)
@@ -138,7 +138,7 @@ class CommentsDownloader(object):
             total_comments = 0
             timestamps = sorted(comments_timeline.keys())
             subs = []
-            for i, tc in enumerate(timestamps):
+            for tc in timestamps:
                 t = comments_timeline[tc]
                 clip_start = int(tc) - int(download_start_time) + int(comments_delay)
                 if clip_start < 0:

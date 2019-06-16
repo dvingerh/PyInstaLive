@@ -2,7 +2,7 @@ import sys
 
 
 class Constants:
-    SCRIPT_VER = "3.1.2"
+    SCRIPT_VER = "3.1.4"
     PYTHON_VER = sys.version.split(' ')[0]
     CONFIG_TEMPLATE = """
 [pyinstalive]
@@ -22,4 +22,5 @@ clear_temp_files = False
 do_heartbeat = False
 proxy =
 verbose = False
+skip_merge = False
     """

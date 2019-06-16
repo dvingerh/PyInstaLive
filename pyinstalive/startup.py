@@ -84,6 +84,7 @@ def validate_inputs(config, args, unknown_args):
         pil.run_at_finish = config.get('pyinstalive', 'run_at_finish')
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
         pil.verbose = config.get('pyinstalive', 'verbose')
+        pil.skip_merge = config.get('pyinstalive', 'skip_merge')
         pil.args = args
         pil.config = config
         pil.proxy = config.get('pyinstalive', 'proxy')
@@ -113,6 +114,14 @@ def validate_inputs(config, args, unknown_args):
             pil.verbose = True
         else:
             pil.verbose = False
+
+        if helpers.bool_str_parse(config.get('pyinstalive', 'skip_merge')) == "Invalid":
+            pil.skip_merge = False
+            error_arr.append(['skip_merge', 'False'])
+        elif helpers.bool_str_parse(config.get('pyinstalive', 'skip_merge')):
+            pil.skip_merge = True
+        else:
+            pil.skip_merge = False
 
         if helpers.bool_str_parse(config.get('pyinstalive', 'use_locks')) == "Invalid":
             pil.use_locks = False
@@ -169,6 +178,11 @@ def validate_inputs(config, args, unknown_args):
 
         if args.noreplays:
             pil.dl_replays = False
+
+        if args.verbose:
+            pil.verbose = True
+        if args.skip_merge:
+            pil.skip_merge = True
 
         if not pil.dl_lives and not pil.dl_replays:
             logger.error("You have disabled both livestream and replay downloading.")
@@ -276,7 +290,7 @@ def run():
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="PyInstaLive will output JSON "
                                                                                      "responses and some misc "
                                                                                      "variables.")
-
+    parser.add_argument('-sm', '--skip-merge', dest='skip_merge', action='store_true', help="PyInstaLive will not merge the downloaded livestream files.")
     parser.add_argument('-o', '--organize', action='store_true', help="Create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. Then move the video(s) of each user into their associated folder.")
 
     # Workaround to 'disable' argument abbreviations

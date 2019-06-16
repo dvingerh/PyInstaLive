@@ -45,6 +45,7 @@ def initialize():
     global do_heartbeat
     global proxy
     global verbose
+    global skip_merge
     global config_login_overridden
     ig_api = None
     ig_user = ""
@@ -79,4 +80,5 @@ def initialize():
     do_heartbeat = False
     proxy = None
     verbose = False
+    skip_merge = False
     config_login_overridden = False

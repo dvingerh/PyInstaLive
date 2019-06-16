@@ -63,3 +63,5 @@ pildev/
 
 *.txt
 venv/
+
+\.vscode/\.ropeproject/
