@@ -41,7 +41,7 @@ def onlogin_callback(api, cookie_file):
     cache_settings = api.settings
     with open(cookie_file, 'w') as outfile:
         json.dump(cache_settings, outfile, default=to_json)
-        logger.info('New cookie file was made: {0!s}'.format(cookie_file))
+        logger.info('New cookie file was made: {0!s}'.format(os.path.basename(cookie_file)))
         logger.separator()
 
 
@@ -54,10 +54,10 @@ def authenticate(username, password, force_use_login_args=False):
             pil.config_login_overridden = True
             logger.binfo("Overriding configuration file login with -u and -p arguments.")
             logger.separator()
-        cookie_file = "{}.json".format(username)
+        cookie_file = os.path.join(os.path.dirname(pil.config_path), "{}.json".format(username))
         if not os.path.isfile(cookie_file):
             # settings file does not exist
-            logger.warn('Unable to find cookie file: {0!s}'.format(cookie_file))
+            logger.warn('Unable to find cookie file: {0!s}'.format(os.path.basename(cookie_file)))
             logger.info('Creating a new one.')
 
             # login new

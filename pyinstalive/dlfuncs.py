@@ -427,7 +427,7 @@ def iterate_users(user_list):
                     '--no-lives' if not pil.dl_lives else '',
                     '--no-replays' if not pil.dl_replays else '',
                     '--no-heartbeat' if not pil.do_heartbeat else '',
-                    '--username {:s} --password {:s}'.format(pil.ig_user, pil.ig_pass) if pil.config_login_overridden else None))
+                    '--username {:s} --password {:s}'.format(pil.ig_user, pil.ig_pass) if pil.config_login_overridden else ''))
                 if start_result:
                     logger.warn("Could not start process: {:s}".format(str(start_result)))
                 else:
