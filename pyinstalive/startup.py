@@ -31,6 +31,13 @@ except ImportError:
 def validate_inputs(config, args, unknown_args):
     error_arr = []
     try:
+        if args.configpath:
+            pil.config_path = args.configpath
+            if not os.path.isfile(pil.config_path):
+                pil.config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
+                logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.config_path))
+                logger.separator()
+                
         config.read(pil.config_path)
 
         if args.download:
@@ -77,6 +84,7 @@ def validate_inputs(config, args, unknown_args):
             logger.warn('    ' + ' '.join(unknown_args))
             logger.separator()
 
+
         pil.ig_user = config.get('pyinstalive', 'username')
         pil.ig_pass = config.get('pyinstalive', 'password')
         pil.dl_path = config.get('pyinstalive', 'download_path')
@@ -88,13 +96,6 @@ def validate_inputs(config, args, unknown_args):
         pil.args = args
         pil.config = config
         pil.proxy = config.get('pyinstalive', 'proxy')
-
-        if args.configpath:
-            pil.config_path = args.configpath
-            if not os.path.isfile(pil.config_path):
-                pil.config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
-                logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.config_path))
-                logger.separator()
 
         if args.dlpath:
             pil.dl_path = args.dlpath
