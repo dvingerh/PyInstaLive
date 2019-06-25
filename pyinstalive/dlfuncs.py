@@ -310,7 +310,7 @@ def download_replays():
                 logger.separator()
 
             for dl_path_file in dl_path_files:
-                if (str(replay_obj.get('id')) in dl_path_file) and ("_live_" not in dl_path_file) and (dl_path_file.endswith(".mp4")):
+                if (str(replay_obj.get('id')) in dl_path_file) and ("_replay" in dl_path_file) and (dl_path_file.endswith(".mp4")):
                     logger.binfo("Already downloaded a replay with ID '{:s}'.".format(str(replay_obj.get('id'))))
                     exists = True
             if not exists:
