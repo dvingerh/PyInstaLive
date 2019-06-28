@@ -37,7 +37,7 @@ def validate_inputs(config, args, unknown_args):
                 pil.config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
                 logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.config_path))
                 logger.separator()
-                
+        pil.config_path = os.path.realpath(pil.config_path)
         config.read(pil.config_path)
 
         if args.download:
