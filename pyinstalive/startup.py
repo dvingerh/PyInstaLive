@@ -32,11 +32,16 @@ def validate_inputs(config, args, unknown_args):
     error_arr = []
     try:
         if args.configpath:
-            pil.config_path = args.configpath
-            if not os.path.isfile(pil.config_path):
-                pil.config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
-                logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.config_path))
-                logger.separator()
+            if os.path.isfile(args.configpath):
+                pil.config_path = args.configpath
+            else:
+                if os.path.isfile(pil.config_path):
+                    logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.config_path))
+                    logger.separator()
+                else:  # Create new config if it doesn't exist
+                    logger.banner()
+                    helpers.new_config()
+                    return False
         pil.config_path = os.path.realpath(pil.config_path)
         config.read(pil.config_path)
 
@@ -310,11 +315,6 @@ def run():
     parser.add_argument('-dx', help=argparse.SUPPRESS, metavar='IGNORE')
 
     args, unknown_args = parser.parse_known_args()  # Parse arguments
-
-    if not os.path.exists(pil.config_path):  # Create new config if it doesn't exist
-        logger.banner()
-        helpers.new_config()
-        return
 
     if validate_inputs(config, args, unknown_args):
         if not args.username and not args.password:
