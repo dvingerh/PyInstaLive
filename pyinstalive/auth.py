@@ -88,9 +88,8 @@ def authenticate(username, password, force_use_login_args=False):
         logger.separator()
         if pil.verbose:
             logger.plain(json.dumps(e.error_response))
-        logger.error('Could not login: {:s}'.format(
-            json.loads(e.error_response).get("error_title", e.error_response)))
-        logger.error('{:s}'.format(json.loads(e.error_response).get("message", e.error_response)))
+        logger.error('Could not login: {:s}'.format(e.error_response))
+        #logger.error('{:s}'.format(json.loads(e.error_response).get("message", e.error_response)))
         # logger.error('{:s}'.format(e.error_response))
         logger.separator()
     except Exception as e:
