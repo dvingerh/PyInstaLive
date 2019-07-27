@@ -4,6 +4,7 @@ import os
 import shutil
 import json
 import shlex
+import sys
 
 try:
     import pil
@@ -42,14 +43,14 @@ def command_exists(command):
         fnull = open(os.devnull, 'w')
         subprocess.call([command], stdout=fnull, stderr=subprocess.STDOUT)
         return True
-    except OSError as e:
+    except OSError:
         return False
 
 
 def run_command(command):
     try:
         fnull = open(os.devnull, 'w')
-        subprocess.Popen(shlex.split(command), stdout=fnull, stderr=subprocess.STDOUT)
+        subprocess.Popen(shlex.split(command), stdout=fnull, stderr=sys.stdout)
         return False
     except Exception as e:
         return str(e)

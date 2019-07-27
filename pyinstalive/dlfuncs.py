@@ -34,14 +34,14 @@ def get_stream_duration(duration_type):
     try:
         # For some reason the published_time is roughly 40 seconds behind real world time
         if duration_type == 0: # Airtime duration
-            stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("published_time") + 40), 60)
+            stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("published_time")), 60)
         if duration_type == 1: # Download duration
             stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(pil.epochtime)), 60)
         if duration_type == 2: # Missing duration
-            if (int(pil.epochtime) - pil.livestream_obj.get("published_time") + 40) <= 0:
+            if (int(pil.epochtime) - pil.livestream_obj.get("published_time")) <= 0:
                 stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
             else:
-                stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_obj.get("published_time") + 40), 60)
+                stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_obj.get("published_time")), 60)
 
         if stream_started_mins < 0:
             stream_started_mins = 0
@@ -187,7 +187,7 @@ def download_livestream():
                 heartbeat_info = pil.ig_api.broadcast_heartbeat_and_viewercount(pil.livestream_obj.get('id'))
                 if pil.verbose:
                     logger.plain(json.dumps(heartbeat_info))
-            viewers = pil.livestream_obj.get('viewer_count', 0)
+            viewers = pil.livestream_obj.get('viewer_count', 0) + 1
             if sep:
                 logger.separator()
             else:
