@@ -20,6 +20,13 @@ I am using:
 
 ### To report a bug, fill in the information below.
 
+
+###### Required files
+Please attach the log file of the user you were trying to download (if applicable) and the `pyinstalive.default.log` log file.  
+If your issue is related to assembling segment files please also include the JSON file and a zipped segment files directory.  
+If any of these files exceed the Github upload size limit in size please use [WeTransfer](https://wetransfer.com/) or a similar service to upload these files.
+
+
 ###### PyInstaLive information 
 Run ```pyinstalive --info``` and paste its output below. Don't forget to omit your **username** and **password**.
 
@@ -70,11 +77,6 @@ Accurately describe the issue you're experiencing with the script.
 
 ###### Steps to reproduce issue
 Specify the exact steps taken to reproduce the problem. If you can't reproduce the issue try to describe the steps you've taken that eventually resulted in the issue you have experienced.
-
-###### Required dditional files
-Please attach the log file of the user you were trying to download (if applicable) and the `pyinstalive.default.log` log file.  
-If your issue is related to assembling segment files please also include the JSON file and a zipped segment files directory.  
-If any of these files exceed 10MB in size please use [WeTransfer](https://wetransfer.com/) or a similar service to upload these files.
 
 ##
 

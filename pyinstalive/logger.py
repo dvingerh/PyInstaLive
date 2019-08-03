@@ -31,10 +31,10 @@ def supports_color():
         return False
 
 
-PREFIX_ERROR = '\x1B[1;31;40m[E]\x1B[0m'
-PREFIX_INFO = '\x1B[1;32;40m[I]\x1B[0m'
-PREFIX_WARN = '\x1B[1;33;40m[W]\x1B[0m'
-PREFIX_BINFO = '\x1B[1;34;40m[I]\x1B[0m'
+PREFIX_ERROR = '\x1B[1;31;49m[E]\x1B[0m'
+PREFIX_INFO = '\x1B[1;32;49m[I]\x1B[0m'
+PREFIX_WARN = '\x1B[1;33;49m[W]\x1B[0m'
+PREFIX_BINFO = '\x1B[1;34;49m[I]\x1B[0m'
 PRINT_SEP = '-' * 75
 SUPP_COLOR = supports_color()
 

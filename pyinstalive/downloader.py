@@ -44,8 +44,8 @@ def start():
                 if pil.dl_replays:
                     if pil.replays_obj:
                         logger.info(
-                            '{:d} {:s} available, beginning download.'.format(len(pil.replays_obj), "replays" if len(
-                                pil.replays_obj) > 1 else "replay"))
+                            '{:s} available, beginning download.'.format("Replays" if len(
+                                pil.replays_obj) > 1 else "Replay"))
                         dlfuncs.download_replays()
                     else:
                         logger.info('There are no available replays{:s}.'.format(" saved on your account" if checking_self else ""))

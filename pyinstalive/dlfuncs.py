@@ -155,6 +155,7 @@ def merge_segments():
                 logger.info('Successfully merged downloaded files into video.')
             else:
                 logger.binfo("Merging of downloaded files has been disabled.")
+                logger.binfo("Use --assemble command to manually merge downloaded segments.")
             if pil.clear_temp_files:
                 helpers.remove_temp_folder()
             helpers.remove_lock()
@@ -311,7 +312,7 @@ def download_replays():
 
             for dl_path_file in dl_path_files:
                 if (str(replay_obj.get('id')) in dl_path_file) and ("_replay" in dl_path_file) and (dl_path_file.endswith(".mp4")):
-                    logger.binfo("Already downloaded a replay with ID '{:s}'.".format(str(replay_obj.get('id'))))
+                    logger.binfo("Already downloaded replay {:d} with ID '{:s}'.".format(replay_index + 1, str(replay_obj.get('id'))))
                     exists = True
             if not exists:
                 current = replay_index + 1
