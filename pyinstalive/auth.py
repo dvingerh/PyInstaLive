@@ -3,6 +3,7 @@ import datetime
 import json
 import os.path
 import sys
+import traceback
 
 try:
     import logger
@@ -89,7 +90,7 @@ def authenticate(username, password, force_use_login_args=False):
         if pil.verbose:
             logger.plain(json.dumps(e.error_response))
         logger.error('Could not login: {:s}'.format(e.error_response))
-        #logger.error('{:s}'.format(json.loads(e.error_response).get("message", e.error_response)))
+        # logger.error('{:s}'.format(json.loads(e.error_response).get("message", e.error_response)))
         # logger.error('{:s}'.format(e.error_response))
         logger.separator()
     except Exception as e:
