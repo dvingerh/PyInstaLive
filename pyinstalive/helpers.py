@@ -81,7 +81,7 @@ def check_if_guesting():
 
 
 def generate_json_segments():
-    while not pil.broadcast_downloader.is_aborted:
+    while True:
         pil.livestream_obj['delay'] = (int(pil.epochtime) - pil.livestream_obj['published_time'])
         if 'initial_buffered_duration' not in pil.livestream_obj and pil.broadcast_downloader.initial_buffered_duration:
             pil.livestream_obj['initial_buffered_duration'] = pil.broadcast_downloader.initial_buffered_duration
@@ -92,7 +92,10 @@ def generate_json_segments():
             if not pil.broadcast_downloader.stream_id:
                 pil.broadcast_downloader.stream_id = pil.livestream_obj['id']
             #check_if_guesting()
-            time.sleep(2.5)
+            if pil.kill_segment_thread:
+                break
+            else:
+                time.sleep(2.5)
         except Exception as e:
             logger.warn(str(e))
 

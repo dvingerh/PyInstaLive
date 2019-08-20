@@ -47,6 +47,7 @@ def initialize():
     global verbose
     global skip_merge
     global config_login_overridden
+    global kill_segment_thread
     ig_api = None
     ig_user = ""
     ig_pass = ""
@@ -82,3 +83,4 @@ def initialize():
     verbose = False
     skip_merge = False
     config_login_overridden = False
+    kill_segment_thread = False

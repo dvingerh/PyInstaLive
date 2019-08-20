@@ -143,6 +143,7 @@ def merge_segments():
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
         if pil.segments_json_thread_worker and pil.segments_json_thread_worker.is_alive():
+            pil.kill_segment_thread = True
             pil.segments_json_thread_worker.join()
 
         if pil.comment_thread_worker and pil.comment_thread_worker.is_alive():
