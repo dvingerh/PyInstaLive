@@ -7,7 +7,7 @@ Login errors such as `Challenge required` are usually caused by one of the follo
 - You are using PyInstaLive from a different location, device or IP address compared to where you are usually logged in.
 - Your IP address or account has been flagged as spam or suspicious.
 
-Try to create a new temporary Instagram account (preferably on the device most importantly using the internet connection you will be using PyInstaLive with) and use that instead.
+Try to create a new temporary Instagram account (preferably on the device most importantly using the internet connection you will be using PyInstaLive with) and use that instead. Also make sure to check out [this issue](https://github.com/notcammy/PyInstaLive/issues/57) for more relevant information.
 
 ### I get a Rate Limit related error, how do I solve this?
 This means you are making too many requests to Instagram and is usually the case when you try to check and download livestreams of multiple users at the same time by using a script (as seen below). Increase the timeout for the scripts or decrease the amount of users you are checking.
@@ -25,7 +25,7 @@ You can use the `--download-following` function to check for available livestrea
 
 
 ```batch
-cd C:\PyInstaLive
+cd C:\Users\User\Desktop
 :loop
 pyinstalive -u "username" -p "password" -d "live-username"
 timeout 10 > nul
@@ -40,7 +40,7 @@ Make sure there is a configuration file called pyinstalive.ini in the directory 
 ```shell
 while true
 do
-    cd /home/default/PyInstaLive/
+    cd /home/user/PyInstaLive/
     pyinstalive -u "username" -p "password" -d "live-username"
     sleep 10
 done
