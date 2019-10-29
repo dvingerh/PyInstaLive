@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 3.1.8](https://img.shields.io/badge/Version-3.1.8-orange.svg)
+![Version 3.1.9](https://img.shields.io/badge/Version-3.1.9-orange.svg)
 ![Python 2.7, 3.5](https://img.shields.io/badge/Python-2.7%2C%203.5%2B-3776ab.svg)
 
 [![Support me!](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/dvingerh)
@@ -53,21 +53,21 @@ Make sure all tools are accessible via command line (added to your PATH if on Wi
 
 ## Installation
 
-*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command (e.g. **@3.1.8**).*
+*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command (e.g. **@3.1.9**).*
 
 #### Installing
 
 Run the following command in your command line (might need to be run as administrator on Windows):
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@3.1.8 --process-dependency-links
+pip install git+https://github.com/notcammy/PyInstaLive.git@3.1.9 --process-dependency-links
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **3.1.8**) run the following command:
+To update PyInstaLive to the latest version (currently **3.1.9**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@3.1.8 --process-dependency-links --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@3.1.9 --process-dependency-links --upgrade
 ```
 
 #### Specific versions
@@ -126,7 +126,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 > pyinstalive -d "janedoe"
 
 ---------------------------------------------------------------------------
-[I] PYINSTALIVE (SCRIPT V3.1.8 - PYTHON V3.6.3) - 01-02-2019 06:56:29 PM
+[I] PYINSTALIVE (SCRIPT V3.1.9 - PYTHON V3.6.3) - 01-02-2019 06:56:29 PM
 ---------------------------------------------------------------------------
 [I] Successfully logged into account: johndoe
 ---------------------------------------------------------------------------
