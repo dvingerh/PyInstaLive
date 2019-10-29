@@ -4,8 +4,8 @@ __author__ = 'notcammy'
 __email__ = 'neus2benen@gmail.com'
 __version__ = '3.1.8'
 
-_api_version = '1.5.7'
-_api_extensions_version = '0.3.8'
+_api_version = '1.6.0'
+_api_extensions_version = '0.3.9'
 
 long_description = 'This Python script enables you to download any ongoing Instagram livestreams as well as any ' \
                    'available replays. It is based on another script that has now been discontinued. '
@@ -45,5 +45,6 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ]
 )
