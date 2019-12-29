@@ -23,16 +23,10 @@ setup(
         ]
     },
     install_requires=[
-        'instagram_private_api>=%(api)s' % {'api': _api_version},
-        'instagram_private_api_extensions>=%(ext)s' % {'ext': _api_extensions_version},
+        'instagram_private_api @ https://github.com/ping/instagram_private_api/archive/%(api)s.tar.gz#egg=instagram_private_api-%(api)s' % {'api': _api_version},
+        'instagram_private_api_extensions @ https://github.com/ping/instagram_private_api_extensions/archive/%(api)s.tar.gz#egg=instagram_private_api_extensions-%(api)s' % {'api': _api_extensions_version},
         'argparse',
         'configparser'
-    ],
-    dependency_links=[
-        'https://github.com/ping/instagram_private_api/archive/%(api)s.tar.gz'
-        '#egg=instagram_private_api-%(api)s' % {'api': _api_version},
-        'https://github.com/ping/instagram_private_api_extensions/archive/%(ext)s.tar.gz'
-        '#egg=instagram_private_api_extensions-%(ext)s' % {'ext': _api_extensions_version}
     ],
     include_package_data=True,
     platforms='any',

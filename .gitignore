@@ -33,8 +33,6 @@ snippets\.py
 
 downloaded/
 
-requirements\.txt
-
 *.lock
 
 *.log
@@ -61,7 +59,6 @@ pildev/
 
 \.idea/
 
-*.txt
 venv/
 
 \.vscode/\.ropeproject/
