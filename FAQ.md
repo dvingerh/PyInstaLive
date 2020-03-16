@@ -25,7 +25,6 @@ You can use the `--download-following` function to check for available livestrea
 
 
 ```batch
-cd C:\Users\User\Desktop
 :loop
 pyinstalive -u "username" -p "password" -d "live-username"
 timeout 10 > nul
@@ -40,7 +39,6 @@ Make sure there is a configuration file called pyinstalive.ini in the directory 
 ```shell
 while true
 do
-    cd /home/user/PyInstaLive/
     pyinstalive -u "username" -p "password" -d "live-username"
     sleep 10
 done
