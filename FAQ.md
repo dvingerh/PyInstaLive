@@ -27,7 +27,7 @@ You can use the `--download-following` function to check for available livestrea
 ```batch
 :loop
 pyinstalive -u "username" -p "password" -d "live-username"
-timeout 10 > nul
+timeout 60 > nul
 goto loop
 ```
 Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .bat file. Do this for each user you want to download a livestream of and run the scripts concurrently.
@@ -40,7 +40,7 @@ Make sure there is a configuration file called pyinstalive.ini in the directory 
 while true
 do
     pyinstalive -u "username" -p "password" -d "live-username"
-    sleep 10
+    sleep 60
 done
 ```
 Make a new text file and copy the above contents. Edit the PyInstaLive command to your liking. Make sure to save the text as a .sh file.
