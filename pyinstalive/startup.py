@@ -253,7 +253,7 @@ def validate_inputs(config, args, unknown_args):
             assembler.assemble()
             return False
         elif args.organize:
-            organize.organize_videos()
+            organize.organize_files()
             return False
 
         return True
