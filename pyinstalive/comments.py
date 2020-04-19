@@ -125,7 +125,7 @@ class CommentsDownloader(object):
         wide_build = sys.maxunicode > 65536
         for c in comments:
             if 'offset' in c:
-                for k in c.get('comment').keys():
+                for k in list(c.get('comment')):
                     c[k] = c.get('comment', {}).get(k)
                 c['created_at_utc'] = download_start_time + c.get('offset')
             created_at_utc = str(2 * (c.get('created_at_utc') // 2))
@@ -136,7 +136,7 @@ class CommentsDownloader(object):
         if comments_timeline:
             comment_errors = 0
             total_comments = 0
-            timestamps = sorted(comments_timeline.keys())
+            timestamps = sorted(list(comments_timeline))
             subs = []
             for tc in timestamps:
                 t = comments_timeline[tc]
@@ -193,7 +193,7 @@ class CommentsDownloader(object):
                                                                                                        'ignore')))
                         except Exception:
                             pass
-                total_comments += 1
+                    total_comments += 1
                 subs.append(comments_log)
 
             with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
