@@ -29,7 +29,7 @@
 
 - ```-nhb``` or ```--no-heartbeat```  **—** Passing this argument means no livestream heartbeat checks will be conducted, and the logged in user will not show up as a viewer during the livestream. May cause degraded performance.
 
-- ```-o``` or ```--organize```  **—** Passing this argument will create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. It will then move the video and log files of each user into their associated folder and rename the files to a more friendly format. Example fileanme: ```19-04-2020 06-02-10-PM johndoe (replay).mp4```
+- ```-o``` or ```--organize```  **—** Passing this argument will create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. It will then move the video and log files of each user into their associated folder and rename the files to a more friendly format. Example filename: ```19-04-2020 06-02-10-PM johndoe (replay).mp4```. Temporary file segment folders will not be moved.
 
 - ```-sm``` or ```--skip-merge```  **—** PyInstaLive will not merge any download livestream files when this argument is used.
 
