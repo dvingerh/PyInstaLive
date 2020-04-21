@@ -14,7 +14,7 @@ except ImportError:
 def organize_files():
 
     try:
-        files = [f for f in os.listdir(pil.dl_path) if os.path.isfile(os.path.join(pil.dl_path, f))]
+        files = [f for f in os.listdir(pil.dl_path) if os.path.isfile(os.path.join(pil.dl_path, f)) and not f.endswith(".lock")]
 
         not_moved = 0
         has_moved = 0
@@ -27,15 +27,18 @@ def organize_files():
         new_file_dict = {}
 
         for file in files:
-            username = re.search(username_regex, file)[0]
-            date_ts = datetime.strptime(re.search(date_regex, file)[0], '%Y%m%d').strftime('%d-%m-%Y')
-            time_ts = time.strftime('%I-%M-%S-%p', time.localtime(int(re.search(timestamp_regex, file)[1]))) 
-            file_ext = os.path.splitext(file)[1]
-            file_type = re.search(type_regex, file)[0]
-            
-            new_file = "{:s} {:s} {:s} ({:s}){:s}".format(date_ts, time_ts, username, file_type, file_ext)
-            raw_file_dict[file] = username
-            new_file_dict[file] = new_file
+            try:
+                username = re.search(username_regex, file)[0]
+                date_ts = datetime.strptime(re.search(date_regex, file)[0], '%Y%m%d').strftime('%d-%m-%Y')
+                time_ts = time.strftime('%I-%M-%S-%p', time.localtime(int(re.search(timestamp_regex, file)[1]))) 
+                file_ext = os.path.splitext(file)[1]
+                file_type = re.search(type_regex, file)[0]
+                
+                new_file = "{:s} {:s} {:s} ({:s}){:s}".format(date_ts, time_ts, username, file_type, file_ext)
+                raw_file_dict[file] = username
+                new_file_dict[file] = new_file
+            except TypeError as e:
+                logger.warn("Could not parse filename '{:s}', skipping.".format(file))
         
         for filename, username in raw_file_dict.items():
             try:
