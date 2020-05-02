@@ -72,7 +72,7 @@ skip_merge = False
 
 ```log_to_file```  **—**  When set to true, PyInstaLive will save all its console logs to a text file. The filename will be `pyinstalive_<live-username>.log` where `<live_username>` will be the username of the Instagram user whose livestream or replay you want to download. If no username was given to download (e.g when running `pyinstalive --clean`) the file will be named `pyinstalive.default.log`.
 
-```ffmpeg_path```  **—**  User-defined path to the FFmpeg binary. If left empty, PyInstaLive will fall back to the system's environment variable.
+```ffmpeg_path```  **—**  User-defined path to the FFmpeg binary (e.g. `C:\Users\Username\Desktop\ffmpeg.exe`). If left empty, PyInstaLive will fall back to the system's environment variable.
 
 ```run_at_start```  **—**  Command to run when PyInstaLive starts downloading a livestream. Leave empty to disable. (Experimental feature)
 
