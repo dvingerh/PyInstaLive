@@ -44,7 +44,6 @@ def initialize():
     global has_guest
     global do_heartbeat
     global proxy
-    global verbose
     global skip_merge
     global config_login_overridden
     global kill_segment_thread
@@ -81,7 +80,6 @@ def initialize():
     has_guest = None
     do_heartbeat = False
     proxy = None
-    verbose = False
     skip_merge = False
     config_login_overridden = False
     kill_segment_thread = False

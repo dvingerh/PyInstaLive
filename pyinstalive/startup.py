@@ -102,7 +102,6 @@ def validate_inputs(config, args, unknown_args):
         pil.run_at_start = config.get('pyinstalive', 'run_at_start')
         pil.run_at_finish = config.get('pyinstalive', 'run_at_finish')
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
-        pil.verbose = config.get('pyinstalive', 'verbose')
         pil.skip_merge = config.get('pyinstalive', 'skip_merge')
         pil.args = args
         pil.config = config
@@ -118,14 +117,6 @@ def validate_inputs(config, args, unknown_args):
             pil.show_cookie_expiry = True
         else:
             pil.show_cookie_expiry = False
-
-        if helpers.bool_str_parse(config.get('pyinstalive', 'verbose')) == "Invalid":
-            pil.verbose = False
-            error_arr.append(['verbose', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'verbose')):
-            pil.verbose = True
-        else:
-            pil.verbose = False
 
         if helpers.bool_str_parse(config.get('pyinstalive', 'skip_merge')) == "Invalid":
             pil.skip_merge = False
@@ -191,8 +182,6 @@ def validate_inputs(config, args, unknown_args):
         if args.noreplays:
             pil.dl_replays = False
 
-        if args.verbose:
-            pil.verbose = True
         if args.skip_merge:
             pil.skip_merge = True
 
@@ -299,9 +288,6 @@ def run():
     parser.add_argument('-nhb', '--no-heartbeat', dest='noheartbeat', action='store_true', help="Disable heartbeat "
                                                                                                 "check for "
                                                                                                 "livestreams.")
-    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', help="PyInstaLive will output JSON "
-                                                                                     "responses and some misc "
-                                                                                     "variables.")
     parser.add_argument('-sm', '--skip-merge', dest='skip_merge', action='store_true', help="PyInstaLive will not merge the downloaded livestream files.")
     parser.add_argument('-o', '--organize', action='store_true', help="Create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. Then move the video(s) of each user into their associated folder.")
 

@@ -52,7 +52,6 @@ use_locks = True
 clear_temp_files = False
 do_heartbeat = True
 proxy = 
-verbose = False
 skip_merge = False
 ```
 

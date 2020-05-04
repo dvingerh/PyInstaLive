@@ -68,7 +68,6 @@ $ pyinstalive --info
 
 ###### Command used
 Paste the command here that you are running. Don't forget to omit your **username** and **password**.  
-If you can reproduce the problem then, if possible, run the same command again with `--verbose` prior to uploading the log files.
 
 **Example:** ```pyinstalive -u "johndoe" -p "grapefruits" -d "justinbieber"```
 

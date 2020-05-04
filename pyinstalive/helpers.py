@@ -265,7 +265,7 @@ def create_lock_user():
                 return True
         else:
             return False
-    except Exception as e:
+    except Exception:
         logger.warn("Lock file could not be created. Be careful when running multiple downloads concurrently!")
         return True
 
@@ -278,7 +278,7 @@ def create_lock_folder():
                 return True
         else:
             return False
-    except Exception as e:
+    except Exception:
         logger.warn("Lock file could not be created. Be careful when running multiple downloads concurrently!")
         return True
 
