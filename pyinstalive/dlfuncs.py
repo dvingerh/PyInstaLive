@@ -408,7 +408,7 @@ def iterate_users(user_list):
             else:
                 logger.info("Launching daemon process for '{:s}'.".format(user))
                 start_result = helpers.run_command("{:s} -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s} {:s} {:s}".format(
-                    pil.winbuild_path if pil.winbuild_path else "pyinstalive",
+                    ("'" + pil.winbuild_path + "'") if pil.winbuild_path else "pyinstalive",
                     user,
                     pil.config_path,
                     pil.dl_path,
