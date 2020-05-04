@@ -1,5 +1,5 @@
 # PyInstaLive
-![Version 3.2.0](https://img.shields.io/badge/Version-3.2.0-orange.svg)
+![Version 3.2.1](https://img.shields.io/badge/Version-3.2.1-orange.svg)
 ![Python 2.7, 3.5](https://img.shields.io/badge/Python-2.7%2C%203.5%2B-3776ab.svg)
 
 [![Support me!](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/dvingerh)
@@ -53,21 +53,21 @@ Make sure all tools are accessible via command line (added to your PATH if on Wi
 
 ## Installation
 
-*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command (e.g. **@3.2.0**).*
+*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command (e.g. **@3.2.1**).*
 
 #### Installing
 
 Run the following command in your command line (might need to be run as administrator on Windows):
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.0
+pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.1
 ```
 
 #### Updating
 
-To update PyInstaLive to the latest version (currently **3.2.0**) run the following command:
+To update PyInstaLive to the latest version (currently **3.2.1**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.0 --upgrade
+pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.1 --upgrade
 ```
 
 #### Specific versions
@@ -125,7 +125,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 > pyinstalive -d "janedoe"
 
 ---------------------------------------------------------------------------
-[I] PYINSTALIVE (SCRIPT V3.2.0 - PYTHON V3.6.3) - 01-02-2019 06:56:29 PM
+[I] PYINSTALIVE (SCRIPT V3.2.1 - PYTHON V3.6.3) - 01-02-2019 06:56:29 PM
 ---------------------------------------------------------------------------
 [I] Successfully logged into account: johndoe
 ---------------------------------------------------------------------------
