@@ -307,7 +307,7 @@ def download_replays():
                     "Downloading replay {:s} of {:s} with ID '{:s}'.".format(str(current), str(len(pil.replays_obj)),
                                                                                str(replay_obj.get('id'))))
                 pil.live_folder_path = '{}{}_{}_{}_{}_replay_downloads'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), replay_obj.get("published_time"))
                 broadcast_downloader = replay.Downloader(
                     mpd=replay_obj.get('dash_manifest'),
                     output_dir=pil.live_folder_path,
@@ -316,10 +316,10 @@ def download_replays():
                 if pil.use_locks:
                     helpers.create_lock_folder()
                 replay_mp4_file = '{}{}_{}_{}_{}_replay.mp4'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), replay_obj.get("published_time"))
 
                 comments_json_file = '{}{}_{}_{}_{}_replay_comments.json'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), replay_obj.get("published_time"))
 
                 pil.comment_thread_worker = threading.Thread(target=get_replay_comments, args=(comments_json_file,))
 
