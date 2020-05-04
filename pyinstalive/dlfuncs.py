@@ -422,7 +422,8 @@ def iterate_users(user_list):
                     "If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
             else:
                 logger.info("Launching daemon process for '{:s}'.".format(user))
-                start_result = helpers.run_command("pyinstalive -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s} {:s} {:s}".format(
+                start_result = helpers.run_command("{:s} -d {:s} -cp '{:s}' -dp '{:s}' {:s} {:s} {:s} {:s}".format(
+                    pil.winbuild_path if pil.winbuild_path else "pyinstalive",
                     user,
                     pil.config_path,
                     pil.dl_path,

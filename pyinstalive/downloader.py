@@ -18,7 +18,7 @@ def start():
         if not pil.dl_replays:
             logger.binfo("Replay downloading is disabled either with an argument or in the config file.")
             logger.separator()
-        if not helpers.command_exists("pyinstalive"):
+        if not helpers.command_exists("pyinstalive") and not pil.winbuild_path:
             logger.error("PyInstaLive must be properly installed when using the -df argument.")
             logger.separator()
         else:

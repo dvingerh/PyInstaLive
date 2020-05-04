@@ -303,3 +303,9 @@ def remove_temp_folder():
 
 def download_folder_has_lockfile():
     return os.path.isfile(os.path.join(pil.dl_path, pil.dl_user + '.lock'))
+
+def winbuild_path():
+    if getattr(sys, 'frozen', False):
+        return sys.executable
+    elif __file__:
+        return None

@@ -48,6 +48,7 @@ def initialize():
     global skip_merge
     global config_login_overridden
     global kill_segment_thread
+    global winbuild_path
     ig_api = None
     ig_user = ""
     ig_pass = ""
@@ -84,3 +85,4 @@ def initialize():
     skip_merge = False
     config_login_overridden = False
     kill_segment_thread = False
+    winbuild_path = helpers.winbuild_path()
