@@ -322,7 +322,7 @@ def run():
             if pil.dl_user or pil.args.downloadfollowing:
                 downloader.start()
             elif pil.dl_batchusers:
-                if not helpers.command_exists("pyinstalive"):
+                if not helpers.command_exists("pyinstalive") and not pil.winbuild_path:
                     logger.error("PyInstaLive must be properly installed when using the -b argument.")
                     logger.separator()
                 else:
