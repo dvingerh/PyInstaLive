@@ -33,8 +33,12 @@ def organize_files():
                 time_ts = time.strftime('%I-%M-%S-%p', time.localtime(int(re.search(timestamp_regex, file)[1]))) 
                 file_ext = os.path.splitext(file)[1]
                 file_type = re.search(type_regex, file)[0]
-                
-                new_file = "{:s} {:s} {:s} ({:s}){:s}".format(date_ts, time_ts, username, file_type, file_ext)
+                json_type = ""
+                if file.endswith("_downloads.json"):
+                    json_type = " downloads"
+                elif file.endswith("_comments.json"):
+                    json_type = " comments"
+                new_file = "{:s} {:s} {:s} ({:s}){:s}{:s}".format(date_ts, time_ts, username, file_type, json_type, file_ext)
                 raw_file_dict[file] = username
                 new_file_dict[file] = new_file
             except TypeError as e:
