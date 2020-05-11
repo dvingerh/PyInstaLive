@@ -454,7 +454,7 @@ def get_live_comments(comments_json_file):
                     comments_delay=pil.broadcast_downloader.initial_buffered_duration)
                 if len(comments_downloader.comments) == 1:
                     logger.info("Successfully saved 1 comment.")
-                    os.remove(comments_json_file)
+                    #os.remove(comments_json_file)
                     logger.separator()
                     return True
                 else:
@@ -464,7 +464,7 @@ def get_live_comments(comments_json_file):
                                 str(total_comments), str(comment_errors)))
                     else:
                         logger.info("Successfully saved {:s} comments.".format(str(total_comments)))
-                    os.remove(comments_json_file)
+                    #os.remove(comments_json_file)
                     logger.separator()
                     return True
             else:
@@ -491,7 +491,7 @@ def get_replay_comments(comments_json_file):
                     comments_delay=0)
                 if total_comments == 1:
                     logger.info("Successfully saved 1 comment to logfile.")
-                    os.remove(comments_json_file)
+                    #os.remove(comments_json_file)
                     logger.separator()
                     return True
                 else:
@@ -501,7 +501,7 @@ def get_replay_comments(comments_json_file):
                                 str(total_comments), str(comment_errors)))
                     else:
                         logger.info("Successfully saved {:s} comments.".format(str(total_comments)))
-                    os.remove(comments_json_file)
+                    #os.remove(comments_json_file)
                     logger.separator()
                     return True
             else:

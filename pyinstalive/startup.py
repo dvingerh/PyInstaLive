@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import os
+import sys
 import logging
 import platform
 import subprocess
@@ -14,8 +15,9 @@ try:
     import downloader
     import assembler
     import dlfuncs
-    from constants import Constants
     import organize
+    from constants import Constants
+    from comments import CommentsDownloader
 except ImportError:
     from urllib.parse import urlparse
     from . import pil
@@ -25,8 +27,9 @@ except ImportError:
     from . import downloader
     from . import assembler
     from . import dlfuncs
-    from .constants import Constants
     from . import organize
+    from .constants import Constants
+    from .comments import CommentsDownloader
 
 def validate_inputs(config, args, unknown_args):
     error_arr = []
@@ -58,7 +61,7 @@ def validate_inputs(config, args, unknown_args):
                 logger.warn("Please use only one download method. Use -h for more information.")
                 logger.separator()
                 return False
-        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize:
+        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize and not args.generatecomments:
             logger.banner()
             logger.error("Please use a download method. Use -h for more information.")
             logger.separator()
@@ -241,6 +244,10 @@ def validate_inputs(config, args, unknown_args):
             pil.assemble_arg = args.assemble
             assembler.assemble()
             return False
+        elif args.generatecomments:
+            pil.gencomments_arg = args.generatecomments
+            CommentsDownloader.generate_log(gen_from_arg=True)
+            return False
         elif args.organize:
             organize.organize_files()
             return False
@@ -282,6 +289,8 @@ def run():
                         help="Path to folder where PyInstaLive should save livestreams and replays.")
     parser.add_argument('-as', '--assemble', dest='assemble', type=str, required=False,
                         help="Path to json file required by the assembler to generate a video file from the segments.")
+    parser.add_argument('-gc', '--generate-comments', dest='generatecomments', type=str, required=False,
+                        help="Path to json file required to generate a comments log from a json file.")
     parser.add_argument('-df', '--download-following', dest='downloadfollowing', action='store_true',
                         help="PyInstaLive will check for available livestreams and replays from users the account "
                              "used to login follows.")

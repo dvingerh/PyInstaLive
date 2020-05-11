@@ -71,9 +71,11 @@ class CommentsDownloader(object):
             logger.warn('Comment downloading error: %s' % e)
         except ClientError as e:
             if e.code == 500:
-                logger.warn('Comment downloading ClientError: %d %s' % (e.code, e.error_response))
+                logger.warn('Comment downloading ClientError: %d %s' %
+                            (e.code, e.error_response))
             elif e.code == 400 and not e.msg:
-                logger.warn('Comment downloading ClientError: %d %s' % (e.code, e.error_response))
+                logger.warn('Comment downloading ClientError: %d %s' %
+                            (e.code, e.error_response))
             else:
                 raise e
         finally:
@@ -115,91 +117,122 @@ class CommentsDownloader(object):
             json.dump(broadcast, outfile, indent=2)
 
     @staticmethod
-    def generate_log(comments, download_start_time, log_file, comments_delay=10.0):
-        python_version = sys.version.split(' ')[0]
-        comments_timeline = {}
-        wide_build = sys.maxunicode > 65536
-        for c in comments:
-            if 'offset' in c:
-                for k in list(c.get('comment')):
-                    c[k] = c.get('comment', {}).get(k)
-                c['created_at_utc'] = download_start_time + c.get('offset')
-            created_at_utc = str(2 * (c.get('created_at_utc') // 2))
-            comment_list = comments_timeline.get(created_at_utc) or []
-            comment_list.append(c)
-            comments_timeline[created_at_utc] = comment_list
-
-        if comments_timeline:
-            comment_errors = 0
-            total_comments = 0
-            timestamps = sorted(list(comments_timeline))
-            subs = []
-            for tc in timestamps:
-                t = comments_timeline[tc]
-                clip_start = int(tc) - int(download_start_time) + int(comments_delay)
-                if clip_start < 0:
-                    clip_start = 0
-
-                comments_log = ''
-                for c in t:
-                    try:
-                        if python_version.startswith('3'):
-                            if c.get('user', {}).get('is_verified'):
-                                comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                                                  '{} {}: {}'.format(c.get('user', {}).get('username'),
-                                                                                     "(v)", c.get('text')))
-                            else:
-                                comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                                                  '{}: {}'.format(c.get('user', {}).get('username'),
-                                                                                  c.get('text')))
-                        else:
-                            if not wide_build:
-                                if c.get('user', {}).get('is_verified'):
-                                    comments_log += '{}{}\n\n'.format(
-                                        time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                        '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)",
-                                                           c.get('text').encode('ascii', 'ignore')))
-                                else:
-                                    comments_log += '{}{}\n\n'.format(
-                                        time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                        '{}: {}'.format(c.get('user', {}).get('username'),
-                                                        c.get('text').encode('ascii', 'ignore')))
-                            else:
-                                if c.get('user', {}).get('is_verified'):
-                                    comments_log += '{}{}\n\n'.format(
-                                        time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                        '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
-                                else:
-                                    comments_log += '{}{}\n\n'.format(
-                                        time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                        '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
-                    except Exception:
-                        comment_errors += 1
-                        try:
-                            if c.get('user', {}).get('is_verified'):
-                                comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                                                  '{} {}: {}'.format(c.get('user', {}).get('username'),
-                                                                                     "(v)",
-                                                                                     c.get('text').encode('ascii',
-                                                                                                          'ignore')))
-                            else:
-                                comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
-                                                                  '{}: {}'.format(c.get('user', {}).get('username'),
-                                                                                  c.get('text').encode('ascii',
-                                                                                                       'ignore')))
-                        except Exception:
-                            pass
-                    total_comments += 1
-                subs.append(comments_log)
-
-            with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
-                if python_version.startswith('2') and not wide_build:
-                    log_outfile.write(
-                        'This log was generated using Python {:s} without wide unicode support. This means characters '
-                        'such as emotes are not saved.\nUser comments without any text usually are comments that only '
-                        'had emotes.\nBuild Python 2 with the --enable-unicode=ucs4 argument or use Python 3 for full '
-                        'unicode support.\n\n'.format(
-                            python_version) + ''.join(subs))
+    def generate_log(comments={}, download_start_time=0, log_file="", comments_delay=10.0, gen_from_arg=False):
+        try:
+            if gen_from_arg:
+                with open(pil.gencomments_arg, 'r') as comments_json:
+                    comments = json.load(comments_json).get("comments", None)
+                if comments:
+                    log_file = os.path.join(
+                        pil.dl_path, os.path.basename(pil.gencomments_arg.replace(".json", ".log")))
+                    logger.info("Generating comments file from input...")
                 else:
-                    log_outfile.write(''.join(subs))
-            return comment_errors, total_comments
+                    logger.warn(
+                        "The input file does not contain any comments.")
+                    logger.separator()
+                    return None
+            python_version = sys.version.split(' ')[0]
+            comments_timeline = {}
+            wide_build = sys.maxunicode > 65536
+            for c in comments:
+                if 'offset' in c:
+                    for k in list(c.get('comment')):
+                        c[k] = c.get('comment', {}).get(k)
+                    c['created_at_utc'] = download_start_time + c.get('offset')
+                created_at_utc = str(2 * (c.get('created_at_utc') // 2))
+                comment_list = comments_timeline.get(created_at_utc) or []
+                comment_list.append(c)
+                comments_timeline[created_at_utc] = comment_list
+
+            if comments_timeline:
+                comment_errors = 0
+                total_comments = 0
+                timestamps = sorted(list(comments_timeline))
+                subs = []
+                for tc in timestamps:
+                    t = comments_timeline[tc]
+                    clip_start = int(tc) - int(download_start_time) + \
+                        int(comments_delay)
+                    if clip_start < 0:
+                        clip_start = 0
+
+                    comments_log = ''
+                    for c in t:
+                        try:
+                            if python_version.startswith('3'):
+                                if c.get('user', {}).get('is_verified'):
+                                    comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
+                                                                      '{} {}: {}'.format(c.get('user', {}).get('username'),
+                                                                                         "(v)", c.get('text')))
+                                else:
+                                    comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
+                                                                      '{}: {}'.format(c.get('user', {}).get('username'),
+                                                                                      c.get('text')))
+                            else:
+                                if not wide_build:
+                                    if c.get('user', {}).get('is_verified'):
+                                        comments_log += '{}{}\n\n'.format(
+                                            time.strftime(
+                                                '%H:%M:%S\n', time.gmtime(clip_start)),
+                                            '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)",
+                                                               c.get('text').encode('ascii', 'ignore')))
+                                    else:
+                                        comments_log += '{}{}\n\n'.format(
+                                            time.strftime(
+                                                '%H:%M:%S\n', time.gmtime(clip_start)),
+                                            '{}: {}'.format(c.get('user', {}).get('username'),
+                                                            c.get('text').encode('ascii', 'ignore')))
+                                else:
+                                    if c.get('user', {}).get('is_verified'):
+                                        comments_log += '{}{}\n\n'.format(
+                                            time.strftime(
+                                                '%H:%M:%S\n', time.gmtime(clip_start)),
+                                            '{} {}: {}'.format(c.get('user', {}).get('username'), "(v)", c.get('text')))
+                                    else:
+                                        comments_log += '{}{}\n\n'.format(
+                                            time.strftime(
+                                                '%H:%M:%S\n', time.gmtime(clip_start)),
+                                            '{}: {}'.format(c.get('user', {}).get('username'), c.get('text')))
+                        except Exception:
+                            comment_errors += 1
+                            try:
+                                if c.get('user', {}).get('is_verified'):
+                                    comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
+                                                                      '{} {}: {}'.format(c.get('user', {}).get('username'),
+                                                                                         "(v)",
+                                                                                         c.get('text').encode('ascii',
+                                                                                                              'ignore')))
+                                else:
+                                    comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(clip_start)),
+                                                                      '{}: {}'.format(c.get('user', {}).get('username'),
+                                                                                      c.get('text').encode('ascii',
+                                                                                                           'ignore')))
+                            except Exception:
+                                pass
+                        total_comments += 1
+                    subs.append(comments_log)
+
+                with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
+                    if python_version.startswith('2') and not wide_build:
+                        log_outfile.write(
+                            'This log was generated using Python {:s} without wide unicode support. This means characters '
+                            'such as emotes are not saved.\nUser comments without any text usually are comments that only '
+                            'had emotes.\nBuild Python 2 with the --enable-unicode=ucs4 argument or use Python 3 for full '
+                            'unicode support.\n\n'.format(
+                                python_version) + ''.join(subs))
+                    else:
+                        log_outfile.write(''.join(subs))
+                if gen_from_arg:
+                    if comment_errors:
+                        logger.warn(
+                            "Successfully saved {:s} comments but {:s} comments are (partially) missing.".format(
+                                str(total_comments), str(comment_errors)))
+                    else:
+                        logger.info("Successfully saved {:s} comments.".format(
+                            str(total_comments)))
+                    logger.separator()
+                return comment_errors, total_comments
+        except Exception as e:
+            logger.error(
+                "An error occurred while saving comments: {:s}".format(str(e)))
+            logger.separator()
