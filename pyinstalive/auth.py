@@ -111,7 +111,7 @@ def authenticate(username, password, force_use_login_args=False):
                 cookie_expiry = ig_api.cookie_jar.auth_expires
                 logger.info('Cookie file expiry date: {:s}'.format(
                     datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%d at %I:%M:%S %p')))
-            except AttributeError as e:
+            except Exception as e:
                 logger.warn('An error occurred while getting the cookie file expiry date: {:s}'.format(str(e)))
 
         logger.separator()
