@@ -33,6 +33,8 @@
 
 - ```-sm``` or ```--skip-merge```  **—** PyInstaLive will not merge any download livestream files when this argument is used.
 
+- ```-gc``` or ```--generate-comments```  **—** PyInstaLive will try to generate a comments file from a given comments JSON file.
+
 # Default configuration file
 
 ```ini
