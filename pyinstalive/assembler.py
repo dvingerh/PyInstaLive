@@ -90,6 +90,7 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
             logger.info("Assembling video segment files from specified folder: {}".format(ass_segment_dir))
 
         for segment in all_segments:
+            segment = re.sub('\?.*$', '', segment)
             if not os.path.isfile(segment.replace('.m4v', '.m4a')):
                 logger.warn('Audio segment not found: {0!s}'.format(segment.replace('.m4v', '.m4a')))
                 continue

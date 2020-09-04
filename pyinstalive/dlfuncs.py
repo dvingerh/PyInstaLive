@@ -150,11 +150,11 @@ def merge_segments():
                 logger.info('Merging downloaded files into video.')
                 pil.broadcast_downloader.stitch(live_mp4_file, cleartempfiles=pil.clear_temp_files)
                 logger.info('Successfully merged downloaded files into video.')
+                if pil.clear_temp_files:
+                    helpers.remove_temp_folder()
             else:
                 logger.binfo("Merging of downloaded files has been disabled.")
                 logger.binfo("Use --assemble command to manually merge downloaded segments.")
-            if pil.clear_temp_files:
-                helpers.remove_temp_folder()
             helpers.remove_lock()
         except ValueError as e:
             logger.separator()
