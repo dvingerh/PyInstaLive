@@ -1,3 +1,7 @@
+## Notice
+Active development for this script has stalled. Only critical issues will be looked into at this time.
+
+
 # PyInstaLive
 ![Version 3.2.4](https://img.shields.io/badge/Version-3.2.4-orange.svg)
 ![Python 2.7, 3.5](https://img.shields.io/badge/Python-2.7%2C%203.5%2B-3776ab.svg)
