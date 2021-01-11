@@ -11,18 +11,18 @@ Active development for this script has ended. Issues will no longer be looked in
 
 This Python script enables you to download any ongoing Instagram livestreams as well as any available replays. It is based on [another script](https://github.com/taengstagram/instagram-livestream-downloader) that has now been discontinued.
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 
 ## Table of Contents
-- [Features](https://github.com/notcammy/PyInstaLive#features)
-- [Quickstart](https://github.com/notcammy/PyInstaLive#quickstart)
-- [Installation](https://github.com/notcammy/PyInstaLive#installation)
-- [Usage](https://github.com/notcammy/PyInstaLive#usage)
-- [Notes](https://github.com/notcammy/PyInstaLive#notes)
-- [Help](https://github.com/notcammy/PyInstaLive#help)
+- [Features](https://github.com/dvingerh/PyInstaLive#features)
+- [Quickstart](https://github.com/dvingerh/PyInstaLive#quickstart)
+- [Installation](https://github.com/dvingerh/PyInstaLive#installation)
+- [Usage](https://github.com/dvingerh/PyInstaLive#usage)
+- [Notes](https://github.com/dvingerh/PyInstaLive#notes)
+- [Help](https://github.com/dvingerh/PyInstaLive#help)
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Main Features
 
@@ -160,19 +160,19 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 ---------------------------------------------------------------------------
 ```
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Notes
-- I have not much time to extensively test the changes I make to the code, so when you do encounter a problem please [open an issue](https://github.com/notcammy/PyInstaLive/issues/new) and try using an older version of PyInstaLive in the meantime.
+- I have not much time to extensively test the changes I make to the code, so when you do encounter a problem please [open an issue](https://github.com/dvingerh/PyInstaLive/issues/new) and try using an older version of PyInstaLive in the meantime.
 
 - Python 2 cannot save most unicode characters in comments such as emojis if it's not built from source using the `--enable-unicode=ucs4` argument. Read more about this [here](https://emoji-unicode.readthedocs.io/en/latest/python2.html). This should probably not affect pre-installed Python 2 installations on Linux-based systems such as Ubuntu or Debian.
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 
 ## Help
-You can find a list of frequently asked questions [here](https://github.com/notcammy/PyInstaLive/blob/master/FAQ.md).
+You can find a list of frequently asked questions [here](https://github.com/dvingerh/PyInstaLive/blob/master/FAQ.md).
 
-You can find a list of available commands and an explanation of the configuration file [here](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md).
+You can find a list of available commands and an explanation of the configuration file [here](https://github.com/dvingerh/PyInstaLive/blob/master/MOREHELP.md).
 
-If you would like to report a bug or ask a question please [open an issue](https://github.com/notcammy/PyInstaLive/issues/new).
+If you would like to report a bug or ask a question please [open an issue](https://github.com/dvingerh/PyInstaLive/issues/new).
