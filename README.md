@@ -32,7 +32,7 @@ PyInstaLive is capable of downloading:
 - Livestream and replay comments.
 - Available livestreams and replays from your following user feed, concurrently.
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Quickstart
 
@@ -42,7 +42,7 @@ PyInstaLive is capable of downloading:
 - Edit the configuration file using any text editor.
 - Run `pyinstalive -d "<live-username>"` to start downloading a livestream or replay.
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Prerequisites
 
@@ -53,7 +53,7 @@ PyInstaLive is capable of downloading:
 
 Make sure all tools are accessible via command line (added to your PATH if on Windows, use Google).
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Installation
 
@@ -63,7 +63,7 @@ Make sure all tools are accessible via command line (added to your PATH if on Wi
 
 Run the following command in your command line (might need to be run as administrator on Windows):
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.4
+pip install git+https://github.com/dvingerh/PyInstaLive.git@3.2.4
 ```
 
 #### Updating
@@ -71,7 +71,7 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.4
 To update PyInstaLive to the latest version (currently **3.2.4**) run the following command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.4 --upgrade
+pip install git+https://github.com/dvingerh/PyInstaLive.git@3.2.4 --upgrade
 ```
 
 #### Specific versions
@@ -79,12 +79,12 @@ pip install git+https://github.com/notcammy/PyInstaLive.git@3.2.4 --upgrade
 If you want to install a specific version of PyInstaLive when for example the newest version contains a bug, you can specify a different version tag in the install command:
 
 ```bash
-pip install git+https://github.com/notcammy/PyInstaLive.git@2.2.0
+pip install git+https://github.com/dvingerh/PyInstaLive.git@2.2.0
 ```
 
 Use the version number you want after the **@** symbol (e.g **@2.2.0**).
 
-![](https://raw.githubusercontent.com/notcammy/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
+![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Usage
 
