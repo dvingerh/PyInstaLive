@@ -123,7 +123,9 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                     assemble(user_called, retry_with_zero_m4v=True)
                     return
             else:
-                logger.info('The video file has been generated: %s' % os.path.basename(ass_mp4_file))
+                logger.separator()
+                logger.info('Saved video: %s' % os.path.basename(ass_mp4_file))
+                logger.separator()
                 os.remove(source['audio'])
                 os.remove(source['video'])
             if user_called:

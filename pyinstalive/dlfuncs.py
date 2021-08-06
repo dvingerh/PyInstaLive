@@ -106,17 +106,17 @@ def merge_segments():
         logger.binfo('Aborted merging process, no video was created.')
         helpers.remove_lock()
 
-def print_durations(download_duration=False):
-        logger.info('Airtime duration  : {}'.format(get_stream_duration(0)))
-        if download_duration:
-            logger.info('Download duration : {}'.format(get_stream_duration(1)))
-        logger.info('Missing (approx.) : {}'.format(get_stream_duration(2)))
+def print_durations(download_ended=False):
+        logger.info('Airing time  : {}'.format(get_stream_duration(0)))
+        if download_ended:
+            logger.info('Downloaded   : {}'.format(get_stream_duration(1)))
+            logger.info('Missing      : {}'.format(get_stream_duration(2)))
 
 def print_heartbeat():
     heartbeat_response = pil.ig_api.post(Constants.BROADCAST_HEALTH_URL.format(pil.livestream_obj.get('broadcast_id')))
     response_json = json.loads(heartbeat_response.text)
-    logger.info('Current status    : {}'.format(response_json.get("broadcast_status").capitalize()))
-    logger.info('Active viewers    : {}'.format(int(response_json.get("viewer_count"))))
+    logger.info('Status       : {}'.format(response_json.get("broadcast_status").capitalize()))
+    logger.info('Viewers      : {}'.format(int(response_json.get("viewer_count"))))
 
 def download_livestream():
     try:
