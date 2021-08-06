@@ -41,11 +41,12 @@ def authenticate(username, password, force_use_login_args=False):
             pil.config_login_overridden = True
             logger.binfo("Overriding configuration file login with -u and -p arguments.")
             logger.separator()
-        session_file = os.path.join(os.path.dirname(pil.config_path), "{}.json".format(username))
+        session_file = os.path.join(os.path.dirname(pil.config_path), "{}.dat".format(username))
         if not os.path.isfile(session_file):
             # settings file does not exist
-            logger.warn('Unable to find session file: {0!s}'.format(os.path.basename(session_file)))
-            logger.info('Creating a new one.')
+            logger.warn('Unable to find login session file: {0!s}'.format(os.path.basename(session_file)))
+            logger.info('A new login session file will be created after logging in.')
+            logger.separator()
 
             # login new
             session = requests.session()
@@ -62,16 +63,18 @@ def authenticate(username, password, force_use_login_args=False):
             session.headers.update({"x-csrftoken": csrf})
             login_response = session.post(Constants.LOGIN_URL_AJAX, data=payload)
             json_data = json.loads(login_response.text)
-            if json_data.get("authenticated"):
+            if json_data.get("authenticated") == True:
                 save_session(session, session_file)
                 ig_api = session
-                logger.info('New session file was made: {0!s}'.format(os.path.basename(session_file)))
+                logger.binfo('New login session file was created: {0!s}'.format(os.path.basename(session_file)))
                 logger.separator()
             else:
-                logger.error(json.dumps(json_data))
+                logger.error('Could not login, ensure your credentials are correct and try again.')
+                logger.separator()
                 ig_api = None
         else:
             ig_api = load_session(session_file)
+            logger.info("Using login session file: {0!s}".format(os.path.basename(session_file)))
 
     except Exception as e:
         logger.error('Unexpected exception: {:s}'.format(e))
