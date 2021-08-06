@@ -17,7 +17,6 @@ try:
     import dlfuncs
     import organize
     from constants import Constants
-    from comments import CommentsDownloader
 except ImportError:
     from urllib.parse import urlparse
     from . import pil
@@ -29,7 +28,6 @@ except ImportError:
     from . import dlfuncs
     from . import organize
     from .constants import Constants
-    from .comments import CommentsDownloader
 
 def validate_inputs(config, args, unknown_args):
     error_arr = []
@@ -61,7 +59,7 @@ def validate_inputs(config, args, unknown_args):
                 logger.warn("Please use only one download method. Use -h for more information.")
                 logger.separator()
                 return False
-        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize and not args.generatecomments:
+        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize:
             logger.banner()
             logger.error("Please use a download method. Use -h for more information.")
             logger.separator()
@@ -145,14 +143,6 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.clear_temp_files = False
 
-        if helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')) == "Invalid":
-            pil.dl_comments = True
-            error_arr.append(['download_comments', 'True'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')):
-            pil.dl_comments = True
-        else:
-            pil.dl_comments = False
-
         if args.skip_merge:
             pil.skip_merge = True
 
@@ -206,10 +196,6 @@ def validate_inputs(config, args, unknown_args):
             pil.assemble_arg = args.assemble
             assembler.assemble()
             return False
-        elif args.generatecomments:
-            pil.gencomments_arg = args.generatecomments
-            CommentsDownloader.generate_log(gen_from_arg=True)
-            return False
         elif args.organize:
             organize.organize_files()
             return False
@@ -247,8 +233,6 @@ def run():
                         help="Path to folder where PyInstaLive should save livestreams.")
     parser.add_argument('-as', '--assemble', dest='assemble', type=str, required=False,
                         help="Path to json file required by the assembler to generate a video file from the segments.")
-    parser.add_argument('-gc', '--generate-comments', dest='generatecomments', type=str, required=False,
-                        help="Path to json file required to generate a comments log from a json file.")
     parser.add_argument('-df', '--download-following', dest='downloadfollowing', action='store_true',
                         help="PyInstaLive will check for available livestreams from users the account "
                              "used to login follows.")

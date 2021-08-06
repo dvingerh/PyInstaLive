@@ -105,7 +105,7 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         for n, source in enumerate(sources):
             ffmpeg_binary = os.getenv('FFMPEG_BINARY', 'ffmpeg')
             cmd = [
-                ffmpeg_binary, '-loglevel', 'warning', '-y',
+                ffmpeg_binary, '-loglevel', 'quiet', '-y',
                 '-i', source['audio'],
                 '-i', source['video'],
                 '-c:v', 'copy', '-c:a', 'copy', ass_mp4_file]

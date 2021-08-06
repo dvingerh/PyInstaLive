@@ -33,7 +33,6 @@
 
 - ```-sm``` or ```--skip-merge```  **—** PyInstaLive will not merge any download livestream files when this argument is used.
 
-- ```-gc``` or ```--generate-comments```  **—** PyInstaLive will try to generate a comments file from a given comments JSON file.
 
 # Default configuration file
 
@@ -42,9 +41,6 @@
 username = johndoe
 password = grapefruits
 download_path = 
-download_lives = True
-download_replays = True
-download_comments = true
 show_cookie_expiry = True
 log_to_file = True
 ffmpeg_path = 

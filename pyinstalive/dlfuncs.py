@@ -15,7 +15,6 @@ try:
     import dlfuncs
     import assembler
     from constants import Constants
-    from comments import CommentsDownloader
 except ImportError:
     from . import logger
     from . import helpers
@@ -23,21 +22,20 @@ except ImportError:
     from . import assembler
     from . import dlfuncs
     from .constants import Constants
-    from .comments import CommentsDownloader
 
 
 def get_stream_duration(duration_type):
     try:
         # For some reason the published_time is roughly 40 seconds behind real world time
         if duration_type == 0: # Airtime duration
-            stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("published_time")), 60)
+            stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
         if duration_type == 1: # Download duration
             stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(pil.epochtime)), 60)
         if duration_type == 2: # Missing duration
-            if (int(pil.epochtime) - pil.livestream_obj.get("published_time")) <= 0:
+            if (int(pil.epochtime) - pil.livestream_obj.get("broadcast_dict").get("published_time")) <= 0:
                 stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
             else:
-                stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_obj.get("published_time")), 60)
+                stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
 
         if stream_started_mins < 0:
             stream_started_mins = 0
@@ -77,9 +75,6 @@ def merge_segments():
             pil.kill_segment_thread = True
             pil.segments_json_thread_worker.join()
 
-        if pil.comment_thread_worker and pil.comment_thread_worker.is_alive():
-            logger.info("Waiting for comment downloader to finish.")
-            pil.comment_thread_worker.join()
         try:
             if not pil.skip_merge:
                 logger.info('Merging downloaded files into video.')
@@ -113,6 +108,17 @@ def merge_segments():
         logger.binfo('Aborted merging process, no video was created.')
         helpers.remove_lock()
 
+def print_durations(download_duration=False):
+        logger.info('Airtime duration  : {}'.format(get_stream_duration(0)))
+        if download_duration:
+            logger.info('Download duration : {}'.format(get_stream_duration(1)))
+        logger.info('Missing (approx.) : {}'.format(get_stream_duration(2)))
+
+def print_heartbeat():
+    heartbeat_response = pil.ig_api.post(Constants.BROADCAST_HEALTH_URL.format(pil.livestream_obj.get('broadcast_id')))
+    response_json = json.loads(heartbeat_response.text)
+    logger.info('Current status    : {}'.format(response_json.get("broadcast_status").capitalize()))
+    logger.info('Active viewers    : {}'.format(int(response_json.get("viewer_count"))))
 
 def download_livestream():
     try:
@@ -127,7 +133,7 @@ def download_livestream():
             duplicate_etag_retry=30,
             mpd_download_timeout=3,
             download_timeout=3,
-            print_status=None,
+            print_status=print_heartbeat,
             ffmpeg_binary=pil.ffmpeg_path)
         pil.broadcast_downloader.stream_id = pil.livestream_obj.get('broadcast_id')
     except Exception as e:
@@ -146,8 +152,11 @@ def download_livestream():
         if broadcast_guest:
             logger.binfo('This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest))
             pil.has_guest = broadcast_guest
-        logger.separator()
         helpers.create_lock_folder()
+        logger.separator()
+        print_durations()
+        print_heartbeat()
+        logger.separator()
         logger.info('Downloading livestream, press [CTRL+C] to abort.')
 
         if pil.run_at_start:
@@ -158,31 +167,18 @@ def download_livestream():
                 logger.binfo("Launched start command: {:s}".format(pil.run_at_start))
             except Exception as e:
                 logger.warn('Could not launch command: {:s}'.format(str(e)))
-
-        if pil.dl_comments:
-            try:
-                comments_json_file = '{}{}_{}_{}_{}_live_comments.json'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('broadcast_id'), pil.epochtime)
-                pil.comment_thread_worker = threading.Thread(target=get_live_comments, args=(comments_json_file,))
-                pil.comment_thread_worker.start()
-            except Exception as e:
-                logger.error('An error occurred while downloading comments: {:s}'.format(str(e)))
         pil.broadcast_downloader.run()
         logger.separator()
         logger.info("The livestream has been ended by the user.")
         logger.separator()
-        logger.info('Airtime duration  : {}'.format(get_stream_duration(0)))
-        logger.info('Download duration : {}'.format(get_stream_duration(1)))
-        logger.info('Missing (approx.) : {}'.format(get_stream_duration(2)))
+        print_durations()
         logger.separator()
         merge_segments()
     except KeyboardInterrupt:
         logger.separator()
         logger.binfo('The download has been aborted.')
         logger.separator()
-        logger.info('Airtime duration  : {}'.format(get_stream_duration(0)))
-        logger.info('Download duration : {}'.format(get_stream_duration(1)))
-        logger.info('Missing (approx.) : {}'.format(get_stream_duration(2)))
+        print_durations(True)
         logger.separator()
         if not pil.broadcast_downloader.is_aborted:
             pil.broadcast_downloader.stop()
@@ -261,50 +257,3 @@ def iterate_users(user_list):
             break
 
 
-def get_live_comments(comments_json_file):
-    try:
-        comments_downloader = CommentsDownloader(destination_file=comments_json_file)
-        first_comment_created_at = 0
-
-        try:
-            while not pil.broadcast_downloader.is_aborted:
-                if 'initial_buffered_duration' not in pil.livestream_obj and pil.broadcast_downloader.initial_buffered_duration:
-                    pil.livestream_obj['initial_buffered_duration'] = pil.broadcast_downloader.initial_buffered_duration
-                    comments_downloader.broadcast = pil.livestream_obj
-                first_comment_created_at = comments_downloader.get_live(first_comment_created_at)
-        except Exception as e:
-            if not 'media has been deleted' in e.error_response:
-                logger.warn("Comment collection ClientError: %d %s" % (e.code, e.error_response))
-
-        try:
-            if comments_downloader.comments:
-                comments_downloader.save()
-                comments_log_file = comments_json_file.replace('.json', '.log')
-                comment_errors, total_comments = CommentsDownloader.generate_log(
-                    comments_downloader.comments, pil.epochtime, comments_log_file,
-                    comments_delay=pil.broadcast_downloader.initial_buffered_duration)
-                if len(comments_downloader.comments) == 1:
-                    logger.info("Successfully saved 1 comment.")
-                    #os.remove(comments_json_file)
-                    logger.separator()
-                    return True
-                else:
-                    if comment_errors:
-                        logger.warn(
-                            "Successfully saved {:s} comments but {:s} comments are (partially) missing.".format(
-                                str(total_comments), str(comment_errors)))
-                    else:
-                        logger.info("Successfully saved {:s} comments.".format(str(total_comments)))
-                    #os.remove(comments_json_file)
-                    logger.separator()
-                    return True
-            else:
-                logger.info("There are no available comments to save.")
-                logger.separator()
-                return False
-        except Exception as e:
-            logger.error('Could not save comments: {:s}'.format(str(e)))
-            return False
-    except KeyboardInterrupt as e:
-        logger.binfo("Downloading livestream comments has been aborted.")
-        return False

@@ -84,6 +84,8 @@ def authenticate(username, password, force_use_login_args=False):
     if ig_api:
         logger.info('Successfully logged into account: {:s}'.format(str(username)))
         logger.separator()
+        if ig_api.cookies["csrftoken"] != ig_api.headers.get("x-csrftoken"):
+            ig_api.cookies.set("csrftoken", ig_api.headers.get("x-csrftoken"), domain=".instagram.com")
         return ig_api
     else:
         return None
