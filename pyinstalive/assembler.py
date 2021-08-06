@@ -32,35 +32,18 @@ def _get_file_index(filename):
 
 def assemble(user_called=True, retry_with_zero_m4v=False):
     try:
-        ass_json_file = pil.assemble_arg if pil.assemble_arg.endswith(".json") else pil.assemble_arg + ".json"
-        ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(ass_json_file).replace("_downloads", "").replace(".json", ".mp4"))
-        ass_segment_dir = pil.assemble_arg if not pil.assemble_arg.endswith(".json") else pil.assemble_arg.replace(".json", "")
-        
+        ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(pil.assemble_arg).replace("_downloads", "") + ".mp4")
+        ass_segment_dir = pil.assemble_arg
         broadcast_info = {}
         if not os.path.isdir(ass_segment_dir) or not os.listdir(ass_segment_dir):
             logger.error('The segment directory does not exist or does not contain any files: %s' % ass_segment_dir)
             logger.separator()
             return
-        if not os.path.isfile(ass_json_file):
-            logger.warn("No matching json file found for the segment directory, trying to continue without it.")
-            ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
-            broadcast_info['id'] = ass_stream_id
-            broadcast_info['broadcast_status'] = "active"
-            broadcast_info['segments'] = {}
-        else:
-            with open(ass_json_file) as info_file:
-                try:
-                    broadcast_info = json.load(info_file)
-                except Exception as e:
-                    logger.warn("Could not decode json file, trying to continue without it.")
-                    ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
-                    broadcast_info['id'] = ass_stream_id
-                    broadcast_info['broadcast_status'] = "active"
-                    broadcast_info['segments'] = {}
 
-        if broadcast_info.get('broadcast_status', '') == 'post_live':
-            logger.error('Video segment files from replay downloads cannot be assembled.')
-            return
+        ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
+        broadcast_info['id'] = ass_stream_id
+        broadcast_info['broadcast_status'] = "active"
+        broadcast_info['segments'] = {}
 
         stream_id = str(broadcast_info['id'])
 
@@ -86,8 +69,6 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
             logger.error("No video segment files have been found in the specified folder.")
             logger.separator()
             return
-        else:
-            logger.info("Assembling video segment files from specified folder: {}".format(ass_segment_dir))
 
         for segment in all_segments:
             segment = re.sub('\?.*$', '', segment)

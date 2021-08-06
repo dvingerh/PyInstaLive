@@ -18,8 +18,6 @@ def initialize():
     global dl_user
     global dl_batchusers
     global dl_path
-    global dl_lives
-    global dl_replays
     global dl_comments
     global log_to_file
     global run_at_start
@@ -30,7 +28,6 @@ def initialize():
     global args
     global uargs
     global livestream_obj
-    global replays_obj
     global broadcast_downloader
     global epochtime
     global datetime_compat
@@ -42,7 +39,6 @@ def initialize():
     global ffmpeg_path
     global clear_temp_files
     global has_guest
-    global do_heartbeat
     global proxy
     global skip_merge
     global config_login_overridden
@@ -55,8 +51,6 @@ def initialize():
     dl_user = ""
     dl_batchusers = []
     dl_path = os.getcwd() + "/"
-    dl_lives = True
-    dl_replays = True
     dl_comments = True
     log_to_file = True
     run_at_start = ""
@@ -67,7 +61,6 @@ def initialize():
     args = None
     uargs = None
     livestream_obj = None
-    replays_obj = None
     broadcast_downloader = None
     epochtime = helpers.strepochtime()
     datetime_compat = helpers.strdatetime_compat()
@@ -79,7 +72,6 @@ def initialize():
     ffmpeg_path = None
     clear_temp_files = False
     has_guest = None
-    do_heartbeat = False
     proxy = None
     skip_merge = False
     config_login_overridden = False

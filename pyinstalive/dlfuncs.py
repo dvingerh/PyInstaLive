@@ -1,16 +1,12 @@
+from json.decoder import JSONDecodeError
 import os
 import shutil
 import json
 import threading
 import time
-
+from instagram_private_api_extensions import live
 from xml.dom.minidom import parseString
 
-from instagram_private_api import ClientConnectionError
-from instagram_private_api import ClientError
-from instagram_private_api import ClientThrottledError
-from instagram_private_api_extensions import live
-from instagram_private_api_extensions import replay
 
 try:
     import logger
@@ -54,73 +50,12 @@ def get_stream_duration(duration_type):
     except Exception:
         return "Not available"
 
-
-def get_user_id():
-    is_user_id = False
-    user_id = None
-    try:
-        user_id = int(pil.dl_user)
-        is_user_id = True
-    except ValueError:
-        try:
-            user_res = pil.ig_api.username_info(pil.dl_user)
-            user_id = user_res.get('user', {}).get('pk')
-        except ClientConnectionError as cce:
-            logger.error(
-                "Could not get user info for '{:s}': {:d} {:s}".format(pil.dl_user, cce.code, str(cce)))
-            if "getaddrinfo failed" in str(cce):
-                logger.error('Could not resolve host, check your internet connection.')
-            if "timed out" in str(cce):
-                logger.error('The connection timed out, check your internet connection.')
-        except ClientThrottledError as cte:
-            logger.error(
-                "Could not get user info for '{:s}': {:d} {:s}".format(pil.dl_user, cte.code, str(cte)))
-        except ClientError as ce:
-            logger.error(
-                "Could not get user info for '{:s}': {:d} {:s}".format(pil.dl_user, ce.code, str(ce)))
-            if "Not Found" in str(ce):
-                logger.error('The specified user does not exist.')
-        except Exception as e:
-            logger.error("Could not get user info for '{:s}': {:s}".format(pil.dl_user, str(e)))
-        except KeyboardInterrupt:
-            logger.binfo("Aborted getting user info for '{:s}', exiting.".format(pil.dl_user))
-    if user_id and is_user_id:
-        logger.info("Getting info for '{:s}' successful. Assuming input is an user Id.".format(pil.dl_user))
-        logger.separator()
-        return user_id
-    elif user_id:
-        logger.info("Getting info for '{:s}' successful.".format(pil.dl_user))
-        logger.separator()
-        return user_id
-    else:
-        return None
-
-
-def get_broadcasts_info():
-    try:
-        user_id = get_user_id()
-        if user_id:
-            broadcasts = pil.ig_api.user_story_feed(user_id)
-            pil.livestream_obj = broadcasts.get('broadcast')
-            pil.replays_obj = broadcasts.get('post_live_item', {}).get('broadcasts', [])
-            return True
-        else:
-            return False
-    except ClientThrottledError:
-        logger.error('Could not check because you are making too many requests at this time.')
-        return False
-    except Exception as e:
-        logger.error('Could not finish checking: {:s}'.format(str(e)))
-        if "timed out" in str(e):
-            logger.error('The connection timed out, check your internet connection.')
-        if "login_required" in str(e):
-            logger.error('Login cookie was loaded but user is not actually logged in. Delete the cookie file and try '
-                         'again.')
-        return False
-    except KeyboardInterrupt:
-        logger.binfo('Aborted checking for livestreams and replays, exiting.')
-        return False
-
+def get_broadcasts_tray():
+    response = pil.ig_api.get(Constants.REELS_TRAY_URL)
+    response_json = json.loads(response.text)
+    with open("reel.json", 'w') as outfile:
+        json.dump(response_json, outfile, indent=2)
+    return response_json
 
 def merge_segments():
     try:
@@ -134,7 +69,7 @@ def merge_segments():
                 logger.warn('Could not execute command: {:s}'.format(str(e)))
 
         live_mp4_file = '{}{}_{}_{}_{}_live.mp4'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.livestream_obj.get('id'), pil.epochtime)
+                                                     pil.livestream_obj.get('broadcast_id'), pil.epochtime)
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
@@ -148,7 +83,8 @@ def merge_segments():
         try:
             if not pil.skip_merge:
                 logger.info('Merging downloaded files into video.')
-                pil.broadcast_downloader.stitch(live_mp4_file, cleartempfiles=pil.clear_temp_files)
+                pil.assemble_arg = live_mp4_file.replace(".mp4", "_downloads")
+                assembler.assemble(user_called=False)
                 logger.info('Successfully merged downloaded files into video.')
                 if pil.clear_temp_files:
                     helpers.remove_temp_folder()
@@ -163,7 +99,7 @@ def merge_segments():
                 logger.separator()
                 logger.binfo("Segment directory is not empty. Trying to merge again.")
                 logger.separator()
-                pil.assemble_arg = live_mp4_file.replace(".mp4", "_downloads.json")
+                pil.assemble_arg = live_mp4_file.replace(".mp4", "_downloads")
                 assembler.assemble(user_called=False)
             else:
                 logger.separator()
@@ -180,46 +116,28 @@ def merge_segments():
 
 def download_livestream():
     try:
-        def print_status(sep=True):
-            if pil.do_heartbeat:
-                heartbeat_info = pil.ig_api.broadcast_heartbeat_and_viewercount(pil.livestream_obj.get('id'))
-            viewers = pil.livestream_obj.get('viewer_count', 0) + 1
-            if sep:
-                logger.separator()
-            else:
-                logger.info('Username    : {:s}'.format(pil.dl_user))
-            logger.info('Viewers     : {:s} watching'.format(str(int(viewers))))
-            logger.info('Airing time : {:s}'.format(get_stream_duration(0)))
-            if pil.do_heartbeat:
-                logger.info('Status      : {:s}'.format(heartbeat_info.get('broadcast_status').title()))
-                return heartbeat_info.get('broadcast_status') not in ['active', 'interrupted']
-            else:
-                return None
-
-        mpd_url = (pil.livestream_obj.get('dash_manifest')
-                   or pil.livestream_obj.get('dash_abr_playback_url')
-                   or pil.livestream_obj.get('dash_playback_url'))
+        mpd_url = pil.livestream_obj.get('broadcast_dict').get('dash_playback_url')
 
         pil.live_folder_path = '{}{}_{}_{}_{}_live_downloads'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.livestream_obj.get('id'), pil.epochtime)
+                                                     pil.livestream_obj.get('broadcast_id'), pil.epochtime)
         pil.broadcast_downloader = live.Downloader(
             mpd=mpd_url,
             output_dir=pil.live_folder_path,
-            user_agent=pil.ig_api.user_agent,
             max_connection_error_retry=3,
             duplicate_etag_retry=30,
-            callback_check=print_status,
             mpd_download_timeout=3,
             download_timeout=3,
+            print_status=None,
             ffmpeg_binary=pil.ffmpeg_path)
+        pil.broadcast_downloader.stream_id = pil.livestream_obj.get('broadcast_id')
     except Exception as e:
         logger.error('Could not start downloading livestream: {:s}'.format(str(e)))
         logger.separator()
         helpers.remove_lock()
     try:
-        broadcast_owner = pil.livestream_obj.get('broadcast_owner', {}).get('username')
+        broadcast_owner = pil.livestream_obj.get('broadcast_dict', {}).get('broadcast_owner').get("username")
         try:
-            broadcast_guest = pil.livestream_obj.get('cobroadcasters', {})[0].get('username')
+            broadcast_guest = pil.livestream_obj.get('broadcast_dict', {}).get('cobroadcasters')[0].get("username")
         except Exception:
             broadcast_guest = None
         if broadcast_owner != pil.dl_user:
@@ -229,11 +147,7 @@ def download_livestream():
             logger.binfo('This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest))
             pil.has_guest = broadcast_guest
         logger.separator()
-        print_status(False)
-        logger.separator()
         helpers.create_lock_folder()
-        pil.segments_json_thread_worker = threading.Thread(target=helpers.generate_json_segments)
-        pil.segments_json_thread_worker.start()
         logger.info('Downloading livestream, press [CTRL+C] to abort.')
 
         if pil.run_at_start:
@@ -248,7 +162,7 @@ def download_livestream():
         if pil.dl_comments:
             try:
                 comments_json_file = '{}{}_{}_{}_{}_live_comments.json'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), pil.epochtime)
+                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('broadcast_id'), pil.epochtime)
                 pil.comment_thread_worker = threading.Thread(target=get_live_comments, args=(comments_json_file,))
                 pil.comment_thread_worker.start()
             except Exception as e:
@@ -274,120 +188,40 @@ def download_livestream():
             pil.broadcast_downloader.stop()
             merge_segments()
 
-
-def download_replays():
+def get_broadcasts_info():
     try:
-        try:
-            logger.info('Amount of replays    : {:s}'.format(str(len(pil.replays_obj))))
-            for replay_index, replay_obj in enumerate(pil.replays_obj):
-                bc_dash_manifest = parseString(replay_obj.get('dash_manifest')).getElementsByTagName('Period')
-                bc_duration_raw = bc_dash_manifest[0].getAttribute("duration")
-                bc_minutes = (bc_duration_raw.split("H"))[1].split("M")[0]
-                bc_seconds = ((bc_duration_raw.split("M"))[1].split("S")[0]).split('.')[0]
-                logger.info(
-                    'Replay {:s} duration    : {:s} minutes and {:s} seconds'.format(str(replay_index + 1), bc_minutes,
-                                                                                     bc_seconds))
-        except Exception as e:
-            logger.warn("An error occurred while getting replay duration information: {:s}".format(str(e)))
-        logger.separator()
-        logger.info("Downloading replays, press [CTRL+C] to abort.")
-        logger.separator()
-        for replay_index, replay_obj in enumerate(pil.replays_obj):
-            exists = False
-            pil.livestream_obj = replay_obj
-            dl_path_files = os.listdir(pil.dl_path)
-
-            for dl_path_file in dl_path_files:
-                if (str(replay_obj.get('id')) in dl_path_file) and ("_replay" in dl_path_file) and (dl_path_file.endswith(".mp4")):
-                    logger.binfo("Already downloaded replay {:d} with ID '{:s}'.".format(replay_index + 1, str(replay_obj.get('id'))))
-                    exists = True
-            if not exists:
-                current = replay_index + 1
-                logger.info(
-                    "Downloading replay {:s} of {:s} with ID '{:s}'.".format(str(current), str(len(pil.replays_obj)),
-                                                                               str(replay_obj.get('id'))))
-                pil.live_folder_path = '{}{}_{}_{}_{}_replay_downloads'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), replay_obj.get("published_time"))
-                broadcast_downloader = replay.Downloader(
-                    mpd=replay_obj.get('dash_manifest'),
-                    output_dir=pil.live_folder_path,
-                    user_agent=pil.ig_api.user_agent,
-                    ffmpeg_binary=pil.ffmpeg_path)
-                if pil.use_locks:
-                    helpers.create_lock_folder()
-                replay_mp4_file = '{}{}_{}_{}_{}_replay.mp4'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), replay_obj.get("published_time"))
-
-                comments_json_file = '{}{}_{}_{}_{}_replay_comments.json'.format(
-                    pil.dl_path, pil.datetime_compat, pil.dl_user, pil.livestream_obj.get('id'), replay_obj.get("published_time"))
-
-                pil.comment_thread_worker = threading.Thread(target=get_replay_comments, args=(comments_json_file,))
-
-                broadcast_downloader.download(replay_mp4_file, cleartempfiles=pil.clear_temp_files)
-                if pil.clear_temp_files:
-                    helpers.remove_temp_folder()
-                if pil.dl_comments:
-                    logger.info("Downloading replay comments.")
-                    try:
-                        get_replay_comments(comments_json_file)
-                    except Exception as e:
-                        logger.error('An error occurred while downloading comments: {:s}'.format(str(e)))
-
-                logger.info("Finished downloading replay {:s} of {:s}.".format(str(current), str(len(pil.replays_obj))))
-                helpers.remove_lock()
-
-                if current != len(pil.replays_obj):
-                    logger.separator()
-
-        logger.separator()
-        logger.info("Finished downloading all available replays.")
-        helpers.remove_lock()
-    except Exception as e:
-        logger.error('Could not save replay: {:s}'.format(str(e)))
-        helpers.remove_lock()
-    except KeyboardInterrupt:
-        logger.separator()
-        logger.binfo('The download has been aborted by the user, exiting.')
-        helpers.remove_temp_folder()
-        helpers.remove_lock()
+        response = pil.ig_api.get("https://www.instagram.com/{:s}/live/?__a=1".format(pil.dl_user))
+        response_json = json.loads(response.text)
+        pil.livestream_obj = json.loads(response.text)
+        if pil.livestream_obj.get("broadcast_id", None):
+            return True
+        else:
+            return False
+    except JSONDecodeError:
+        return False
 
 
 def download_following():
     try:
-        is_checking = ''
-        if pil.dl_lives and pil.dl_replays:
-            is_checking = 'livestreams or replays'
-        elif pil.dl_lives and not pil.dl_replays:
-            is_checking = 'livestreams'
-        elif not pil.dl_lives and pil.dl_replays:
-            is_checking = 'replays'
-        logger.info("Checking following users for any {:s}.".format(is_checking))
-        broadcast_f_list = pil.ig_api.reels_tray()
+        logger.info("Checking following users for any livestreams.")
+        broadcast_f_list = dlfuncs.get_broadcasts_tray()
 
         usernames_available_livestreams = []
-        usernames_available_replays = []
-        if broadcast_f_list['broadcasts'] and pil.dl_lives:
+        if broadcast_f_list['broadcasts']:
             for broadcast_f in broadcast_f_list['broadcasts']:
                 username = broadcast_f['broadcast_owner']['username']
                 if username not in usernames_available_livestreams:
                     usernames_available_livestreams.append(username)
 
-        if broadcast_f_list.get('post_live', {}).get('post_live_items', []) and pil.dl_replays:
-            for broadcast_r in broadcast_f_list.get('post_live', {}).get('post_live_items', []):
-                for broadcast_f in broadcast_r.get("broadcasts", []):
-                    username = broadcast_f['broadcast_owner']['username']
-                    if username not in usernames_available_replays:
-                        usernames_available_replays.append(username)
         logger.separator()
         available_total = list(usernames_available_livestreams)
-        available_total.extend(x for x in usernames_available_replays if x not in available_total)
         if available_total:
-            logger.info("The following users have available {:s}.".format(is_checking))
+            logger.info("The following users have available livestreams.")
             logger.info(', '.join(available_total))
             logger.separator()
             iterate_users(available_total)
         else:
-            logger.info("There are currently no available {:s}.".format(is_checking))
+            logger.info("There are currently no available livestreams.")
             logger.separator()
     except Exception as e:
         logger.error("Could not finish checking following users: {:s}".format(str(e)))
@@ -412,9 +246,6 @@ def iterate_users(user_list):
                     user,
                     pil.config_path,
                     pil.dl_path,
-                    '--no-lives' if not pil.dl_lives else '',
-                    '--no-replays' if not pil.dl_replays else '',
-                    '--no-heartbeat' if not pil.do_heartbeat else '',
                     '--username {:s} --password {:s}'.format(pil.ig_user, pil.ig_pass) if pil.config_login_overridden else ''))
                 if start_result:
                     logger.warn("Could not start process: {:s}".format(str(start_result)))
@@ -441,7 +272,7 @@ def get_live_comments(comments_json_file):
                     pil.livestream_obj['initial_buffered_duration'] = pil.broadcast_downloader.initial_buffered_duration
                     comments_downloader.broadcast = pil.livestream_obj
                 first_comment_created_at = comments_downloader.get_live(first_comment_created_at)
-        except ClientError as e:
+        except Exception as e:
             if not 'media has been deleted' in e.error_response:
                 logger.warn("Comment collection ClientError: %d %s" % (e.code, e.error_response))
 
@@ -476,40 +307,4 @@ def get_live_comments(comments_json_file):
             return False
     except KeyboardInterrupt as e:
         logger.binfo("Downloading livestream comments has been aborted.")
-        return False
-
-
-def get_replay_comments(comments_json_file):
-    try:
-        comments_downloader = CommentsDownloader(destination_file=comments_json_file)
-        comments_downloader.get_replay()
-        try:
-            if comments_downloader.comments:
-                comments_log_file = comments_json_file.replace('.json', '.log')
-                comment_errors, total_comments = CommentsDownloader.generate_log(
-                    comments_downloader.comments, pil.livestream_obj.get('published_time'), comments_log_file,
-                    comments_delay=0)
-                if total_comments == 1:
-                    logger.info("Successfully saved 1 comment to logfile.")
-                    #os.remove(comments_json_file)
-                    logger.separator()
-                    return True
-                else:
-                    if comment_errors:
-                        logger.warn(
-                            "Successfully saved {:s} comments but {:s} comments are (partially) missing.".format(
-                                str(total_comments), str(comment_errors)))
-                    else:
-                        logger.info("Successfully saved {:s} comments.".format(str(total_comments)))
-                    #os.remove(comments_json_file)
-                    logger.separator()
-                    return True
-            else:
-                logger.info("There are no available comments to save.")
-                return False
-        except Exception as e:
-            logger.error('Could not save comments to logfile: {:s}'.format(str(e)))
-            return False
-    except KeyboardInterrupt as e:
-        logger.binfo("Downloading replay comments has been aborted.")
         return False

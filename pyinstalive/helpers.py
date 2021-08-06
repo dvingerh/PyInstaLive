@@ -79,27 +79,6 @@ def check_if_guesting():
         pil.has_guest = None
 
 
-
-def generate_json_segments():
-    while True:
-        pil.livestream_obj['delay'] = (int(pil.epochtime) - pil.livestream_obj['published_time'])
-        if 'initial_buffered_duration' not in pil.livestream_obj and pil.broadcast_downloader.initial_buffered_duration:
-            pil.livestream_obj['initial_buffered_duration'] = pil.broadcast_downloader.initial_buffered_duration
-        pil.livestream_obj['segments'] = pil.broadcast_downloader.segment_meta
-        try:
-            with open(pil.live_folder_path + ".json", 'w') as json_file:
-                json.dump(pil.livestream_obj, json_file, indent=2)
-            if not pil.broadcast_downloader.stream_id:
-                pil.broadcast_downloader.stream_id = pil.livestream_obj['id']
-            #check_if_guesting()
-            if pil.kill_segment_thread:
-                break
-            else:
-                time.sleep(2.5)
-        except Exception as e:
-            logger.warn(str(e))
-
-
 def clean_download_dir():
     dir_delcount = 0
     file_delcount = 0

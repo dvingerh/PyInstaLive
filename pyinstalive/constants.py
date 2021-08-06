@@ -9,8 +9,6 @@ class Constants:
 username = johndoe
 password = grapefruits
 download_path = {:s}
-download_lives = True
-download_replays = True
 download_comments = true
 show_cookie_expiry = True
 log_to_file = True
@@ -19,7 +17,10 @@ run_at_start =
 run_at_finish =
 use_locks = True
 clear_temp_files = False
-do_heartbeat = True
 proxy =
 skip_merge = False
     """
+    LOGIN_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', "x-ig-app-id": '936619743392459'}
+    LOGIN_URL = 'https://www.instagram.com/accounts/login/'
+    LOGIN_URL_AJAX = 'https://www.instagram.com/accounts/login/ajax/'
+    REELS_TRAY_URL = 'https://i.instagram.com/api/v1/live/reels_tray_broadcasts/'

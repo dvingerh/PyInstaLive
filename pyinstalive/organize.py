@@ -22,7 +22,6 @@ def organize_files():
         username_regex = r'(?<=\d{8}_)(.*?)(?=_\d)'
         date_regex = r'^\d{8}'
         timestamp_regex = r'_(\d{10})_'
-        type_regex = r'(live|replay)'
         raw_file_dict = {}
         new_file_dict = {}
 
@@ -32,7 +31,7 @@ def organize_files():
                 date_ts = datetime.strptime(re.search(date_regex, file)[0], '%Y%m%d').strftime('%d-%m-%Y')
                 time_ts = time.strftime('%I-%M-%S-%p', time.localtime(int(re.search(timestamp_regex, file)[1]))) 
                 file_ext = os.path.splitext(file)[1]
-                file_type = re.search(type_regex, file)[0]
+                file_type = "live"
                 json_type = ""
                 if file.endswith("_downloads.json"):
                     json_type = " downloads"

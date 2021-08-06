@@ -145,32 +145,6 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.clear_temp_files = False
 
-        if helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')) == "Invalid":
-            pil.do_heartbeat = True
-            error_arr.append(['do_heartbeat', 'True'])
-        if helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')):
-            pil.do_heartbeat = True
-        if args.noheartbeat or not helpers.bool_str_parse(config.get('pyinstalive', 'do_heartbeat')):
-            pil.do_heartbeat = False
-            logger.warn("Getting livestream heartbeat is disabled, this may cause degraded performance.")
-            logger.separator()
-
-        if not args.nolives and helpers.bool_str_parse(config.get('pyinstalive', 'download_lives')) == "Invalid":
-            pil.dl_lives = True
-            error_arr.append(['download_lives', 'True'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'download_lives')):
-            pil.dl_lives = True
-        else:
-            pil.dl_lives = False
-
-        if not args.noreplays and helpers.bool_str_parse(config.get('pyinstalive', 'download_replays')) == "Invalid":
-            pil.dl_replays = True
-            error_arr.append(['download_replays', 'True'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'download_replays')):
-            pil.dl_replays = True
-        else:
-            pil.dl_replays = False
-
         if helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')) == "Invalid":
             pil.dl_comments = True
             error_arr.append(['download_comments', 'True'])
@@ -179,20 +153,8 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.dl_comments = False
 
-        if args.nolives:
-            pil.dl_lives = False
-
-        if args.noreplays:
-            pil.dl_replays = False
-
         if args.skip_merge:
             pil.skip_merge = True
-
-        if not pil.dl_lives and not pil.dl_replays:
-            logger.error("You have disabled both livestream and replay downloading.")
-            logger.error("Please enable at least one of them and try again.")
-            logger.separator()
-            return False
 
         if pil.ffmpeg_path:
             if not os.path.isfile(pil.ffmpeg_path):
@@ -273,30 +235,23 @@ def run():
     parser.add_argument('-p', '--password', dest='password', type=str, required=False,
                         help="Instagram password to login with.")
     parser.add_argument('-d', '--download', dest='download', type=str, required=False,
-                        help="The username of the user whose livestream or replay you want to save.")
+                        help="The username of the user whose livestream you want to save.")
     parser.add_argument('-b,', '--batch-file', dest='batchfile', type=str, required=False,
-                        help="Read a text file of usernames to download livestreams or replays from.")
+                        help="Read a text file of usernames to download livestreams from.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
-    parser.add_argument('-nr', '--no-replays', dest='noreplays', action='store_true',
-                        help="When used, do not check for any available replays.")
-    parser.add_argument('-nl', '--no-lives', dest='nolives', action='store_true',
-                        help="When used, do not check for any available livestreams.")
     parser.add_argument('-cl', '--clean', dest='clean', action='store_true',
                         help="PyInstaLive will clean the current download folder of all leftover files.")
     parser.add_argument('-cp', '--config-path', dest='configpath', type=str, required=False,
                         help="Path to a PyInstaLive configuration file.")
     parser.add_argument('-dp', '--download-path', dest='dlpath', type=str, required=False,
-                        help="Path to folder where PyInstaLive should save livestreams and replays.")
+                        help="Path to folder where PyInstaLive should save livestreams.")
     parser.add_argument('-as', '--assemble', dest='assemble', type=str, required=False,
                         help="Path to json file required by the assembler to generate a video file from the segments.")
     parser.add_argument('-gc', '--generate-comments', dest='generatecomments', type=str, required=False,
                         help="Path to json file required to generate a comments log from a json file.")
     parser.add_argument('-df', '--download-following', dest='downloadfollowing', action='store_true',
-                        help="PyInstaLive will check for available livestreams and replays from users the account "
+                        help="PyInstaLive will check for available livestreams from users the account "
                              "used to login follows.")
-    parser.add_argument('-nhb', '--no-heartbeat', dest='noheartbeat', action='store_true', help="Disable heartbeat "
-                                                                                                "check for "
-                                                                                                "livestreams.")
     parser.add_argument('-sm', '--skip-merge', dest='skip_merge', action='store_true', help="PyInstaLive will not merge the downloaded livestream files.")
     parser.add_argument('-o', '--organize', action='store_true', help="Create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. Then move the video(s) of each user into their associated folder.")
 
@@ -304,7 +259,6 @@ def run():
     parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--infx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--noreplayx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--downloadfollowinx', help=argparse.SUPPRESS, metavar='IGNORE')
     parser.add_argument('--configpatx', help=argparse.SUPPRESS, metavar='IGNORE')

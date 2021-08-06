@@ -31,8 +31,6 @@ except ImportError:
     from . import pil
     from . import dlfuncs
 
-from instagram_private_api import ClientError
-
 """
 The content of this file was originally written by https://github.com/taengstagram
 The code has been edited for use in PyInstaLive.
@@ -69,15 +67,6 @@ class CommentsDownloader(object):
 
         except (SSLError, timeout, URLError, HTTPException, SocketError) as e:
             logger.warn('Comment downloading error: %s' % e)
-        except ClientError as e:
-            if e.code == 500:
-                logger.warn('Comment downloading ClientError: %d %s' %
-                            (e.code, e.error_response))
-            elif e.code == 400 and not e.msg:
-                logger.warn('Comment downloading ClientError: %d %s' %
-                            (e.code, e.error_response))
-            else:
-                raise e
         finally:
             try:
                 time.sleep(4)
