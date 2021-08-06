@@ -69,6 +69,7 @@ def authenticate(username, password, force_use_login_args=False):
                 logger.binfo('New login session file was created: {0!s}'.format(os.path.basename(session_file)))
                 logger.separator()
             else:
+                print(json_data)
                 logger.error('Could not login, ensure your credentials are correct and try again.')
                 logger.separator()
                 ig_api = None
