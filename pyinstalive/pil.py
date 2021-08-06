@@ -18,7 +18,6 @@ def initialize():
     global dl_user
     global dl_batchusers
     global dl_path
-    global dl_comments
     global log_to_file
     global run_at_start
     global run_at_finish
@@ -33,25 +32,21 @@ def initialize():
     global datetime_compat
     global live_folder_path
     global use_locks
-    global comment_thread_worker
     global segments_json_thread_worker
     global assemble_arg
     global ffmpeg_path
     global clear_temp_files
     global has_guest
-    global proxy
     global skip_merge
     global config_login_overridden
     global kill_segment_thread
     global winbuild_path
-    global gencomments_arg
     ig_api = None
     ig_user = ""
     ig_pass = ""
     dl_user = ""
     dl_batchusers = []
     dl_path = os.getcwd() + "/"
-    dl_comments = True
     log_to_file = True
     run_at_start = ""
     run_at_finish = ""
@@ -66,15 +61,12 @@ def initialize():
     datetime_compat = helpers.strdatetime_compat()
     live_folder_path = ""
     use_locks = True
-    comment_thread_worker = None
     segments_json_thread_worker = None
     assemble_arg = None
     ffmpeg_path = None
     clear_temp_files = False
     has_guest = None
-    proxy = None
     skip_merge = False
     config_login_overridden = False
     kill_segment_thread = False
     winbuild_path = helpers.winbuild_path()
-    gencomments_arg = None

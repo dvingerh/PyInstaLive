@@ -147,15 +147,9 @@ def show_info():
     cookie_from_config = ''
     try:
         for file in os.listdir(os.getcwd()):
-            if file.endswith(".json"):
-                with open(file) as data_file:
-                    try:
-                        json_data = json.load(data_file)
-                        if json_data.get('created_ts'):
-                            cookie_files.append(file)
-                    except Exception as e:
-                        pass
-            if pil.ig_user == file.replace(".json", ''):
+            if file.endswith(".dat"):
+                cookie_files.append(file)
+            if pil.ig_user == file.replace(".dat", ''):
                 cookie_from_config = file
     except Exception as e:
         logger.warn("Could not check for cookie files: {:s}".format(str(e)))

@@ -94,7 +94,8 @@ def authenticate(username, password, force_use_login_args=False):
             ig_api.cookies.set("csrftoken", ig_api.headers.get("x-csrftoken"), domain=".instagram.com", expires=expiry_epoch)
         if pil.show_cookie_expiry:
             cookie_expiry_date = datetime.fromtimestamp(expiry_epoch).strftime('%Y-%m-%d at %I:%M:%S %p')
-            logger.info("Login expiry date: {}".format(cookie_expiry_date))
+            logger.separator()
+            logger.info("Login session file expiry date: {}".format(cookie_expiry_date))
             logger.separator()
         return ig_api
     else:

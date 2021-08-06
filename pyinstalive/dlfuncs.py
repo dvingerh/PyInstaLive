@@ -184,7 +184,7 @@ def download_livestream():
 
 def get_broadcasts_info():
     try:
-        response = pil.ig_api.get("https://www.instagram.com/{:s}/live/?__a=1".format(pil.dl_user))
+        response = pil.ig_api.get(Constants.BROADCAST_INFO_URL.format(pil.dl_user))
         response_json = json.loads(response.text)
         pil.livestream_obj = json.loads(response.text)
         if pil.livestream_obj.get("broadcast_id", None):

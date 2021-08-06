@@ -106,7 +106,6 @@ def validate_inputs(config, args, unknown_args):
         pil.skip_merge = config.get('pyinstalive', 'skip_merge')
         pil.args = args
         pil.config = config
-        pil.proxy = config.get('pyinstalive', 'proxy')
 
         if args.dlpath:
             pil.dl_path = args.dlpath
@@ -174,12 +173,6 @@ def validate_inputs(config, args, unknown_args):
             else:
                 logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.dl_path))
                 logger.separator()
-
-        if pil.proxy and pil.proxy != '':
-            parsed_url = urlparse(pil.proxy)
-            if not parsed_url.netloc or not parsed_url.scheme:
-                error_arr.append(['proxy', 'None'])
-                pil.proxy = None
 
         if error_arr:
             for error in error_arr:
