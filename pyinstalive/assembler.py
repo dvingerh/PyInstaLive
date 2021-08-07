@@ -33,14 +33,13 @@ def _get_file_index(filename):
 def assemble(user_called=True, retry_with_zero_m4v=False):
     try:
         ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(pil.assemble_arg).replace("_downloads", "") + ".mp4")
-        ass_segment_dir = pil.assemble_arg
         broadcast_info = {}
-        if not os.path.isdir(ass_segment_dir) or not os.listdir(ass_segment_dir):
-            logger.error('The segment directory does not exist or does not contain any files: %s' % ass_segment_dir)
+        if not os.listdir(pil.assemble_arg):
+            logger.error('The segment directory does not exist or does not contain any files: %s' % pil.assemble_arg)
             logger.separator()
             return
 
-        ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
+        ass_stream_id = os.listdir(pil.assemble_arg)[0].split('-')[0]
         broadcast_info['id'] = ass_stream_id
         broadcast_info['broadcast_status'] = "active"
         broadcast_info['segments'] = {}
@@ -50,12 +49,12 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         segment_meta = broadcast_info.get('segments', {})
         if segment_meta:
             all_segments = [
-                os.path.join(ass_segment_dir, k)
+                os.path.join(pil.assemble_arg, k)
                 for k in broadcast_info['segments'].keys()]
         else:
             all_segments = list(filter(
                 os.path.isfile,
-                glob.glob(os.path.join(ass_segment_dir, '%s-*.m4v' % stream_id))))
+                glob.glob(os.path.join(pil.assemble_arg, '%s-*.m4v' % stream_id))))
 
         all_segments = sorted(all_segments, key=lambda x: _get_file_index(x))
         sources = []
@@ -86,9 +85,9 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                 continue
 
             video_stream = os.path.join(
-                ass_segment_dir, video_stream_format.format(stream_id, len(sources)))
+                pil.assemble_arg, video_stream_format.format(stream_id, len(sources)))
             audio_stream = os.path.join(
-                ass_segment_dir, audio_stream_format.format(stream_id, len(sources)))
+                pil.assemble_arg, audio_stream_format.format(stream_id, len(sources)))
 
 
             file_mode = 'ab'

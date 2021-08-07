@@ -32,14 +32,12 @@ def initialize():
     global datetime_compat
     global live_folder_path
     global use_locks
-    global segments_json_thread_worker
     global assemble_arg
     global ffmpeg_path
     global clear_temp_files
     global has_guest
     global skip_merge
     global config_login_overridden
-    global kill_segment_thread
     global winbuild_path
     ig_api = None
     ig_user = ""
@@ -61,12 +59,10 @@ def initialize():
     datetime_compat = helpers.strdatetime_compat()
     live_folder_path = ""
     use_locks = True
-    segments_json_thread_worker = None
     assemble_arg = None
     ffmpeg_path = None
     clear_temp_files = False
     has_guest = None
     skip_merge = False
     config_login_overridden = False
-    kill_segment_thread = False
     winbuild_path = helpers.winbuild_path()

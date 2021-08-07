@@ -1,6 +1,5 @@
 from json.decoder import JSONDecodeError
 import os
-import shutil
 import json
 import threading
 import time
@@ -26,7 +25,6 @@ except ImportError:
 
 def get_stream_duration(duration_type):
     try:
-        # For some reason the published_time is roughly 40 seconds behind real world time
         if duration_type == 0: # Airtime duration
             stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
         if duration_type == 1: # Download duration
@@ -51,7 +49,6 @@ def get_stream_duration(duration_type):
 def get_broadcasts_tray():
     response = pil.ig_api.get(Constants.REELS_TRAY_URL)
     response_json = json.loads(response.text)
-    print(response_json)
     return response_json
 
 def merge_segments():
@@ -69,10 +66,6 @@ def merge_segments():
                                                      pil.livestream_obj.get('broadcast_id'), pil.epochtime)
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
-
-        if pil.segments_json_thread_worker and pil.segments_json_thread_worker.is_alive():
-            pil.kill_segment_thread = True
-            pil.segments_json_thread_worker.join()
 
         try:
             if not pil.skip_merge:
@@ -112,14 +105,18 @@ def print_durations(download_ended=False):
         if download_ended:
             logger.info('Downloaded   : {}'.format(get_stream_duration(1)))
             logger.info('Missing      : {}'.format(get_stream_duration(2)))
-
-def print_heartbeat():
-    heartbeat_response = pil.ig_api.post(Constants.BROADCAST_HEALTH_URL.format(pil.livestream_obj.get('broadcast_id')))
-    response_json = json.loads(heartbeat_response.text)
-    logger.info('Status       : {}'.format(response_json.get("broadcast_status").capitalize()))
-    logger.info('Viewers      : {}'.format(int(response_json.get("viewer_count"))))
+            logger.separator()
+            logger.warn("Final video duration may vary if the livestream was interrupted.")
 
 def download_livestream():
+
+    def print_heartbeat():
+        heartbeat_response = pil.ig_api.post(Constants.BROADCAST_HEALTH_URL.format(pil.livestream_obj.get('broadcast_id')))
+        response_json = json.loads(heartbeat_response.text)
+        logger.info('Status       : {}'.format(response_json.get("broadcast_status").capitalize()))
+        logger.info('Viewers      : {}'.format(int(response_json.get("viewer_count"))))
+        return response_json.get('broadcast_status') not in ['active', 'interrupted'] 
+
     try:
         mpd_url = pil.livestream_obj.get('broadcast_dict').get('dash_playback_url')
 
@@ -132,7 +129,7 @@ def download_livestream():
             duplicate_etag_retry=30,
             mpd_download_timeout=3,
             download_timeout=3,
-            print_status=print_heartbeat,
+            callback_check=print_heartbeat,
             ffmpeg_binary=pil.ffmpeg_path)
         pil.broadcast_downloader.stream_id = pil.livestream_obj.get('broadcast_id')
     except Exception as e:
@@ -170,7 +167,7 @@ def download_livestream():
         logger.separator()
         logger.info("The livestream has been ended by the user.")
         logger.separator()
-        print_durations()
+        print_durations(True)
         logger.separator()
         merge_segments()
     except KeyboardInterrupt:
