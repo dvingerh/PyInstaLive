@@ -21,6 +21,8 @@ def start():
         if not helpers.download_folder_has_lockfile():
             helpers.create_lock_user()
             checking_self = pil.dl_user == pil.ig_user
+            logger.info('Getting livestream info for user: {:s}'.format(pil.dl_user))
+            logger.separator()
             if dlfuncs.get_broadcasts_info():
                 if checking_self:
                     logger.warn("Login with a different account to download your own livestreams.")
@@ -28,7 +30,7 @@ def start():
                     logger.info("Livestream available, starting download.")
                     dlfuncs.download_livestream()
             else:
-                logger.info('There are no available livestreams.')
+                logger.info('There is currently no active livestream.')
 
             helpers.remove_lock()
             logger.separator()

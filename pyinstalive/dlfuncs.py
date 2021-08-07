@@ -51,6 +51,7 @@ def get_stream_duration(duration_type):
 def get_broadcasts_tray():
     response = pil.ig_api.get(Constants.REELS_TRAY_URL)
     response_json = json.loads(response.text)
+    print(response_json)
     return response_json
 
 def merge_segments():
