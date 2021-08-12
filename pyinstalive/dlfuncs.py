@@ -49,6 +49,29 @@ def merge_segments():
             pil.json_thread_worker.join()
         if pil.heartbeat_info_thread_worker and pil.heartbeat_info_thread_worker.is_alive():
             pil.heartbeat_info_thread_worker.join()
+
+        if pil.dl_comments:
+            logger.info("Waiting for comment downloader to finish.")
+            comment_errors, total_comments = helpers.generate_log(pil.comments, live_mp4_file.replace("live.mp4", "comments.txt"),  False)
+            logger.separator()
+            if len(pil.comments) == 1:
+                logger.info("Successfully saved 1 comment.")
+                logger.separator()
+            elif len(pil.comments) > 1:
+                if comment_errors:
+                    logger.warn(
+                        "Successfully saved {:s} comments but {:s} comments are (partially) missing.".format(
+                            str(total_comments), str(comment_errors)))
+                else:
+                    logger.info("Successfully saved {:s} comments.".format(str(total_comments)))
+                logger.separator()
+            else:
+                logger.info("There are no available comments to save.")
+                logger.separator()
+        else:
+            logger.separator()
+
+
         try:
             if not pil.skip_merge:
                 logger.info('Merging downloaded files into video.')
@@ -79,6 +102,7 @@ def merge_segments():
             logger.error('Could not merge downloaded files: {:s}'.format(str(e)))
             helpers.remove_lock()
     except KeyboardInterrupt:
+        pil.kill_threads = True
         logger.binfo('Aborted merging process, no video was created.')
         helpers.remove_lock()
 
@@ -112,11 +136,11 @@ def download_livestream():
             broadcast_guest = None
         if broadcast_owner != pil.dl_user:
             logger.separator()
-            logger.binfo('This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner))
+            logger.binfo('This livestream is a duo-live, the owner is "{}".'.format(broadcast_owner))
             broadcast_guest = None
         if broadcast_guest:
             logger.separator()
-            logger.binfo('This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest))
+            logger.binfo('This livestream is a duo-live, the current guest is "{}".'.format(broadcast_guest))
             pil.has_guest = broadcast_guest
         helpers.create_lock_folder()
         logger.separator()
@@ -125,7 +149,7 @@ def download_livestream():
         logger.separator()
         logger.info('Downloading livestream, press [CTRL+C] to abort.')
 
-        pil.json_thread_worker = threading.Thread(target=helpers.generate_json_segments)
+        pil.json_thread_worker = threading.Thread(target=helpers.generate_json_files)
         pil.json_thread_worker.start()
 
         pil.heartbeat_info_thread_worker = threading.Thread(target=helpers.do_heartbeat)

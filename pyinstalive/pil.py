@@ -18,6 +18,7 @@ def initialize():
     global dl_user
     global dl_batchusers
     global dl_path
+    global dl_comments
     global log_to_file
     global run_at_start
     global run_at_finish
@@ -42,13 +43,17 @@ def initialize():
     global broadcast_downloaded_obj
     global heartbeat_info_thread_worker
     global json_thread_worker
+    global comments_thread_worker
     global kill_threads
+    global comments
+    global comments_last_ts
     ig_api = None
     ig_user = ""
     ig_pass = ""
     dl_user = ""
     dl_batchusers = []
     dl_path = os.getcwd() + "/"
+    dl_comments = False
     log_to_file = True
     run_at_start = ""
     run_at_finish = ""
@@ -73,4 +78,7 @@ def initialize():
     broadcast_downloaded_obj = None
     heartbeat_info_thread_worker = None
     json_thread_worker = None
+    comments_thread_worker = None
     kill_threads = False
+    comments = []
+    comments_last_ts = 0

@@ -110,6 +110,14 @@ def validate_inputs(config, args, unknown_args):
         if args.dlpath:
             pil.dl_path = args.dlpath
 
+        if helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')) == "Invalid":
+            pil.dl_comments = False
+            error_arr.append(['download_comments', 'True'])
+        elif helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')):
+            pil.dl_comments = True
+        else:
+            pil.dl_comments = False
+
         if helpers.bool_str_parse(config.get('pyinstalive', 'show_session_expires')) == "Invalid":
             pil.show_session_expires = False
             error_arr.append(['show_session_expires', 'False'])

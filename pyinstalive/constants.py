@@ -25,4 +25,5 @@ skip_merge = False
     BROADCAST_HEALTH_URL = 'https://i.instagram.com/api/v1/live/{:s}/info/'
     BROADCAST_HEALTH2_URL = 'https://i.instagram.com/api/v1/live/{:s}/heartbeat_and_get_viewer_count/'
     BROADCAST_INFO_URL = 'https://www.instagram.com/{:s}/live/?__a=1'
+    BROADCAST_COMMENTS_URL = 'https://i.instagram.com/api/v1/live/{:s}/get_comment/?last_comment_ts={:s}'
     MAIN_SITE_URL = 'https://www.instagram.com/'

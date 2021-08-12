@@ -5,6 +5,7 @@ import shutil
 import json
 import shlex
 import sys
+import codecs
 
 try:
     import pil
@@ -226,19 +227,35 @@ def get_stream_duration(duration_type):
     except Exception:
         return "Not available"
 
-def generate_json_segments():
+def generate_json_files():
     while True:
+        if pil.kill_threads:
+            break
+        else:
+            time.sleep(2.5)
         live_json_file = '{}{}_{}_{}_{}_live_downloads.json'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
                                                      pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
-
         pil.initial_broadcast_obj['segments'] = pil.broadcast_downloader.segment_meta
+
+        if pil.dl_comments:
+            comments_collected = pil.comments
+            before_count = len(comments_collected)
+            comments_response = pil.ig_api.get(Constants.BROADCAST_COMMENTS_URL.format(pil.initial_broadcast_obj.get('broadcast_id'), str(pil.comments_last_ts)))
+            comments_json = json.loads(comments_response.text)
+            new_comments = comments_json.get("comments", [])
+            for i, comment in enumerate(new_comments):
+                elapsed = int(time.time()) - int(pil.epochtime)
+                new_comments[i].update({"total_elapsed": elapsed})
+            pil.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else int(time.time()))
+            comments_collected.extend(new_comments)
+            after_count = len(comments_collected)
+
+            if after_count > before_count:
+                pil.initial_broadcast_obj['comments'] = comments_collected
+            pil.comments = comments_collected
         try:
             with open(live_json_file, 'w') as json_file:
                 json.dump(pil.initial_broadcast_obj, json_file, indent=2)
-            if pil.kill_threads:
-                break
-            else:
-                time.sleep(2.5)
         except Exception as e:
             logger.warn(str(e))
 
@@ -251,24 +268,24 @@ def print_durations(download_ended=False):
             logger.warn("Final video duration may vary if the livestream was interrupted.")
 
 def print_heartbeat(from_thread=False):
-    if not pil.broadcast_downloaded_obj:
-        previous_state = pil.initial_broadcast_obj.get("broadcast_dict").get("broadcast_status")
-    else:
-        previous_state = pil.broadcast_downloaded_obj.get("broadcast_status")
-    heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
-    pil.ig_api.post(Constants.BROADCAST_HEALTH2_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
-    response_json = json.loads(heartbeat_response.text)
-    pil.broadcast_downloaded_obj = response_json
-    if from_thread:
-        check_if_guesting()
-    if not from_thread or (previous_state != pil.broadcast_downloaded_obj.get("broadcast_status")):
+    if not pil.kill_threads:
+        if not pil.broadcast_downloaded_obj:
+            previous_state = pil.initial_broadcast_obj.get("broadcast_dict").get("broadcast_status")
+        else:
+            previous_state = pil.broadcast_downloaded_obj.get("broadcast_status")
+        heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
+        pil.ig_api.post(Constants.BROADCAST_HEALTH2_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
+        response_json = json.loads(heartbeat_response.text)
+        pil.broadcast_downloaded_obj = response_json
         if from_thread:
-            logger.separator()
-            print_durations()
-        logger.info('Status       : {}'.format( pil.broadcast_downloaded_obj.get("broadcast_status").capitalize()))
-        logger.info('Viewers      : {}'.format(int( pil.broadcast_downloaded_obj.get("viewer_count"))))
-    return  pil.broadcast_downloaded_obj.get('broadcast_status') not in ['active', 'interrupted'] 
-
+            check_if_guesting()
+        if not from_thread or (previous_state != pil.broadcast_downloaded_obj.get("broadcast_status")):
+            if from_thread:
+                logger.separator()
+                print_durations()
+            logger.info('Status       : {}'.format( pil.broadcast_downloaded_obj.get("broadcast_status").capitalize()))
+            logger.info('Viewers      : {}'.format(int( pil.broadcast_downloaded_obj.get("viewer_count"))))
+        return  pil.broadcast_downloaded_obj.get('broadcast_status') not in ['active', 'interrupted']     
 
 def do_heartbeat():
     while True:
@@ -370,3 +387,68 @@ def winbuild_path():
         return sys.executable
     elif __file__:
         return None
+
+def generate_log(comments={}, log_file="", gen_from_arg=False):
+    try:
+        if gen_from_arg:
+            with open(pil.gencomments_arg, 'r') as comments_json:
+                comments = json.load(comments_json).get("comments", None)
+            if comments:
+                log_file = os.path.join(
+                    pil.dl_path, os.path.basename(pil.gencomments_arg.replace(".json", ".log")))
+                logger.info("Generating comments file from input...")
+            else:
+                logger.warn(
+                    "The input file does not contain any comments.")
+                logger.separator()
+                return None
+        comments_timeline = {}
+        for c in comments:
+            if 'offset' in c:
+                for k in list(c.get('comment')):
+                    c[k] = c.get('comment', {}).get(k)
+                c['created_at_utc'] = c.get('offset')
+            created_at_utc = str(2 * (c.get('created_at_utc') // 2))
+            comment_list = comments_timeline.get(created_at_utc) or []
+            comment_list.append(c)
+            comments_timeline[created_at_utc] = comment_list
+
+        if comments_timeline:
+            comment_errors = 0
+            total_comments = 0
+            timestamps = sorted(list(comments_timeline))
+            subs = []
+            for tc in timestamps:
+                t = comments_timeline[tc]
+
+                comments_log = ''
+                for c in t:
+                    try:
+                        comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(c.get("total_elapsed"))), '{}: {}'.format(c.get('user', {}).get('username'),c.get('text')))
+                    except Exception:
+                        comment_errors += 1
+                        try:
+                            comments_log += '{}{}\n\n'.format(time.strftime('%H:%M:%S\n', time.gmtime(c.get("total_elapsed"))), '{}: {}'.format(c.get('user', {}).get('username'),c.get('text').encode('ascii', 'ignore')))
+                        except Exception:
+                            pass
+                    total_comments += 1
+                subs.append(comments_log)
+
+            with codecs.open(log_file, 'w', 'utf-8-sig') as log_outfile:
+                log_outfile.write(''.join(subs))
+            if gen_from_arg:
+                if comment_errors:
+                    logger.warn(
+                        "Successfully saved {:s} comments but {:s} comments might be (partially) incomplete.".format(
+                            str(total_comments), str(comment_errors)))
+                else:
+                    logger.info("Successfully saved {:s} comments.".format(
+                        str(total_comments)))
+                logger.separator()
+            return comment_errors, total_comments
+        else:
+            return 0, 0
+    except Exception as e:
+        logger.error(
+            "An error occurred while saving comments: {:s}".format(str(e)))
+        logger.separator()
