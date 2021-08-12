@@ -39,6 +39,9 @@ def initialize():
     global skip_merge
     global config_login_overridden
     global winbuild_path
+    global broadcast_downloaded_obj
+    global heartbeat_thread_worker
+    global kill_heartbeat_thread
     ig_api = None
     ig_user = ""
     ig_pass = ""
@@ -66,3 +69,6 @@ def initialize():
     skip_merge = False
     config_login_overridden = False
     winbuild_path = helpers.winbuild_path()
+    broadcast_downloaded_obj = None
+    heartbeat_thread_worker = None
+    kill_heartbeat_thread = False

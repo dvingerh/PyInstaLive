@@ -190,6 +190,23 @@ def show_info():
     logger.separator()
 
 
+def generate_json_segments():
+    while True:
+        live_json_file = '{}{}_{}_{}_{}_live_downloads.json'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
+                                                     pil.livestream_obj.get('broadcast_id'), pil.epochtime)
+
+        pil.livestream_obj['segments'] = pil.broadcast_downloader.segment_meta
+        try:
+            with open(live_json_file, 'w') as json_file:
+                json.dump(pil.livestream_obj, json_file, indent=2)
+            if pil.kill_heartbeat_thread:
+                break
+            else:
+                time.sleep(2.5)
+        except Exception as e:
+            logger.warn(str(e))
+
+
 def new_config():
     try:
         if os.path.exists(pil.config_path):

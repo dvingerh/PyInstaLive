@@ -67,6 +67,11 @@ def merge_segments():
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
+        logger.info("Waiting for heartbeat thread to finish.")
+        if pil.heartbeat_thread_worker and pil.heartbeat_thread_worker.is_alive():
+            pil.kill_heartbeat_thread = True
+            pil.heartbeat_thread_worker.join()
+
         try:
             if not pil.skip_merge:
                 logger.info('Merging downloaded files into video.')
@@ -154,6 +159,9 @@ def download_livestream():
         print_heartbeat()
         logger.separator()
         logger.info('Downloading livestream, press [CTRL+C] to abort.')
+
+        pil.heartbeat_thread_worker = threading.Thread(target=helpers.generate_json_segments)
+        pil.heartbeat_thread_worker.start()
 
         if pil.run_at_start:
             try:
