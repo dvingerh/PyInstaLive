@@ -256,6 +256,7 @@ def print_heartbeat(from_thread=False):
     else:
         previous_state = pil.broadcast_downloaded_obj.get("broadcast_status")
     heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
+    pil.ig_api.post(Constants.BROADCAST_HEALTH2_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
     response_json = json.loads(heartbeat_response.text)
     pil.broadcast_downloaded_obj = response_json
     if from_thread:

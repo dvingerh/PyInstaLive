@@ -3,9 +3,7 @@ import os
 import json
 import threading
 import time
-from typing import final
 from instagram_private_api_extensions import live
-from xml.dom.minidom import parseString
 
 
 try:
