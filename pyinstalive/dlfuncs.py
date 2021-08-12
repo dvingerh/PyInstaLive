@@ -40,7 +40,7 @@ def merge_segments():
                 logger.warn('Could not execute command: {:s}'.format(str(e)))
 
         live_mp4_file = '{}{}_{}_{}_{}_live.mp4'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.livestream_obj.get('broadcast_id'), pil.epochtime)
+                                                     pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
@@ -87,10 +87,10 @@ def merge_segments():
 
 def download_livestream():
     try:
-        mpd_url = pil.livestream_obj.get('broadcast_dict').get('dash_playback_url')
+        mpd_url = pil.initial_broadcast_obj.get('broadcast_dict').get('dash_playback_url')
 
         pil.live_folder_path = '{}{}_{}_{}_{}_live_downloads'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.livestream_obj.get('broadcast_id'), pil.epochtime)
+                                                     pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
         pil.broadcast_downloader = live.Downloader(
             mpd=mpd_url,
             output_dir=pil.live_folder_path,
@@ -100,15 +100,15 @@ def download_livestream():
             download_timeout=3,
             callback_check=helpers.print_heartbeat,
             ffmpeg_binary=pil.ffmpeg_path)
-        pil.broadcast_downloader.stream_id = pil.livestream_obj.get('broadcast_id')
+        pil.broadcast_downloader.stream_id = pil.initial_broadcast_obj.get('broadcast_id')
     except Exception as e:
         logger.error('Could not start downloading livestream: {:s}'.format(str(e)))
         logger.separator()
         helpers.remove_lock()
     try:
-        broadcast_owner = pil.livestream_obj.get('broadcast_dict', {}).get('broadcast_owner').get("username")
+        broadcast_owner = pil.initial_broadcast_obj.get('broadcast_dict', {}).get('broadcast_owner').get("username")
         try:
-            broadcast_guest = pil.livestream_obj.get('broadcast_dict', {}).get('cobroadcasters')[0].get("username")
+            broadcast_guest = pil.initial_broadcast_obj.get('broadcast_dict', {}).get('cobroadcasters')[0].get("username")
         except Exception:
             broadcast_guest = None
         if broadcast_owner != pil.dl_user:
@@ -160,14 +160,26 @@ def download_livestream():
 
 def get_broadcasts_info():
     try:
-        response = pil.ig_api.get(Constants.BROADCAST_INFO_URL.format(pil.dl_user))
-        response_json = json.loads(response.text)
-        pil.livestream_obj = json.loads(response.text)
-        if pil.livestream_obj.get("broadcast_id", None):
-            return True
-        else:
-            return False
-    except JSONDecodeError:
+
+        broadcast_f_list = dlfuncs.get_broadcasts_tray()
+        open("test.json", "w").write(json.dumps(broadcast_f_list))
+        final_broadcast_name = None
+        if broadcast_f_list.get("broadcasts", None):
+            for broadcast_f in broadcast_f_list.get("broadcasts", None):
+                owner_username = broadcast_f.get("broadcast_owner", None).get("username", None)
+                guest_username = broadcast_f.get("cobroadcasters", None)[0].get("username", None)
+                if (pil.dl_user == owner_username) or (pil.dl_user == guest_username):
+                    final_broadcast_name = owner_username
+                    break
+
+        if final_broadcast_name != None:
+            response = pil.ig_api.get(Constants.BROADCAST_INFO_URL.format(final_broadcast_name))
+            pil.initial_broadcast_obj = json.loads(response.text)
+            if pil.initial_broadcast_obj.get("broadcast_id", None):
+                return True
+            else:
+                return False
+    except (JSONDecodeError, IndexError):
         return False
 
 

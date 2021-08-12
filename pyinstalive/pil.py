@@ -26,7 +26,7 @@ def initialize():
     global config
     global args
     global uargs
-    global livestream_obj
+    global initial_broadcast_obj
     global broadcast_downloader
     global epochtime
     global datetime_compat
@@ -57,7 +57,7 @@ def initialize():
     config = None
     args = None
     uargs = None
-    livestream_obj = None
+    initial_broadcast_obj = None
     broadcast_downloader = None
     epochtime = helpers.strepochtime()
     datetime_compat = helpers.strdatetime_compat()

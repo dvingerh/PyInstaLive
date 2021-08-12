@@ -26,7 +26,7 @@ def start():
             if dlfuncs.get_broadcasts_info():
                 if checking_self:
                     logger.warn("Login with a different account to download your own livestreams.")
-                elif pil.livestream_obj:
+                elif pil.initial_broadcast_obj:
                     logger.info("Livestream available, starting download.")
                     dlfuncs.download_livestream()
             else:

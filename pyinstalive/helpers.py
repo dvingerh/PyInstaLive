@@ -188,20 +188,23 @@ def check_if_guesting():
     if not broadcast_guest and pil.has_guest:
         logger.separator()
         logger.binfo('The livestream owner has stopped guesting with "{}".'.format(pil.has_guest))
+        if pil.has_guest == pil.dl_user:
+            pil.broadcast_downloader.is_aborted = True
         pil.has_guest = None
+        
 
 def get_stream_duration(duration_type):
     try:
         if not pil.broadcast_downloaded_obj:
             if duration_type == 0: # Airtime duration
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
+                stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.initial_broadcast_obj.get("broadcast_dict").get("published_time")), 60)
             if duration_type == 1: # Download duration
                 stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(pil.epochtime)), 60)
             if duration_type == 2: # Missing duration
                 if (int(pil.epochtime) - pil.broadcast_downloaded_obj.get("published_time")) <= 0:
                     stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
                 else:
-                    stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
+                    stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.initial_broadcast_obj.get("broadcast_dict").get("published_time")), 60)
         else:
             if duration_type == 0: # Airtime duration
                 stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.broadcast_downloaded_obj.get("published_time")), 60)
@@ -226,12 +229,12 @@ def get_stream_duration(duration_type):
 def generate_json_segments():
     while True:
         live_json_file = '{}{}_{}_{}_{}_live_downloads.json'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.livestream_obj.get('broadcast_id'), pil.epochtime)
+                                                     pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
 
-        pil.livestream_obj['segments'] = pil.broadcast_downloader.segment_meta
+        pil.initial_broadcast_obj['segments'] = pil.broadcast_downloader.segment_meta
         try:
             with open(live_json_file, 'w') as json_file:
-                json.dump(pil.livestream_obj, json_file, indent=2)
+                json.dump(pil.initial_broadcast_obj, json_file, indent=2)
             if pil.kill_threads:
                 break
             else:
@@ -249,13 +252,14 @@ def print_durations(download_ended=False):
 
 def print_heartbeat(from_thread=False):
     if not pil.broadcast_downloaded_obj:
-        previous_state = pil.livestream_obj.get("broadcast_dict").get("broadcast_status")
+        previous_state = pil.initial_broadcast_obj.get("broadcast_dict").get("broadcast_status")
     else:
         previous_state = pil.broadcast_downloaded_obj.get("broadcast_status")
-    heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.livestream_obj.get('broadcast_id')))
+    heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
     response_json = json.loads(heartbeat_response.text)
     pil.broadcast_downloaded_obj = response_json
-    check_if_guesting()
+    if from_thread:
+        check_if_guesting()
     if not from_thread or (previous_state != pil.broadcast_downloaded_obj.get("broadcast_status")):
         if from_thread:
             logger.separator()
