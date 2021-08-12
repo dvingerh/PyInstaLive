@@ -23,29 +23,6 @@ except ImportError:
     from .constants import Constants
 
 
-def get_stream_duration(duration_type):
-    try:
-        if duration_type == 0: # Airtime duration
-            stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
-        if duration_type == 1: # Download duration
-            stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(pil.epochtime)), 60)
-        if duration_type == 2: # Missing duration
-            if (int(pil.epochtime) - pil.livestream_obj.get("broadcast_dict").get("published_time")) <= 0:
-                stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
-            else:
-                stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_obj.get("broadcast_dict").get("published_time")), 60)
-
-        if stream_started_mins < 0:
-            stream_started_mins = 0
-        if stream_started_secs < 0:
-            stream_started_secs = 0
-        stream_duration_str = '%d minutes' % stream_started_mins
-        if stream_started_secs:
-            stream_duration_str += ' and %d seconds' % stream_started_secs
-        return stream_duration_str
-    except Exception:
-        return "Not available"
-
 def get_broadcasts_tray():
     response = pil.ig_api.get(Constants.REELS_TRAY_URL)
     response_json = json.loads(response.text)
@@ -67,11 +44,12 @@ def merge_segments():
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
-        logger.info("Waiting for heartbeat thread to finish.")
-        if pil.heartbeat_thread_worker and pil.heartbeat_thread_worker.is_alive():
-            pil.kill_heartbeat_thread = True
-            pil.heartbeat_thread_worker.join()
-
+        pil.kill_threads = True
+        logger.info("Waiting for threads to finish.")
+        if pil.json_thread_worker and pil.json_thread_worker.is_alive():
+            pil.json_thread_worker.join()
+        if pil.heartbeat_info_thread_worker and pil.heartbeat_info_thread_worker.is_alive():
+            pil.heartbeat_info_thread_worker.join()
         try:
             if not pil.skip_merge:
                 logger.info('Merging downloaded files into video.')
@@ -105,23 +83,9 @@ def merge_segments():
         logger.binfo('Aborted merging process, no video was created.')
         helpers.remove_lock()
 
-def print_durations(download_ended=False):
-        logger.info('Airing time  : {}'.format(get_stream_duration(0)))
-        if download_ended:
-            logger.info('Downloaded   : {}'.format(get_stream_duration(1)))
-            logger.info('Missing      : {}'.format(get_stream_duration(2)))
-            logger.separator()
-            logger.warn("Final video duration may vary if the livestream was interrupted.")
+
 
 def download_livestream():
-
-    def print_heartbeat():
-        heartbeat_response = pil.ig_api.post(Constants.BROADCAST_HEALTH_URL.format(pil.livestream_obj.get('broadcast_id')))
-        response_json = json.loads(heartbeat_response.text)
-        logger.info('Status       : {}'.format(response_json.get("broadcast_status").capitalize()))
-        logger.info('Viewers      : {}'.format(int(response_json.get("viewer_count"))))
-        return response_json.get('broadcast_status') not in ['active', 'interrupted'] 
-
     try:
         mpd_url = pil.livestream_obj.get('broadcast_dict').get('dash_playback_url')
 
@@ -134,7 +98,7 @@ def download_livestream():
             duplicate_etag_retry=30,
             mpd_download_timeout=3,
             download_timeout=3,
-            callback_check=print_heartbeat,
+            callback_check=helpers.print_heartbeat,
             ffmpeg_binary=pil.ffmpeg_path)
         pil.broadcast_downloader.stream_id = pil.livestream_obj.get('broadcast_id')
     except Exception as e:
@@ -148,20 +112,26 @@ def download_livestream():
         except Exception:
             broadcast_guest = None
         if broadcast_owner != pil.dl_user:
+            logger.separator()
             logger.binfo('This livestream is a dual-live, the owner is "{}".'.format(broadcast_owner))
             broadcast_guest = None
         if broadcast_guest:
+            logger.separator()
             logger.binfo('This livestream is a dual-live, the current guest is "{}".'.format(broadcast_guest))
             pil.has_guest = broadcast_guest
         helpers.create_lock_folder()
         logger.separator()
-        print_durations()
-        print_heartbeat()
+        helpers.print_durations()
+        helpers.print_heartbeat()
         logger.separator()
         logger.info('Downloading livestream, press [CTRL+C] to abort.')
 
-        pil.heartbeat_thread_worker = threading.Thread(target=helpers.generate_json_segments)
-        pil.heartbeat_thread_worker.start()
+        pil.json_thread_worker = threading.Thread(target=helpers.generate_json_segments)
+        pil.json_thread_worker.start()
+
+        pil.heartbeat_info_thread_worker = threading.Thread(target=helpers.do_heartbeat)
+        pil.heartbeat_info_thread_worker.start()
+
 
         if pil.run_at_start:
             try:
@@ -175,14 +145,14 @@ def download_livestream():
         logger.separator()
         logger.info("The livestream has been ended by the user.")
         logger.separator()
-        print_durations(True)
+        helpers.print_durations(True)
         logger.separator()
         merge_segments()
     except KeyboardInterrupt:
         logger.separator()
         logger.binfo('The download has been aborted.')
         logger.separator()
-        print_durations(True)
+        helpers.print_durations(True)
         logger.separator()
         if not pil.broadcast_downloader.is_aborted:
             pil.broadcast_downloader.stop()

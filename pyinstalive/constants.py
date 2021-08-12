@@ -22,6 +22,6 @@ skip_merge = False
     LOGIN_URL = 'https://www.instagram.com/accounts/login/'
     AJAX_LOGIN_URL = 'https://www.instagram.com/accounts/login/ajax/'
     REELS_TRAY_URL = 'https://i.instagram.com/api/v1/live/reels_tray_broadcasts/'
-    BROADCAST_HEALTH_URL = 'https://i.instagram.com/api/v1/live/{:s}/heartbeat_and_get_viewer_count/'
+    BROADCAST_HEALTH_URL = 'https://i.instagram.com/api/v1/live/{:s}/info/'
     BROADCAST_INFO_URL = 'https://www.instagram.com/{:s}/live/?__a=1'
     MAIN_SITE_URL = 'https://www.instagram.com/'
