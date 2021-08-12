@@ -44,7 +44,7 @@ def merge_segments():
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
         pil.kill_threads = True
-        logger.info("Waiting for threads to finish.")
+        logger.info("Waiting for background threads to finish.")
         if pil.json_thread_worker and pil.json_thread_worker.is_alive():
             pil.json_thread_worker.join()
         if pil.heartbeat_info_thread_worker and pil.heartbeat_info_thread_worker.is_alive():

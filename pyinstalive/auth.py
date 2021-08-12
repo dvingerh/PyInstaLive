@@ -102,7 +102,6 @@ def authenticate(username, password, force_use_login_args=False):
             else:
                 response = ig_api.get(Constants.MAIN_SITE_URL)
                 login_state = get_shared_data(response.text)
-                open("state.html", "w").write(response.text)
                 if login_state.get("entry_data").get("FeedPage", None) == None:
                     if login_state.get("entry_data").get("Challenge", None) != None:
                         logger.error("Could not login with the login session file: {0!s}".format(os.path.basename(session_file)))
