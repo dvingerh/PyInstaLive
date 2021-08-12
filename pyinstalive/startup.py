@@ -110,13 +110,13 @@ def validate_inputs(config, args, unknown_args):
         if args.dlpath:
             pil.dl_path = args.dlpath
 
-        if helpers.bool_str_parse(config.get('pyinstalive', 'show_cookie_expiry')) == "Invalid":
-            pil.show_cookie_expiry = False
-            error_arr.append(['show_cookie_expiry', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'show_cookie_expiry')):
-            pil.show_cookie_expiry = True
+        if helpers.bool_str_parse(config.get('pyinstalive', 'show_session_expires')) == "Invalid":
+            pil.show_session_expires = False
+            error_arr.append(['show_session_expires', 'False'])
+        elif helpers.bool_str_parse(config.get('pyinstalive', 'show_session_expires')):
+            pil.show_session_expires = True
         else:
-            pil.show_cookie_expiry = False
+            pil.show_session_expires = False
 
         if helpers.bool_str_parse(config.get('pyinstalive', 'skip_merge')) == "Invalid":
             pil.skip_merge = False

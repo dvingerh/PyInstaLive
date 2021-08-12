@@ -9,7 +9,7 @@ class Constants:
 username = johndoe
 password = grapefruits
 download_path = {:s}
-show_cookie_expiry = True
+show_session_expires = True
 log_to_file = True
 ffmpeg_path = 
 run_at_start =

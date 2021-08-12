@@ -21,7 +21,7 @@ def initialize():
     global log_to_file
     global run_at_start
     global run_at_finish
-    global show_cookie_expiry
+    global show_session_expires
     global config_path
     global config
     global args
@@ -52,7 +52,7 @@ def initialize():
     log_to_file = True
     run_at_start = ""
     run_at_finish = ""
-    show_cookie_expiry = False
+    show_session_expires = False
     config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
     config = None
     args = None

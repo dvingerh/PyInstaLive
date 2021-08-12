@@ -74,7 +74,7 @@ def authenticate(username, password, force_use_login_args=False):
                 expiry_date = datetime.fromtimestamp(expiry_epoch).strftime('%Y-%m-%d at %I:%M:%S %p')
 
                 logger.binfo('New login session file was created: {0!s}'.format(os.path.basename(session_file)))
-                if pil.show_cookie_expiry:
+                if pil.show_session_expires:
                     logger.info("Login session file expiry date: {}".format(expiry_date))
             else:
                 if (json_data.get("message") == 'checkpoint_required'):
@@ -91,7 +91,7 @@ def authenticate(username, password, force_use_login_args=False):
                 if cookie.name == "csrftoken":
                     expiry_epoch = cookie.expires
             expiry_date = datetime.fromtimestamp(expiry_epoch).strftime('%Y-%m-%d at %I:%M:%S %p')
-            if pil.show_cookie_expiry:
+            if pil.show_session_expires:
                 logger.info("Login session file expiry date: {}".format(expiry_date))
             if int(expiry_epoch) <= int(pil.epochtime):
                 os.remove(session_file)

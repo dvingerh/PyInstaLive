@@ -128,16 +128,16 @@ def clean_download_dir():
 
 
 def show_info():
-    cookie_files = []
-    cookie_from_config = ''
+    session_files = []
+    session_from_config = ''
     try:
         for file in os.listdir(os.getcwd()):
             if file.endswith(".dat"):
-                cookie_files.append(file)
+                session_files.append(file)
             if pil.ig_user == file.replace(".dat", ''):
-                cookie_from_config = file
+                session_from_config = file
     except Exception as e:
-        logger.warn("Could not check for cookie files: {:s}".format(str(e)))
+        logger.warn("Could not list login session files: {:s}".format(str(e)))
         logger.whiteline()
     logger.info("To see all the available arguments, use the -h argument.")
     logger.whiteline()
@@ -148,13 +148,13 @@ def show_info():
     else:
         logger.info("FFmpeg framework:           Available")
 
-    if len(cookie_from_config) > 0:
-        logger.info("Cookie files:               {:s} ({:s} matches config user)".format(str(len(cookie_files)),
-                                                                                         cookie_from_config))
-    elif len(cookie_files) > 0:
-        logger.info("Cookie files:               {:s}".format(str(len(cookie_files))))
+    if len(session_from_config) > 0:
+        logger.info("Login session files:        {:s} ({:s} matches config user)".format(str(len(session_files)),
+                                                                                         session_from_config))
+    elif len(session_files) > 0:
+        logger.info("Login session files:        {:s}".format(str(len(session_files))))
     else:
-        logger.warn("Cookie files:               None found")
+        logger.warn("Login session files:        None found")
 
     logger.info("CLI supports color:         {:s}".format("No" if not logger.supports_color() else "Yes"))
     logger.info(
