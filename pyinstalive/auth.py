@@ -44,11 +44,13 @@ def authenticate(username, password, force_use_login_args=False):
         session_file = os.path.join(os.path.dirname(pil.config_path), "{}.dat".format(username))
         if not os.path.isfile(session_file):
             # settings file does not exist
-            logger.warn('Unable to find login session file: {0!s}'.format(os.path.basename(session_file)))
-            logger.info('A new login session file will be created after logging in.')
+            logger.info('Login session file not found: {0!s}'.format(os.path.basename(session_file)))
+            logger.info('A new login session file will be created.')
             logger.separator()
 
             # login new
+            expiry_epoch = 0
+            expiry_date = None
             session = requests.session()
             session.headers = Constants.LOGIN_HEADERS
             response = session.get(Constants.LOGIN_URL)
@@ -66,8 +68,14 @@ def authenticate(username, password, force_use_login_args=False):
             if json_data.get("authenticated") == True:
                 save_session(session, session_file)
                 ig_api = session
+                for cookie in list(ig_api.cookies):
+                    if cookie.name == "csrftoken":
+                        expiry_epoch = cookie.expires
+                expiry_date = datetime.fromtimestamp(expiry_epoch).strftime('%Y-%m-%d at %I:%M:%S %p')
+
                 logger.binfo('New login session file was created: {0!s}'.format(os.path.basename(session_file)))
-                logger.separator()
+                if pil.show_cookie_expiry:
+                    logger.info("Login session file expiry date: {}".format(expiry_date))
             else:
                 if (json_data.get("message") == 'checkpoint_required'):
                     logger.error('Could not login, the action was flagged as suspicious by Instagram.')
@@ -77,25 +85,36 @@ def authenticate(username, password, force_use_login_args=False):
                 logger.separator()
                 ig_api = None
         else:
-            logger.info("Loading and verifying existing login session file: {0!s}".format(os.path.basename(session_file)))
+            logger.info("Using an existing login session file: {0!s}".format(os.path.basename(session_file)))
             ig_api = load_session(session_file)
-            response = ig_api.get(Constants.MAIN_SITE_URL)
-            
-            login_state = get_shared_data(response.text)
-            if login_state.get("entry_data").get("FeedPage", None) == None:
-                if login_state.get("entry_data").get("Challenge", None) != None:
-                    logger.error("Could not login with the login session file: {0!s}".format(os.path.basename(session_file)))
-                    logger.error('The login session was flagged as suspicious by Instagram.')
-                    logger.error('Please solve the login checkpoint on your computer and try again.')
-                    logger.separator()
-                    ig_api = None
-                else:
-                    logger.error("Could not login with the login session file: {0!s}".format(os.path.basename(session_file)))
-                    logger.error('Please delete the login session file and try again.')
-                    logger.separator()
-                    ig_api = None
-            else:
+            for cookie in list(ig_api.cookies):
+                if cookie.name == "csrftoken":
+                    expiry_epoch = cookie.expires
+            expiry_date = datetime.fromtimestamp(expiry_epoch).strftime('%Y-%m-%d at %I:%M:%S %p')
+            if pil.show_cookie_expiry:
+                logger.info("Login session file expiry date: {}".format(expiry_date))
+            if int(expiry_epoch) <= int(pil.epochtime):
+                os.remove(session_file)
+                logger.warn('The login session file has expired and was deleted.')
                 logger.separator()
+                authenticate(username, password)
+                return ig_api
+            else:
+                response = ig_api.get(Constants.MAIN_SITE_URL)
+                login_state = get_shared_data(response.text)
+                open("state.html", "w").write(response.text)
+                if login_state.get("entry_data").get("FeedPage", None) == None:
+                    if login_state.get("entry_data").get("Challenge", None) != None:
+                        logger.error("Could not login with the login session file: {0!s}".format(os.path.basename(session_file)))
+                        logger.error('The login session was flagged as suspicious by Instagram.')
+                        logger.error('Please solve the login checkpoint on your computer and try again.')
+                        logger.separator()
+                        ig_api = None
+                    else:
+                        logger.error("Could not login with the login session file: {0!s}".format(os.path.basename(session_file)))
+                        logger.error('Please delete the login session file and try again.')
+                        logger.separator()
+                        ig_api = None
 
     except Exception as e:
         logger.error('Unexpected exception: {:s}'.format(e))
@@ -106,18 +125,11 @@ def authenticate(username, password, force_use_login_args=False):
         logger.separator()
 
     if ig_api:
+        logger.separator()
         logger.info('Successfully logged into account: {:s}'.format(str(username)))
-        expiry_epoch = 0
-        for cookie in list(ig_api.cookies):
-            if cookie.name == "csrftoken":
-                expiry_epoch = cookie.expires
+        logger.separator()
         if ig_api.cookies["csrftoken"] != ig_api.headers.get("x-csrftoken"):
             ig_api.cookies.set("csrftoken", ig_api.headers.get("x-csrftoken"), domain=".instagram.com", expires=expiry_epoch)
-        if pil.show_cookie_expiry:
-            cookie_expiry_date = datetime.fromtimestamp(expiry_epoch).strftime('%Y-%m-%d at %I:%M:%S %p')
-            logger.separator()
-            logger.info("Login session file expiry date: {}".format(cookie_expiry_date))
-            logger.separator()
         return ig_api
     else:
         return None
