@@ -3,6 +3,7 @@ import os
 import json
 import threading
 import time
+from typing import final
 from instagram_private_api_extensions import live
 from xml.dom.minidom import parseString
 
@@ -167,11 +168,13 @@ def get_broadcasts_info():
         if broadcast_f_list.get("broadcasts", None):
             for broadcast_f in broadcast_f_list.get("broadcasts", None):
                 owner_username = broadcast_f.get("broadcast_owner", None).get("username", None)
-                guest_username = broadcast_f.get("cobroadcasters", None)[0].get("username", None)
+                try:
+                    guest_username = broadcast_f.get("cobroadcasters", None)[0].get("username", None)
+                except:
+                    guest_username = None
                 if (pil.dl_user == owner_username) or (pil.dl_user == guest_username):
                     final_broadcast_name = owner_username
                     break
-
         if final_broadcast_name != None:
             response = pil.ig_api.get(Constants.BROADCAST_INFO_URL.format(final_broadcast_name))
             pil.initial_broadcast_obj = json.loads(response.text)
