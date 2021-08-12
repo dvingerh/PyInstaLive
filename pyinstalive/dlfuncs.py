@@ -161,7 +161,6 @@ def get_broadcasts_info():
     try:
 
         broadcast_f_list = dlfuncs.get_broadcasts_tray()
-        open("test.json", "w").write(json.dumps(broadcast_f_list))
         final_broadcast_name = None
         if broadcast_f_list.get("broadcasts", None):
             for broadcast_f in broadcast_f_list.get("broadcasts", None):
