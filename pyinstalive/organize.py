@@ -36,7 +36,7 @@ def organize_files():
                     raw_file_dict[file] = username
                     new_file_dict[file] = new_file
                 except TypeError as e:
-                    logger.warn("Could not parse filename '{:s}', skipping.".format(file))
+                    logger.warn("Could not parse filename: {:s}".format(file))
                     not_moved += 1 
                     has_error = True
             elif file.endswith(".log"):
@@ -47,7 +47,7 @@ def organize_files():
                     raw_file_dict[file] = username_fix
                     new_file_dict[file] = new_file
                 except TypeError as e:
-                    logger.warn("Could not parse filename '{:s}', skipping.".format(file))
+                    logger.warn("Could not parse filename: {:s}".format(file))
                     not_moved += 1 
                     has_error = True
         
@@ -61,13 +61,13 @@ def organize_files():
             if not os.path.isfile(destination_path):
                 try:
                     shutil.move(source_path, destination_path)
-                    logger.info("Moved and renamed '{:s}' successfully.".format(filename))
+                    logger.info("Successfully moved and renamed: {:s}.".format(filename))
                     has_moved += 1
                 except OSError as oe:
                     logger.warn("Could not move and rename {:s}: {:s}".format(filename, str(oe)))
                     not_moved += 1
             else:
-                logger.binfo("Did not move and rename '{:s}' because it already exists.".format(filename))
+                logger.warn("Could not move and rename duplicate file: {:s}".format(filename))
                 not_moved += 1
 
         if (has_moved > 0) or (not_moved > 0 and has_error):

@@ -62,3 +62,10 @@ pildev/
 venv/
 
 \.vscode/\.ropeproject/
+
+*.dat
+
+*.mp4
+
+
+*_downloads\

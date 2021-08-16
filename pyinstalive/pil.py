@@ -37,7 +37,7 @@ def initialize():
     global ffmpeg_path
     global clear_temp_files
     global has_guest
-    global skip_merge
+    global skip_assemble
     global config_login_overridden
     global winbuild_path
     global broadcast_downloaded_obj
@@ -72,7 +72,7 @@ def initialize():
     ffmpeg_path = None
     clear_temp_files = False
     has_guest = None
-    skip_merge = False
+    skip_assemble = False
     config_login_overridden = False
     winbuild_path = helpers.winbuild_path()
     broadcast_downloaded_obj = None

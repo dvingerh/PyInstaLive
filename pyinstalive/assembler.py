@@ -32,29 +32,48 @@ def _get_file_index(filename):
 
 def assemble(user_called=True, retry_with_zero_m4v=False):
     try:
-        ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(pil.assemble_arg).replace("_downloads", "") + ".mp4")
+        ass_json_file = pil.assemble_arg if pil.assemble_arg.endswith(".json") else pil.assemble_arg + ".json"
+        ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(ass_json_file).replace("_downloads", "").replace(".json", ".mp4"))
+        ass_segment_dir = pil.assemble_arg if not pil.assemble_arg.endswith(".json") else pil.assemble_arg.replace(".json", "")
+        
         broadcast_info = {}
-        if not os.listdir(pil.assemble_arg):
-            logger.error('The segment directory does not exist or does not contain any files: %s' % pil.assemble_arg)
+        if not os.path.isdir(ass_segment_dir):
+            logger.error("Could not create video file: The segment directory does not exist.")
             logger.separator()
-            return
+            return False
+        elif not os.listdir(ass_segment_dir):
+            logger.error("Could not create video file: The segment directory does not contain any files.")
+            logger.separator()
+            return False
+        
+        if not os.path.isfile(ass_json_file):
+            logger.warn("No matching JSON file found for the segment directory, trying to continue without it.")
+            ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
+            broadcast_info["broadcast_dict"]['id'] = ass_stream_id
+            broadcast_info["broadcast_dict"]['broadcast_status'] = "active"
+            broadcast_info['segments'] = {}
+        else:
+            with open(ass_json_file) as info_file:
+                try:
+                    broadcast_info = json.load(info_file)
+                except Exception as e:
+                    logger.warn("Could not decode JSON file, trying to continue without it.")
+                    ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
+                    broadcast_info["broadcast_dict"]['id'] = ass_stream_id
+                    broadcast_info["broadcast_dict"]['broadcast_status'] = "active"
+                    broadcast_info['segments'] = {}
 
-        ass_stream_id = os.listdir(pil.assemble_arg)[0].split('-')[0]
-        broadcast_info['id'] = ass_stream_id
-        broadcast_info['broadcast_status'] = "active"
-        broadcast_info['segments'] = {}
-
-        stream_id = str(broadcast_info['id'])
+        stream_id = str(broadcast_info["broadcast_dict"]['id'])
 
         segment_meta = broadcast_info.get('segments', {})
         if segment_meta:
             all_segments = [
-                os.path.join(pil.assemble_arg, k)
+                os.path.join(ass_segment_dir, k)
                 for k in broadcast_info['segments'].keys()]
         else:
             all_segments = list(filter(
                 os.path.isfile,
-                glob.glob(os.path.join(pil.assemble_arg, '%s-*.m4v' % stream_id))))
+                glob.glob(os.path.join(ass_segment_dir, '%s-*.m4v' % stream_id))))
 
         all_segments = sorted(all_segments, key=lambda x: _get_file_index(x))
         sources = []
@@ -65,9 +84,9 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         has_skipped_zero_m4v = False
 
         if not all_segments:
-            logger.error("No video segment files have been found in the specified folder.")
+            logger.error("Could not create video file: The segment directory does not contain any files.")
             logger.separator()
-            return
+            return False
 
         for segment in all_segments:
             segment = re.sub('\?.*$', '', segment)
@@ -85,9 +104,9 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                 continue
 
             video_stream = os.path.join(
-                pil.assemble_arg, video_stream_format.format(stream_id, len(sources)))
+                ass_segment_dir, video_stream_format.format(stream_id, len(sources)))
             audio_stream = os.path.join(
-                pil.assemble_arg, audio_stream_format.format(stream_id, len(sources)))
+                ass_segment_dir, audio_stream_format.format(stream_id, len(sources)))
 
 
             file_mode = 'ab'
@@ -104,7 +123,7 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         for n, source in enumerate(sources):
             ffmpeg_binary = os.getenv('FFMPEG_BINARY', 'ffmpeg')
             cmd = [
-                ffmpeg_binary, '-loglevel', 'quiet', '-y',
+                ffmpeg_binary, '-loglevel', 'error', '-y',
                 '-i', source['audio'],
                 '-i', source['video'],
                 '-c:v', 'copy', '-c:a', 'copy', ass_mp4_file]
@@ -119,15 +138,14 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                     os.remove(source['audio'])
                     os.remove(source['video'])
                     logger.separator()
-                    assemble(user_called, retry_with_zero_m4v=True)
-                    return
+                    return assemble(user_called, retry_with_zero_m4v=True)
+                    
             else:
-                logger.separator()
-                logger.info('Saved video: %s' % os.path.basename(ass_mp4_file))
-                logger.separator()
                 os.remove(source['audio'])
                 os.remove(source['video'])
             if user_called:
+                logger.info('Created video: %s' % os.path.basename(ass_mp4_file))
                 logger.separator()
+            return True
     except Exception as e:
-        logger.error("An error occurred: {:s}".format(str(e)))
+        logger.error("Could not create video file: {:s}".format(str(e)))

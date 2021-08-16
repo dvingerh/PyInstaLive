@@ -6,6 +6,7 @@ import json
 import shlex
 import sys
 import codecs
+import threading
 
 try:
     import pil
@@ -17,7 +18,6 @@ except ImportError:
     from . import helpers
     from . import logger
     from .constants import Constants
-
 
 def strdatetime():
     return time.strftime('%m-%d-%Y %I:%M:%S %p')
@@ -116,7 +116,7 @@ def clean_download_dir():
         logger.separator()
     except KeyboardInterrupt as e:
         logger.separator()
-        logger.warn("The cleanup has been aborted.")
+        logger.warn("The cleanup was aborted by the user.")
         if dir_delcount == 0 and file_delcount == 0 and error_count == 0 and lock_count == 0:
             logger.info('No items were removed.')
             logger.separator()
@@ -185,12 +185,12 @@ def check_if_guesting():
     if broadcast_guest and not pil.has_guest:
         logger.separator()
         pil.has_guest = broadcast_guest
-        logger.binfo('The livestream owner has started guesting with "{}".'.format(pil.has_guest))
+        logger.binfo('The livestream host has started guesting with user: {}'.format(pil.has_guest))
     if not broadcast_guest and pil.has_guest:
         logger.separator()
-        logger.binfo('The livestream owner has stopped guesting with "{}".'.format(pil.has_guest))
+        logger.binfo('The livestream host has stopped guesting with user: {}'.format(pil.has_guest))
         if pil.has_guest == pil.dl_user:
-            pil.broadcast_downloader.is_aborted = True
+            pil.broadcast_downloader.stop()
         pil.has_guest = None
         
 
@@ -228,34 +228,33 @@ def get_stream_duration(duration_type):
         return "Not available"
 
 def generate_json_files():
-    while True:
-        if pil.kill_threads:
-            break
-        else:
-            time.sleep(2.5)
-        live_json_file = '{}{}_{}_{}_{}_live_downloads.json'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
-        pil.initial_broadcast_obj['segments'] = pil.broadcast_downloader.segment_meta
-
-        if pil.dl_comments:
-            comments_collected = pil.comments
-            before_count = len(comments_collected)
-            comments_response = pil.ig_api.get(Constants.BROADCAST_COMMENTS_URL.format(pil.initial_broadcast_obj.get('broadcast_id'), str(pil.comments_last_ts)))
-            comments_json = json.loads(comments_response.text)
-            new_comments = comments_json.get("comments", [])
-            for i, comment in enumerate(new_comments):
-                elapsed = int(time.time()) - int(pil.epochtime)
-                new_comments[i].update({"total_elapsed": elapsed})
-            pil.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else int(time.time()))
-            comments_collected.extend(new_comments)
-            after_count = len(comments_collected)
-
-            if after_count > before_count:
-                pil.initial_broadcast_obj['comments'] = comments_collected
-            pil.comments = comments_collected
+    if not pil.kill_threads:
         try:
-            with open(live_json_file, 'w') as json_file:
-                json.dump(pil.initial_broadcast_obj, json_file, indent=2)
+            live_json_file = '{}{}_{}_{}_{}_live_downloads.json'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
+                                                        pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
+            pil.initial_broadcast_obj['segments'] = pil.broadcast_downloader.segment_meta
+
+            if pil.dl_comments:
+                comments_collected = pil.comments
+                before_count = len(comments_collected)
+                comments_response = pil.ig_api.get(Constants.BROADCAST_COMMENTS_URL.format(pil.initial_broadcast_obj.get('broadcast_id'), str(pil.comments_last_ts)))
+                comments_json = json.loads(comments_response.text)
+                new_comments = comments_json.get("comments", [])
+                for i, comment in enumerate(new_comments):
+                    elapsed = int(time.time()) - int(pil.epochtime)
+                    new_comments[i].update({"total_elapsed": elapsed})
+                pil.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else int(time.time()))
+                comments_collected.extend(new_comments)
+                after_count = len(comments_collected)
+
+                if after_count > before_count:
+                    pil.initial_broadcast_obj['comments'] = comments_collected
+                pil.comments = comments_collected
+            try:
+                with open(live_json_file, 'w') as json_file:
+                    json.dump(pil.initial_broadcast_obj, json_file, indent=2)
+            except Exception as e:
+                logger.warn(str(e))
         except Exception as e:
             logger.warn(str(e))
 
@@ -264,8 +263,6 @@ def print_durations(download_ended=False):
         if download_ended:
             logger.info('Downloaded   : {}'.format(get_stream_duration(1)))
             logger.info('Missing      : {}'.format(get_stream_duration(2)))
-            logger.separator()
-            logger.warn("Final video duration may vary if the livestream was interrupted.")
 
 def print_heartbeat(from_thread=False):
     if not pil.kill_threads:
@@ -285,15 +282,23 @@ def print_heartbeat(from_thread=False):
                 print_durations()
             logger.info('Status       : {}'.format( pil.broadcast_downloaded_obj.get("broadcast_status").capitalize()))
             logger.info('Viewers      : {}'.format(int( pil.broadcast_downloaded_obj.get("viewer_count"))))
-        return  pil.broadcast_downloaded_obj.get('broadcast_status') not in ['active', 'interrupted']     
+        return pil.broadcast_downloaded_obj.get('broadcast_status') not in ['available', 'interrupted']
 
-def do_heartbeat():
+def do_json_generation():
     while True:
-        time.sleep(5)
+        generate_json_files()
         if pil.kill_threads:
             break
         else:
-            print_heartbeat(True)
+            time.sleep(2.5)
+
+def do_heartbeat():
+    while True:
+        print_heartbeat(True)
+        if pil.kill_threads:
+            break
+        else:
+            time.sleep(5)
 
 def new_config():
     try:
@@ -304,7 +309,7 @@ def new_config():
                 for line in f:
                     logger.plain("    {:s}".format(line.rstrip()))
             logger.whiteline()
-            logger.info("To create a default config file, delete 'pyinstalive.ini' and run this script again.")
+            logger.info("To create a default configuration file, delete the existing file and run PyInstaLive again.")
             logger.separator()
         else:
             try:
@@ -312,12 +317,12 @@ def new_config():
                 config_file = open(pil.config_path, "w")
                 config_file.write(Constants.CONFIG_TEMPLATE.format(os.getcwd()).strip())
                 config_file.close()
-                logger.warn("Edit the created 'pyinstalive.ini' file and run this script again.")
+                logger.info("A new configuration file has been created.")
                 logger.separator()
                 return
             except Exception as e:
-                logger.error("Could not create default config file: {:s}".format(str(e)))
-                logger.warn("You must manually create and edit it with the following template: ")
+                logger.error("Could not create default configuration file: {:s}".format(str(e)))
+                logger.warn("Please manually create one using the following template: ")
                 logger.whiteline()
                 for line in Constants.CONFIG_TEMPLATE.strip().splitlines():
                     logger.plain("    {:s}".format(line.rstrip()))
@@ -325,9 +330,9 @@ def new_config():
                 logger.warn("Save it as 'pyinstalive.ini' and run this script again.")
                 logger.separator()
     except Exception as e:
-        logger.error("An error occurred: {:s}".format(str(e)))
+        logger.error("d: {:s}".format(str(e)))
         logger.warn(
-            "If you don't have a configuration file, manually create and edit one with the following template:")
+            "If you don't have a configuration file, manually create one using the following template:")
         logger.whiteline()
         logger.plain(Constants.CONFIG_TEMPLATE)
         logger.whiteline()
@@ -344,7 +349,7 @@ def create_lock_user():
         else:
             return False
     except Exception:
-        logger.warn("Lock file could not be created. Be careful when running multiple downloads concurrently!")
+        logger.warn("Could not create lock file.")
         return True
 
 
@@ -357,7 +362,7 @@ def create_lock_folder():
         else:
             return False
     except Exception:
-        logger.warn("Lock file could not be created. Be careful when running multiple downloads concurrently!")
+        logger.warn("Could not create lock file.")
         return True
 
 
@@ -396,10 +401,9 @@ def generate_log(comments={}, log_file="", gen_from_arg=False):
             if comments:
                 log_file = os.path.join(
                     pil.dl_path, os.path.basename(pil.gencomments_arg.replace(".json", ".log")))
-                logger.info("Generating comments file from input...")
+                logger.info("Generating comments file from input.")
             else:
-                logger.warn(
-                    "The input file does not contain any comments.")
+                logger.warn("The input file does not contain any comments.")
                 logger.separator()
                 return None
         comments_timeline = {}
@@ -439,7 +443,7 @@ def generate_log(comments={}, log_file="", gen_from_arg=False):
             if gen_from_arg:
                 if comment_errors:
                     logger.warn(
-                        "Successfully saved {:s} comments but {:s} comments might be (partially) incomplete.".format(
+                        "Successfully saved {:s} comments. {:s} comments might be (partially) incomplete.".format(
                             str(total_comments), str(comment_errors)))
                 else:
                     logger.info("Successfully saved {:s} comments.".format(
@@ -449,6 +453,5 @@ def generate_log(comments={}, log_file="", gen_from_arg=False):
         else:
             return 0, 0
     except Exception as e:
-        logger.error(
-            "An error occurred while saving comments: {:s}".format(str(e)))
+        logger.error("Could not save comments: {:s}".format(str(e)))
         logger.separator()

@@ -4,10 +4,8 @@ import os
 import sys
 import logging
 import platform
-import subprocess
 
 try:
-    import urlparse
     import pil
     import auth
     import logger
@@ -18,7 +16,6 @@ try:
     import organize
     from constants import Constants
 except ImportError:
-    from urllib.parse import urlparse
     from . import pil
     from . import auth
     from . import logger
@@ -36,10 +33,13 @@ def validate_inputs(config, args, unknown_args):
         if args.configpath:
             if os.path.isfile(args.configpath):
                 pil.config_path = args.configpath
+                logger.binfo("Overriding configuration file path: {:s}".format(pil.config_path))
+                logger.separator()
             else:
                 logger.banner()
                 banner_shown = True
-                logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.config_path))
+                logger.warn("The specified configuration file path does not exist.")
+                logger.warn("Falling back to default path: {:s}".format(pil.config_path))
                 pil.config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
                 logger.separator()
 
@@ -56,12 +56,12 @@ def validate_inputs(config, args, unknown_args):
             pil.dl_user = args.download
             if args.downloadfollowing or args.batchfile:
                 logger.banner()
-                logger.warn("Please use only one download method. Use -h for more information.")
+                logger.warn("Only one download method at a time is permitted.")
                 logger.separator()
                 return False
         elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize:
             logger.banner()
-            logger.error("Please use a download method. Use -h for more information.")
+            logger.error("Please specify a download method.")
             logger.separator()
             return False
 
@@ -92,7 +92,7 @@ def validate_inputs(config, args, unknown_args):
 
         if unknown_args:
             pil.uargs = unknown_args
-            logger.warn("The following unknown argument(s) were provided and will be ignored: ")
+            logger.warn("The following unknown argument(s) were provided and will be ignored.")
             logger.warn('    ' + ' '.join(unknown_args))
             logger.separator()
 
@@ -103,7 +103,7 @@ def validate_inputs(config, args, unknown_args):
         pil.run_at_start = config.get('pyinstalive', 'run_at_start')
         pil.run_at_finish = config.get('pyinstalive', 'run_at_finish')
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
-        pil.skip_merge = config.get('pyinstalive', 'skip_merge')
+        pil.skip_assemble = config.get('pyinstalive', 'skip_assemble')
         pil.args = args
         pil.config = config
 
@@ -126,13 +126,13 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.show_session_expires = False
 
-        if helpers.bool_str_parse(config.get('pyinstalive', 'skip_merge')) == "Invalid":
-            pil.skip_merge = False
-            error_arr.append(['skip_merge', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'skip_merge')):
-            pil.skip_merge = True
+        if helpers.bool_str_parse(config.get('pyinstalive', 'skip_assemble')) == "Invalid":
+            pil.skip_assemble = False
+            error_arr.append(['skip_assemble', 'False'])
+        elif helpers.bool_str_parse(config.get('pyinstalive', 'skip_assemble')):
+            pil.skip_assemble = True
         else:
-            pil.skip_merge = False
+            pil.skip_assemble = False
 
         if helpers.bool_str_parse(config.get('pyinstalive', 'use_locks')) == "Invalid":
             pil.use_locks = False
@@ -150,19 +150,20 @@ def validate_inputs(config, args, unknown_args):
         else:
             pil.clear_temp_files = False
 
-        if args.skip_merge:
-            pil.skip_merge = True
+        if args.skip_assemble:
+            pil.skip_assemble = True
 
         if pil.ffmpeg_path:
             if not os.path.isfile(pil.ffmpeg_path):
                 pil.ffmpeg_path = None
                 cmd = "where" if platform.system() == "Windows" else "which"
-                logger.warn("Custom FFmpeg binary path is invalid, falling back to environment variable.")
+                logger.warn("The specified FFmpeg file path does not exist.")
+                logger.warn("Falling back to the environment variables.")
             else:
                 logger.binfo("Overriding FFmpeg binary path: {:s}".format(pil.ffmpeg_path))
         else:
             if not helpers.command_exists('ffmpeg') and not args.info:
-                logger.error("FFmpeg framework not found, exiting.")
+                logger.error("Could not find the FFmpeg framework.")
                 logger.separator()
                 return False
 
@@ -179,12 +180,14 @@ def validate_inputs(config, args, unknown_args):
             if not args.dlpath:
                 error_arr.append(['download_path', os.getcwd() + "/"])
             else:
-                logger.warn("Custom config path is invalid, falling back to default path: {:s}".format(pil.dl_path))
+                logger.warn("The specified download path does not exist.")
+                logger.warn("Falling back to default path: {:s}".format(pil.dl_path))
                 logger.separator()
 
         if error_arr:
             for error in error_arr:
-                logger.warn("Invalid value for '{:s}'. Using default value: {:s}".format(error[0], error[1]))
+                logger.warn("Invalid value for entry: {:s}".format(error[0]))
+                logger.warn("Falling back to default value: {:s}".format(error[1]))
                 logger.separator()
 
         if args.info:
@@ -203,11 +206,14 @@ def validate_inputs(config, args, unknown_args):
 
         return True
     except Exception as e:
-        logger.error("An error occurred: {:s}".format(str(e)))
-        logger.error("Make sure the config file and given arguments are valid and try again.")
+        logger.error("Could not process the configuration file: {:s}".format(str(e)))
+        logger.error("Ensure the configuration file and given arguments are valid and try again.")
         logger.separator()
         return False
-
+    except KeyboardInterrupt:
+        logger.binfo('The process was aborted by the user.')
+        logger.separator()
+        return False
 
 def run():
     pil.initialize()
@@ -237,7 +243,7 @@ def run():
     parser.add_argument('-df', '--download-following', dest='downloadfollowing', action='store_true',
                         help="PyInstaLive will check for available livestreams from users the account "
                              "used to login follows.")
-    parser.add_argument('-sm', '--skip-merge', dest='skip_merge', action='store_true', help="PyInstaLive will not merge the downloaded livestream files.")
+    parser.add_argument('-sm', '--skip-assemble', dest='skip_assemble', action='store_true', help="PyInstaLive will not assemble the downloaded livestream files.")
     parser.add_argument('-o', '--organize', action='store_true', help="Create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. Then move the video(s) of each user into their associated folder.")
 
     # Workaround to 'disable' argument abbreviations
@@ -260,7 +266,8 @@ def run():
         if not args.username and not args.password:
             pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
         elif (args.username and not args.password) or (args.password and not args.username):
-            logger.warn("Missing --username or --password argument. Falling back to config file.")
+            logger.warn("Missing --username or --password argument.")
+            logger.warn("Falling back to the configuration file values.")
             logger.separator()
             pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
         elif args.username and args.password:
@@ -271,7 +278,7 @@ def run():
                 downloader.start()
             elif pil.dl_batchusers:
                 if not helpers.command_exists("pyinstalive") and not pil.winbuild_path:
-                    logger.error("PyInstaLive must be properly installed when using the -b argument.")
+                    logger.error("PyInstaLive must be installed to use the -b argument.")
                     logger.separator()
                 else:
                     dlfuncs.iterate_users(pil.dl_batchusers)

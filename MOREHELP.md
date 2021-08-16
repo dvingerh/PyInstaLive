@@ -11,10 +11,6 @@
 
 - ```-i``` or ```--info```  **—**  PyInstaLive will show information such as its current version, the configuration file contents, available cookie files and other relevant information.
 
-- ```-nr``` or ```--no-replays```  **—**  PyInstaLive will not download any available replays. Overrides the configuration file value.
-
-- ```-nl``` or ```--no-lives```  **—**  PyInstaLive will not download livestreams. Overrides the configuration file value.
-
 - ```-cl``` or ```--clean```  **—**  PyInstaLive clean the current download folder by deleting folders ending in `_downloads`. Any folders that contain a `folder.lock` file (e.g. folders for ongoing downloads) will be skipped.
 
 - ```-df``` or ```--download-following```  **—**  PyInstaLive will check if any users from your following list have any available livestreams or replays and start a daemon process running PyInstaLive in the background for those that do. You cannot cancel the launched processes or start them with any extra arguments. It's recommended to enable ```log_to_file``` when using this argument. (Experimental, use at own risk.)
@@ -27,11 +23,9 @@
 
 - ```-b``` or ```--batch-file```  **—** PyInstaLive will check the users inside a text file for any available livestreams or replays.
 
-- ```-nhb``` or ```--no-heartbeat```  **—** Passing this argument means no livestream heartbeat checks will be conducted, and the logged in user will not show up as a viewer during the livestream. May cause degraded performance.
-
 - ```-o``` or ```--organize```  **—** (**In testing, use at your own discretion**) Passing this argument will create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. It will then move the video and log files of each user into their associated folder and rename the files to a more friendly format. Example filename: ```19-04-2020 06-02-10-PM johndoe (replay).mp4```. Temporary file segment folders will not be moved.
 
-- ```-sm``` or ```--skip-merge```  **—** PyInstaLive will not merge any download livestream files when this argument is used.
+- ```-sm``` or ```--skip-assemble```  **—** PyInstaLive will not assemble any download livestream files when this argument is used.
 
 
 # Default configuration file
@@ -50,7 +44,7 @@ use_locks = True
 clear_temp_files = False
 do_heartbeat = True
 proxy = 
-skip_merge = False
+skip_assemble = False
 ```
 
 ```username```  **—**  Instagram username to login with.

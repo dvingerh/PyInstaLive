@@ -27,7 +27,7 @@ def get_broadcasts_tray():
     response_json = json.loads(response.text)
     return response_json
 
-def merge_segments():
+def assemble_segments():
     try:
         if pil.run_at_finish:
             try:
@@ -36,22 +36,23 @@ def merge_segments():
                 thread.start()
                 logger.binfo("Launched finish command: {:s}".format(pil.run_at_finish))
             except Exception as e:
-                logger.warn('Could not execute command: {:s}'.format(str(e)))
+                logger.warn('Could not launch finish command: {:s}'.format(str(e)))
 
         live_mp4_file = '{}{}_{}_{}_{}_live.mp4'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
                                                      pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
 
         live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
 
-        pil.kill_threads = True
         logger.info("Waiting for background threads to finish.")
-        if pil.json_thread_worker and pil.json_thread_worker.is_alive():
+        if pil.json_thread_worker and pil.heartbeat_info_thread_worker:
+            pil.kill_threads = True
             pil.json_thread_worker.join()
-        if pil.heartbeat_info_thread_worker and pil.heartbeat_info_thread_worker.is_alive():
             pil.heartbeat_info_thread_worker.join()
 
+
         if pil.dl_comments:
-            logger.info("Waiting for comment downloader to finish.")
+            logger.separator()
+            logger.info("Generating comments text file.")
             comment_errors, total_comments = helpers.generate_log(pil.comments, live_mp4_file.replace("live.mp4", "comments.txt"),  False)
             logger.separator()
             if len(pil.comments) == 1:
@@ -59,9 +60,7 @@ def merge_segments():
                 logger.separator()
             elif len(pil.comments) > 1:
                 if comment_errors:
-                    logger.warn(
-                        "Successfully saved {:s} comments but {:s} comments are (partially) missing.".format(
-                            str(total_comments), str(comment_errors)))
+                    logger.warn("Successfully saved {:s} comments but {:s} comments might be (partially) incomplete.".format(str(total_comments), str(comment_errors)))
                 else:
                     logger.info("Successfully saved {:s} comments.".format(str(total_comments)))
                 logger.separator()
@@ -73,37 +72,40 @@ def merge_segments():
 
 
         try:
-            if not pil.skip_merge:
-                logger.info('Merging downloaded files into video.')
+            if not pil.skip_assemble:
+                logger.info('Assembling downloaded files into video.')
                 pil.assemble_arg = live_mp4_file.replace(".mp4", "_downloads")
-                assembler.assemble(user_called=False)
-                logger.info('Successfully merged downloaded files into video.')
+                if assembler.assemble(user_called=False):
+                    logger.separator()
+                    logger.info('Saved video: %s' % os.path.basename(live_mp4_file))
+                else:
+                    logger.error("No video could be created.")
                 if pil.clear_temp_files:
                     helpers.remove_temp_folder()
             else:
-                logger.binfo("Merging of downloaded files has been disabled.")
-                logger.binfo("Use --assemble command to manually merge downloaded segments.")
+                logger.binfo("Assembling of downloaded files has been disabled.")
+                logger.binfo("Use --assemble command to manually assemble downloaded files.")
             helpers.remove_lock()
         except ValueError as e:
             logger.separator()
-            logger.error('Could not merge downloaded files: {:s}'.format(str(e)))
+            logger.error('Could not assemble downloaded files: {:s}'.format(str(e)))
             if os.listdir(live_segments_path):
                 logger.separator()
-                logger.binfo("Segment directory is not empty. Trying to merge again.")
+                logger.binfo("Segment directory is not empty. Trying to assemble again.")
                 logger.separator()
                 pil.assemble_arg = live_mp4_file.replace(".mp4", "_downloads")
                 assembler.assemble(user_called=False)
             else:
                 logger.separator()
-                logger.error("Segment directory is empty. There is nothing to merge.")
+                logger.error("Segment directory is empty. There is nothing to assemble.")
                 logger.separator()
             helpers.remove_lock()
         except Exception as e:
-            logger.error('Could not merge downloaded files: {:s}'.format(str(e)))
+            logger.error('Could not assemble downloaded files: {:s}'.format(str(e)))
             helpers.remove_lock()
     except KeyboardInterrupt:
-        pil.kill_threads = True
-        logger.binfo('Aborted merging process, no video was created.')
+        logger.separator()
+        logger.binfo('The assembling process was aborted by the user.')
         helpers.remove_lock()
 
 
@@ -136,7 +138,7 @@ def download_livestream():
             broadcast_guest = None
         if broadcast_owner != pil.dl_user:
             logger.separator()
-            logger.binfo('This livestream is a duo-live, the owner is "{}".'.format(broadcast_owner))
+            logger.binfo('This livestream is a duo-live, the host is "{}".'.format(broadcast_owner))
             broadcast_guest = None
         if broadcast_guest:
             logger.separator()
@@ -149,10 +151,12 @@ def download_livestream():
         logger.separator()
         logger.info('Downloading livestream, press [CTRL+C] to abort.')
 
-        pil.json_thread_worker = threading.Thread(target=helpers.generate_json_files)
+        pil.json_thread_worker = threading.Thread(target=helpers.do_json_generation)
+        pil.json_thread_worker.daemon = True
         pil.json_thread_worker.start()
 
         pil.heartbeat_info_thread_worker = threading.Thread(target=helpers.do_heartbeat)
+        pil.heartbeat_info_thread_worker.daemon = True
         pil.heartbeat_info_thread_worker.start()
 
 
@@ -163,27 +167,26 @@ def download_livestream():
                 thread.start()
                 logger.binfo("Launched start command: {:s}".format(pil.run_at_start))
             except Exception as e:
-                logger.warn('Could not launch command: {:s}'.format(str(e)))
+                logger.warn('Could not launch start command: {:s}'.format(str(e)))
         pil.broadcast_downloader.run()
         logger.separator()
-        logger.info("The livestream has been ended by the user.")
+        logger.info("The livestream has been ended by the host.")
         logger.separator()
         helpers.print_durations(True)
         logger.separator()
-        merge_segments()
+        assemble_segments()
     except KeyboardInterrupt:
         logger.separator()
-        logger.binfo('The download has been aborted.')
+        logger.binfo('The livestream download was aborted by the user.')
         logger.separator()
         helpers.print_durations(True)
         logger.separator()
         if not pil.broadcast_downloader.is_aborted:
             pil.broadcast_downloader.stop()
-            merge_segments()
+        assemble_segments()
 
 def get_broadcasts_info():
     try:
-
         broadcast_f_list = dlfuncs.get_broadcasts_tray()
         final_broadcast_name = None
         if broadcast_f_list.get("broadcasts", None):
@@ -196,6 +199,8 @@ def get_broadcasts_info():
                 if (pil.dl_user == owner_username) or (pil.dl_user == guest_username):
                     final_broadcast_name = owner_username
                     break
+        else:
+            return False
         if final_broadcast_name != None:
             response = pil.ig_api.get(Constants.BROADCAST_INFO_URL.format(final_broadcast_name))
             pil.initial_broadcast_obj = json.loads(response.text)
@@ -203,13 +208,18 @@ def get_broadcasts_info():
                 return True
             else:
                 return False
+        else:
+            return False
+        
     except (JSONDecodeError, IndexError):
         return False
+    except KeyboardInterrupt:
+        return None
 
 
 def download_following():
     try:
-        logger.info("Checking following users for any livestreams.")
+        logger.info("Checking following users for available livestreams.")
         broadcast_f_list = dlfuncs.get_broadcasts_tray()
 
         usernames_available_livestreams = []
@@ -222,7 +232,7 @@ def download_following():
         logger.separator()
         available_total = list(usernames_available_livestreams)
         if available_total:
-            logger.info("The following users have available livestreams.")
+            logger.info("There are {} available livestreams.".format(str(len(available_total))))
             logger.info(', '.join(available_total))
             logger.separator()
             iterate_users(available_total)
@@ -233,7 +243,7 @@ def download_following():
         logger.error("Could not finish checking following users: {:s}".format(str(e)))
     except KeyboardInterrupt:
         logger.separator()
-        logger.binfo('The checking process has been aborted by the user.')
+        logger.binfo('The checking process was aborted by the user.')
         logger.separator()
 
 
@@ -241,12 +251,10 @@ def iterate_users(user_list):
     for user in user_list:
         try:
             if os.path.isfile(os.path.join(pil.dl_path, user + '.lock')):
-                logger.warn("Lock file is already present for '{:s}', there is probably another download "
-                            "ongoing!".format(user))
-                logger.warn(
-                    "If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
+                logger.warn("Lock file already exists for user: {:s}".format(user + '.lock'))
+                logger.warn("If there is no download ongoing please delete the file and try again.".format(user + '.lock'))
             else:
-                logger.info("Launching daemon process for '{:s}'.".format(user))
+                logger.info("Launching daemon process for user: {:s}".format(user))
                 start_result = helpers.run_command("{:s} -d {:s} -cp '{:s}' -dp '{:s}' {:s}".format(
                     ("'" + pil.winbuild_path + "'") if pil.winbuild_path else "pyinstalive",
                     user,
@@ -262,7 +270,7 @@ def iterate_users(user_list):
         except Exception as e:
             logger.warn("Could not start process: {:s}".format(str(e)))
         except KeyboardInterrupt:
-            logger.binfo('The process launching has been aborted by the user.')
+            logger.binfo('The process launching was aborted by the user.')
             logger.separator()
             break
 

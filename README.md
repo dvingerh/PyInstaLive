@@ -91,7 +91,7 @@ run_at_finish =
 use_locks = True
 clear_temp_files = False
 proxy = 
-skip_merge = False
+skip_assemble = False
 ```
 
 #### Example
@@ -112,8 +112,11 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 ---------------------------------------------------------------------------
 [I] PYINSTALIVE (SCRIPT V3.3.0 - PYTHON V3.8.10) - 08-12-2021 02:23:37 PM
 ---------------------------------------------------------------------------
-[I] Using an existing login session file: johndoe.dat
-[I] Login session file expiry date: 2022-08-06 at 12:13:03 AM
+[I] An existing login session file was found: johndoe.dat
+[I] Checking the validity of the saved login session.
+---------------------------------------------------------------------------
+[I] Successfully logged in using account: johndoe
+[I] The login session file will expire on: 08-12-2022 at 03:06:53 AM
 ---------------------------------------------------------------------------
 [I] Successfully logged into account: johndoe
 ---------------------------------------------------------------------------
@@ -133,14 +136,15 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 [I] Downloaded   : 6 minutes and 8 seconds
 [I] Missing      : 2 minutes and 38 seconds
 ---------------------------------------------------------------------------
-[W] Final video duration may vary if the livestream was interrupted.
----------------------------------------------------------------------------
 [I] Waiting for background threads to finish.
-[I] Merging downloaded files into video.
 ---------------------------------------------------------------------------
-[I] Saved video: 20210812_janedoe_17931255316652921_1628771017_live.mp4
+[I] Generating comments text file.
 ---------------------------------------------------------------------------
-[I] Successfully merged downloaded files into video.
+[I] Successfully saved 59 comments.
+---------------------------------------------------------------------------
+[I] Assembling downloaded files into video.
+---------------------------------------------------------------------------
+[I] Created video: 20210812_janedoe_17931255316652921_1628771017_live.mp4
 ---------------------------------------------------------------------------
 ```
 
