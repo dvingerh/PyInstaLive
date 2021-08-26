@@ -86,8 +86,8 @@ download_path =
 show_cookie_expiry = True
 log_to_file = True
 ffmpeg_path = 
-run_at_start =
-run_at_finish =
+cmd_on_started =
+cmd_on_ended =
 use_locks = True
 clear_temp_files = False
 proxy = 
@@ -138,7 +138,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 ---------------------------------------------------------------------------
 [I] Waiting for background threads to finish.
 ---------------------------------------------------------------------------
-[I] Generating comments text file.
+[I] Saving comments to text file.
 ---------------------------------------------------------------------------
 [I] Successfully saved 59 comments.
 ---------------------------------------------------------------------------

@@ -100,8 +100,8 @@ def validate_inputs(config, args, unknown_args):
         pil.ig_user = config.get('pyinstalive', 'username')
         pil.ig_pass = config.get('pyinstalive', 'password')
         pil.dl_path = config.get('pyinstalive', 'download_path')
-        pil.run_at_start = config.get('pyinstalive', 'run_at_start')
-        pil.run_at_finish = config.get('pyinstalive', 'run_at_finish')
+        pil.cmd_on_started = config.get('pyinstalive', 'cmd_on_started')
+        pil.cmd_on_ended = config.get('pyinstalive', 'cmd_on_ended')
         pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
         pil.skip_assemble = config.get('pyinstalive', 'skip_assemble')
         pil.args = args

@@ -159,9 +159,9 @@ def show_info():
 
     logger.info("CLI supports color:         {:s}".format("No" if not logger.supports_color() else "Yes"))
     logger.info(
-        "Command to run at start:    {:s}".format("None" if not pil.run_at_start else pil.run_at_start))
+        "Command to run at start:    {:s}".format("None" if not pil.cmd_on_started else pil.cmd_on_started))
     logger.info(
-        "Command to run at finish:   {:s}".format("None" if not pil.run_at_finish else pil.run_at_finish))
+        "Command to run at finish:   {:s}".format("None" if not pil.cmd_on_ended else pil.cmd_on_ended))
 
     if os.path.exists(pil.config_path):
         logger.info("Config file contents:")
@@ -179,43 +179,43 @@ def show_info():
 def check_if_guesting():
     try:
 
-        broadcast_guest =  pil.broadcast_downloaded_obj.get('cobroadcasters', {})[0].get('username')
+        livestream_guest =  pil.livestream_downloaded_obj.get('cobroadcasters', {})[0].get('username')
     except Exception:
-        broadcast_guest = None
-    if broadcast_guest and not pil.has_guest:
+        livestream_guest = None
+    if livestream_guest and not pil.has_guest:
         logger.separator()
-        pil.has_guest = broadcast_guest
+        pil.has_guest = livestream_guest
         logger.binfo('The livestream host has started guesting with user: {}'.format(pil.has_guest))
-    if not broadcast_guest and pil.has_guest:
+    if not livestream_guest and pil.has_guest:
         logger.separator()
         logger.binfo('The livestream host has stopped guesting with user: {}'.format(pil.has_guest))
         if pil.has_guest == pil.dl_user:
-            pil.broadcast_downloader.stop()
+            pil.livestream_downloader.stop()
         pil.has_guest = None
         
 
 def get_stream_duration(duration_type):
     try:
-        if not pil.broadcast_downloaded_obj:
+        if not pil.livestream_downloaded_obj:
             if duration_type == 0: # Airtime duration
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.initial_broadcast_obj.get("broadcast_dict").get("published_time")), 60)
+                stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.initial_livestream_obj.get("broadcast_dict").get("published_time")), 60)
             if duration_type == 1: # Download duration
                 stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(pil.epochtime)), 60)
             if duration_type == 2: # Missing duration
-                if (int(pil.epochtime) - pil.broadcast_downloaded_obj.get("published_time")) <= 0:
+                if (int(pil.epochtime) - pil.livestream_downloaded_obj.get("published_time")) <= 0:
                     stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
                 else:
-                    stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.initial_broadcast_obj.get("broadcast_dict").get("published_time")), 60)
+                    stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.initial_livestream_obj.get("broadcast_dict").get("published_time")), 60)
         else:
             if duration_type == 0: # Airtime duration
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.broadcast_downloaded_obj.get("published_time")), 60)
+                stream_started_mins, stream_started_secs = divmod((int(time.time()) - pil.livestream_downloaded_obj.get("published_time")), 60)
             if duration_type == 1: # Download duration
                 stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(pil.epochtime)), 60)
             if duration_type == 2: # Missing duration
-                if (int(pil.epochtime) - pil.broadcast_downloaded_obj.get("published_time")) <= 0:
+                if (int(pil.epochtime) - pil.livestream_downloaded_obj.get("published_time")) <= 0:
                     stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
                 else:
-                    stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.broadcast_downloaded_obj.get("published_time")), 60)
+                    stream_started_mins, stream_started_secs = divmod((int(pil.epochtime) - pil.livestream_downloaded_obj.get("published_time")), 60)
         if stream_started_mins < 0:
             stream_started_mins = 0
         if stream_started_secs < 0:
@@ -231,13 +231,13 @@ def generate_json_files():
     if not pil.kill_threads:
         try:
             live_json_file = '{}{}_{}_{}_{}_live_downloads.json'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                        pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
-            pil.initial_broadcast_obj['segments'] = pil.broadcast_downloader.segment_meta
+                                                        pil.initial_livestream_obj.get('broadcast_id'), pil.epochtime)
+            pil.initial_livestream_obj['segments'] = pil.livestream_downloader.segment_meta
 
             if pil.dl_comments:
                 comments_collected = pil.comments
                 before_count = len(comments_collected)
-                comments_response = pil.ig_api.get(Constants.BROADCAST_COMMENTS_URL.format(pil.initial_broadcast_obj.get('broadcast_id'), str(pil.comments_last_ts)))
+                comments_response = pil.ig_api.get(Constants.BROADCAST_COMMENTS_URL.format(pil.initial_livestream_obj.get('broadcast_id'), str(pil.comments_last_ts)))
                 comments_json = json.loads(comments_response.text)
                 new_comments = comments_json.get("comments", [])
                 for i, comment in enumerate(new_comments):
@@ -248,11 +248,11 @@ def generate_json_files():
                 after_count = len(comments_collected)
 
                 if after_count > before_count:
-                    pil.initial_broadcast_obj['comments'] = comments_collected
+                    pil.initial_livestream_obj['comments'] = comments_collected
                 pil.comments = comments_collected
             try:
                 with open(live_json_file, 'w') as json_file:
-                    json.dump(pil.initial_broadcast_obj, json_file, indent=2)
+                    json.dump(pil.initial_livestream_obj, json_file, indent=2)
             except Exception as e:
                 logger.warn(str(e))
         except Exception as e:
@@ -266,23 +266,23 @@ def print_durations(download_ended=False):
 
 def print_heartbeat(from_thread=False):
     if not pil.kill_threads:
-        if not pil.broadcast_downloaded_obj:
-            previous_state = pil.initial_broadcast_obj.get("broadcast_dict").get("broadcast_status")
+        if not pil.livestream_downloaded_obj:
+            previous_state = pil.initial_livestream_obj.get("broadcast_dict").get("broadcast_status")
         else:
-            previous_state = pil.broadcast_downloaded_obj.get("broadcast_status")
-        heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
-        pil.ig_api.post(Constants.BROADCAST_HEALTH2_URL.format(pil.initial_broadcast_obj.get('broadcast_id')))
+            previous_state = pil.livestream_downloaded_obj.get("broadcast_status")
+        heartbeat_response = pil.ig_api.get(Constants.BROADCAST_HEALTH_URL.format(pil.initial_livestream_obj.get('broadcast_id')))
+        pil.ig_api.post(Constants.BROADCAST_HEALTH2_URL.format(pil.initial_livestream_obj.get('broadcast_id')))
         response_json = json.loads(heartbeat_response.text)
-        pil.broadcast_downloaded_obj = response_json
+        pil.livestream_downloaded_obj = response_json
         if from_thread:
             check_if_guesting()
-        if not from_thread or (previous_state != pil.broadcast_downloaded_obj.get("broadcast_status")):
+        if not from_thread or (previous_state != pil.livestream_downloaded_obj.get("broadcast_status")):
             if from_thread:
                 logger.separator()
                 print_durations()
-            logger.info('Status       : {}'.format( pil.broadcast_downloaded_obj.get("broadcast_status").capitalize()))
-            logger.info('Viewers      : {}'.format(int( pil.broadcast_downloaded_obj.get("viewer_count"))))
-        return pil.broadcast_downloaded_obj.get('broadcast_status') not in ['available', 'interrupted']
+            logger.info('Status       : {}'.format( pil.livestream_downloaded_obj.get("broadcast_status").capitalize()))
+            logger.info('Viewers      : {}'.format(int( pil.livestream_downloaded_obj.get("viewer_count"))))
+        return pil.livestream_downloaded_obj.get('broadcast_status') not in ['available', 'interrupted']
 
 def do_json_generation():
     while True:

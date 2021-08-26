@@ -16,7 +16,7 @@ This means you are making too many requests to Instagram and is usually the case
 
 #### Option 1 - Checking your following users
 
-You can use the `--download-following` function to check for available livestreams and replays from your following user list. Read the [Help Documents](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md) for more information.
+You can use the `--download-following` function to check for available livestreams from your following user list. Read the [Help Documents](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md) for more information.
 
 #### Option 2 - Using external scripts
 ##### Note: Continuously checking for livestreams with an external script is considered suspicious behaviour by Instagram. Use a timeout as large as possible to decrease the chances of your account, device or IP from getting flagged as suspicious and getting blocked as a result of that. Use the scripts below at your own risk.
@@ -57,11 +57,9 @@ Use the scripts provided in the previous question, they'll infinitely run the Py
 
 No. This is because livestream_dl is no longer being maintained and as such uses an older version of libraries required by PyInstaLive. Installing PyInstaLive and livestream_dl on different Python versions (2/3) will probably work though.
 
-### PyInstaLive failed to generate a video file after the download has ended. What do I do?
+### PyInstaLive failed to assemble a video file after the download has ended. What do I do?
 
-Don't get your hopes up because manually generating a video file has no guarantee of success, but read below for instructions on what you can do in case this has happened to you.
-
-If it failed to generate a video file from a **livestream** you have two options:
+If it failed to assemble a video there are two options:
 * Use the `--assemble` command as described in the [FAQ](https://github.com/notcammy/PyInstaLive/blob/master/MOREHELP.md#commands).
 
 If that didn't work, you can still attempt to concatenate the segment files yourself:
@@ -69,8 +67,3 @@ If that didn't work, you can still attempt to concatenate the segment files your
 * Open the segment video directory in your command line.
   * Windows: `copy /b *.m4v video.mp4 && copy /b *.m4a audio.mp4 && ffmpeg -i video.mp4 -i audio.mp4 -c copy output.mp4`
   * Linux: `cat  *.m4v > video.mp4 && cat  *.m4a > audio.mp4 && ffmpeg -i video.mp4 -i audio.mp4 -c copy output.mp4`
-
-##
-
-If it failed to generate a video file from a **replay** you can try the following:
-- Open the segment video directory in your command line and run `ffmpeg -i video.mp4 -i audio.mp4 -c copy output.mp4`.

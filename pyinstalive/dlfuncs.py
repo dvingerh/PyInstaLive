@@ -29,19 +29,19 @@ def get_broadcasts_tray():
 
 def assemble_segments():
     try:
-        if pil.run_at_finish:
+        if pil.cmd_on_ended:
             try:
-                thread = threading.Thread(target=helpers.run_command, args=(pil.run_at_finish,))
+                thread = threading.Thread(target=helpers.run_command, args=(pil.cmd_on_ended,))
                 thread.daemon = True
                 thread.start()
-                logger.binfo("Launched finish command: {:s}".format(pil.run_at_finish))
+                logger.binfo("Launched finish command: {:s}".format(pil.cmd_on_ended))
             except Exception as e:
                 logger.warn('Could not launch finish command: {:s}'.format(str(e)))
 
         live_mp4_file = '{}{}_{}_{}_{}_live.mp4'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
+                                                     pil.initial_livestream_obj.get('broadcast_id'), pil.epochtime)
 
-        live_segments_path = os.path.normpath(pil.broadcast_downloader.output_dir)
+        live_segments_path = os.path.normpath(pil.livestream_downloader.output_dir)
 
         logger.info("Waiting for background threads to finish.")
         if pil.json_thread_worker and pil.heartbeat_info_thread_worker:
@@ -112,11 +112,11 @@ def assemble_segments():
 
 def download_livestream():
     try:
-        mpd_url = pil.initial_broadcast_obj.get('broadcast_dict').get('dash_playback_url')
+        mpd_url = pil.initial_livestream_obj.get('broadcast_dict').get('dash_abr_playback_url')
 
         pil.live_folder_path = '{}{}_{}_{}_{}_live_downloads'.format(pil.dl_path, pil.datetime_compat, pil.dl_user,
-                                                     pil.initial_broadcast_obj.get('broadcast_id'), pil.epochtime)
-        pil.broadcast_downloader = live.Downloader(
+                                                     pil.initial_livestream_obj.get('broadcast_id'), pil.epochtime)
+        pil.livestream_downloader = live.Downloader(
             mpd=mpd_url,
             output_dir=pil.live_folder_path,
             max_connection_error_retry=3,
@@ -125,25 +125,25 @@ def download_livestream():
             download_timeout=3,
             callback_check=helpers.print_heartbeat,
             ffmpeg_binary=pil.ffmpeg_path)
-        pil.broadcast_downloader.stream_id = pil.initial_broadcast_obj.get('broadcast_id')
+        pil.livestream_downloader.stream_id = pil.initial_livestream_obj.get('broadcast_id')
     except Exception as e:
         logger.error('Could not start downloading livestream: {:s}'.format(str(e)))
         logger.separator()
         helpers.remove_lock()
     try:
-        broadcast_owner = pil.initial_broadcast_obj.get('broadcast_dict', {}).get('broadcast_owner').get("username")
+        livestream_owner = pil.initial_livestream_obj.get('broadcast_dict', {}).get('broadcast_owner').get("username")
         try:
-            broadcast_guest = pil.initial_broadcast_obj.get('broadcast_dict', {}).get('cobroadcasters')[0].get("username")
+            livestream_guest = pil.initial_livestream_obj.get('broadcast_dict', {}).get('cobroadcasters')[0].get("username")
         except Exception:
-            broadcast_guest = None
-        if broadcast_owner != pil.dl_user:
+            livestream_guest = None
+        if livestream_owner != pil.dl_user:
             logger.separator()
-            logger.binfo('This livestream is a duo-live, the host is "{}".'.format(broadcast_owner))
-            broadcast_guest = None
-        if broadcast_guest:
+            logger.binfo('This livestream is a duo-live, the host is "{}".'.format(livestream_owner))
+            livestream_guest = None
+        if livestream_guest:
             logger.separator()
-            logger.binfo('This livestream is a duo-live, the current guest is "{}".'.format(broadcast_guest))
-            pil.has_guest = broadcast_guest
+            logger.binfo('This livestream is a duo-live, the current guest is "{}".'.format(livestream_guest))
+            pil.has_guest = livestream_guest
         helpers.create_lock_folder()
         logger.separator()
         helpers.print_durations()
@@ -160,15 +160,15 @@ def download_livestream():
         pil.heartbeat_info_thread_worker.start()
 
 
-        if pil.run_at_start:
+        if pil.cmd_on_started:
             try:
-                thread = threading.Thread(target=helpers.run_command, args=(pil.run_at_start,))
+                thread = threading.Thread(target=helpers.run_command, args=(pil.cmd_on_started,))
                 thread.daemon = True
                 thread.start()
-                logger.binfo("Launched start command: {:s}".format(pil.run_at_start))
+                logger.binfo("Launched start command: {:s}".format(pil.cmd_on_started))
             except Exception as e:
                 logger.warn('Could not launch start command: {:s}'.format(str(e)))
-        pil.broadcast_downloader.run()
+        pil.livestream_downloader.run()
         logger.separator()
         logger.info("The livestream has been ended by the host.")
         logger.separator()
@@ -181,30 +181,30 @@ def download_livestream():
         logger.separator()
         helpers.print_durations(True)
         logger.separator()
-        if not pil.broadcast_downloader.is_aborted:
-            pil.broadcast_downloader.stop()
+        if not pil.livestream_downloader.is_aborted:
+            pil.livestream_downloader.stop()
         assemble_segments()
 
-def get_broadcasts_info():
+def get_livestreams_info():
     try:
-        broadcast_f_list = dlfuncs.get_broadcasts_tray()
-        final_broadcast_name = None
-        if broadcast_f_list.get("broadcasts", None):
-            for broadcast_f in broadcast_f_list.get("broadcasts", None):
-                owner_username = broadcast_f.get("broadcast_owner", None).get("username", None)
+        livestream_list = dlfuncs.get_broadcasts_tray()
+        final_livestream_username = None
+        if livestream_list.get("broadcasts", None):
+            for livestream in livestream_list.get("broadcasts", None):
+                owner_username = livestream.get("broadcast_owner", None).get("username", None)
                 try:
-                    guest_username = broadcast_f.get("cobroadcasters", None)[0].get("username", None)
+                    guest_username = livestream.get("cobroadcasters", None)[0].get("username", None)
                 except:
                     guest_username = None
                 if (pil.dl_user == owner_username) or (pil.dl_user == guest_username):
-                    final_broadcast_name = owner_username
+                    final_livestream_username = owner_username
                     break
         else:
             return False
-        if final_broadcast_name != None:
-            response = pil.ig_api.get(Constants.BROADCAST_INFO_URL.format(final_broadcast_name))
-            pil.initial_broadcast_obj = json.loads(response.text)
-            if pil.initial_broadcast_obj.get("broadcast_id", None):
+        if final_livestream_username != None:
+            response = pil.ig_api.get(Constants.livestream_info_URL.format(final_livestream_username))
+            pil.initial_livestream_obj = json.loads(response.text)
+            if pil.initial_livestream_obj.get("broadcast_id", None):
                 return True
             else:
                 return False
@@ -220,12 +220,12 @@ def get_broadcasts_info():
 def download_following():
     try:
         logger.info("Checking following users for available livestreams.")
-        broadcast_f_list = dlfuncs.get_broadcasts_tray()
+        livestream_list = dlfuncs.get_broadcasts_tray()
 
         usernames_available_livestreams = []
-        if broadcast_f_list['broadcasts']:
-            for broadcast_f in broadcast_f_list['broadcasts']:
-                username = broadcast_f['broadcast_owner']['username']
+        if livestream_list['broadcasts']:
+            for livestream in livestream_list['broadcasts']:
+                username = livestream['broadcast_owner']['username']
                 if username not in usernames_available_livestreams:
                     usernames_available_livestreams.append(username)
 

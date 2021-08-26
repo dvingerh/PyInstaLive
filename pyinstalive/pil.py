@@ -20,15 +20,15 @@ def initialize():
     global dl_path
     global dl_comments
     global log_to_file
-    global run_at_start
-    global run_at_finish
+    global cmd_on_started
+    global cmd_on_ended
     global show_session_expires
     global config_path
     global config
     global args
     global uargs
-    global initial_broadcast_obj
-    global broadcast_downloader
+    global initial_livestream_obj
+    global livestream_downloader
     global epochtime
     global datetime_compat
     global live_folder_path
@@ -40,7 +40,7 @@ def initialize():
     global skip_assemble
     global config_login_overridden
     global winbuild_path
-    global broadcast_downloaded_obj
+    global livestream_downloaded_obj
     global heartbeat_info_thread_worker
     global json_thread_worker
     global comments_thread_worker
@@ -55,15 +55,15 @@ def initialize():
     dl_path = os.getcwd() + "/"
     dl_comments = False
     log_to_file = True
-    run_at_start = ""
-    run_at_finish = ""
+    cmd_on_started = ""
+    cmd_on_ended = ""
     show_session_expires = False
     config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
     config = None
     args = None
     uargs = None
-    initial_broadcast_obj = None
-    broadcast_downloader = None
+    initial_livestream_obj = None
+    livestream_downloader = None
     epochtime = helpers.strepochtime()
     datetime_compat = helpers.strdatetime_compat()
     live_folder_path = ""
@@ -75,7 +75,7 @@ def initialize():
     skip_assemble = False
     config_login_overridden = False
     winbuild_path = helpers.winbuild_path()
-    broadcast_downloaded_obj = None
+    livestream_downloaded_obj = None
     heartbeat_info_thread_worker = None
     json_thread_worker = None
     comments_thread_worker = None

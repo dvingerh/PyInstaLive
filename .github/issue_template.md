@@ -2,8 +2,8 @@
 #### Check the boxes below by filling `[ ]` with an `x` so it looks like `[x]`.
 #### Use the Preview button to ensure the template is filled in correctly.
 ##
-- [ ] I am using the latest version of PyInstaLive: 3.2.4.
-- [ ] I have installed either Python 2.7.x or 3.5+: `YOUR VERSION HERE`
+- [ ] I am using the latest version of PyInstaLive: 3.3.0.
+- [ ] I have installed  3.6+: `YOUR VERSION HERE`
 - [ ] I have read the [README](https://github.com/notcammy/pyinstalive/blob/master/README.md).
 - [ ] I have read the [FAQ](https://github.com/notcammy/pyinstalive/blob/master/FAQ.md).
 - [ ] I have checked all [existing issues](https://github.com/notcammy/PyInstaLive/issues?q=is%3Aissue), none of which could solve my issue.
@@ -34,33 +34,32 @@ Run ```pyinstalive --info``` and paste its output below. Don't forget to omit yo
 ```bash
 $ pyinstalive --info
 ---------------------------------------------------------------------------
-[I] PYINSTALIVE (SCRIPT V3.2.4 - PYTHON V3.6.3) - 01-02-2019 07:00:17 PM
+[I] PYINSTALIVE (SCRIPT V3.3.0 - PYTHON V3.8.10) - 08-21-2021 03:33:23 AM
 ---------------------------------------------------------------------------
 [I] To see all the available arguments, use the -h argument.
 
-[I] PyInstaLive version:        3.2.4
-[I] Python version:             3.6.3
+[I] PyInstaLive version:        3.3.0
+[I] Python version:             3.8.10
 [I] FFmpeg framework:           Available
-[I] Cookie files:               2 (johndoe.json matches config user)
+[I] Login session files:        1 (johndoe.dat matches config user)
 [I] CLI supports color:         Yes
 [I] Command to run at start:    None
 [I] Command to run at finish:   None
 [I] Config file contents:
 
     [pyinstalive]
-    username = *removed*
-    password = *removed*
+    username = johndoe
+    password = grapefruits
     download_path = \path\to\downloads
-    download_lives = True
-    download_replays = True
+    show_session_expires = True
     download_comments = True
-    show_cookie_expiry = False
-    ffmpeg_path =
-    log_to_file = True
-    run_at_start =
-    run_at_finish =
-    use_locks = True
     clear_temp_files = False
+    skip_assemble = False
+    cmd_on_started =
+    cmd_on_ended =
+    ffmpeg_path = 
+    log_to_file = True
+    use_locks = False
 
 [I] End of PyInstaLive information screen.
 ---------------------------------------------------------------------------
@@ -71,7 +70,7 @@ Paste the command here that you are running. Don't forget to omit your **usernam
 
 **Example:** ```pyinstalive -u "johndoe" -p "grapefruits" -d "justinbieber"```
 
-###### Behavior
+###### Behaviour
 Accurately describe the issue you're experiencing with the script.
 
 ###### Steps to reproduce issue

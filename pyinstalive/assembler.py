@@ -36,7 +36,7 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(ass_json_file).replace("_downloads", "").replace(".json", ".mp4"))
         ass_segment_dir = pil.assemble_arg if not pil.assemble_arg.endswith(".json") else pil.assemble_arg.replace(".json", "")
         
-        broadcast_info = {}
+        livestream_info = {}
         if not os.path.isdir(ass_segment_dir):
             logger.error("Could not create video file: The segment directory does not exist.")
             logger.separator()
@@ -49,27 +49,27 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         if not os.path.isfile(ass_json_file):
             logger.warn("No matching JSON file found for the segment directory, trying to continue without it.")
             ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
-            broadcast_info["broadcast_dict"]['id'] = ass_stream_id
-            broadcast_info["broadcast_dict"]['broadcast_status'] = "active"
-            broadcast_info['segments'] = {}
+            livestream_info["broadcast_dict"]['id'] = ass_stream_id
+            livestream_info["broadcast_dict"]['broadcast_status'] = "active"
+            livestream_info['segments'] = {}
         else:
             with open(ass_json_file) as info_file:
                 try:
-                    broadcast_info = json.load(info_file)
+                    livestream_info = json.load(info_file)
                 except Exception as e:
                     logger.warn("Could not decode JSON file, trying to continue without it.")
                     ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
-                    broadcast_info["broadcast_dict"]['id'] = ass_stream_id
-                    broadcast_info["broadcast_dict"]['broadcast_status'] = "active"
-                    broadcast_info['segments'] = {}
+                    livestream_info["broadcast_dict"]['id'] = ass_stream_id
+                    livestream_info["broadcast_dict"]['broadcast_status'] = "active"
+                    livestream_info['segments'] = {}
 
-        stream_id = str(broadcast_info["broadcast_dict"]['id'])
+        stream_id = str(livestream_info["broadcast_dict"]['id'])
 
-        segment_meta = broadcast_info.get('segments', {})
+        segment_meta = livestream_info.get('segments', {})
         if segment_meta:
             all_segments = [
                 os.path.join(ass_segment_dir, k)
-                for k in broadcast_info['segments'].keys()]
+                for k in livestream_info['segments'].keys()]
         else:
             all_segments = list(filter(
                 os.path.isfile,

@@ -12,8 +12,8 @@ download_path = {:s}
 show_session_expires = True
 download_comments = True
 clear_temp_files = False
-run_at_start =
-run_at_finish =
+cmd_on_started =
+cmd_on_ended =
 ffmpeg_path = 
 log_to_file = True
 skip_assemble = False
@@ -26,6 +26,6 @@ proxy =
     REELS_TRAY_URL = 'https://i.instagram.com/api/v1/live/reels_tray_broadcasts/'
     BROADCAST_HEALTH_URL = 'https://i.instagram.com/api/v1/live/{:s}/info/'
     BROADCAST_HEALTH2_URL = 'https://i.instagram.com/api/v1/live/{:s}/heartbeat_and_get_viewer_count/'
-    BROADCAST_INFO_URL = 'https://www.instagram.com/{:s}/live/?__a=1'
+    livestream_info_URL = 'https://www.instagram.com/{:s}/live/?__a=1'
     BROADCAST_COMMENTS_URL = 'https://i.instagram.com/api/v1/live/{:s}/get_comment/?last_comment_ts={:s}'
     MAIN_SITE_URL = 'https://www.instagram.com/'

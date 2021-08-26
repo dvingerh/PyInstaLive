@@ -23,16 +23,16 @@ def start():
             checking_self = pil.dl_user == pil.ig_user
             logger.info('Getting livestream information for user: {:s}'.format(pil.dl_user))
             logger.separator()
-            broadcast_info_result = dlfuncs.get_broadcasts_info()
-            if broadcast_info_result == True:
+            livestream_info_result = dlfuncs.get_livestreams_info()
+            if livestream_info_result == True:
                 if checking_self:
                     logger.warn("Login with a different account to download your own livestreams.")
-                elif pil.initial_broadcast_obj:
+                elif pil.initial_livestream_obj:
                     logger.info("Livestream available, starting download.")
                     dlfuncs.download_livestream()
-            elif broadcast_info_result == False:
+            elif livestream_info_result == False:
                 logger.info('There is currently no available livestream.')
-            elif not broadcast_info_result:
+            elif not livestream_info_result:
                 logger.binfo('The checking process was aborted by the user.')
             helpers.remove_lock()
             logger.separator()

@@ -69,3 +69,5 @@ venv/
 
 
 *_downloads\
+
+*.txt
