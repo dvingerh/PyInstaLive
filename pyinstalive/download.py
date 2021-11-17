@@ -12,7 +12,7 @@ import os
 import json
 
 class Download:
-    def __init__(self, download_user):
+    def __init__(self, download_user=""):
         self.download_user = download_user
         self.timestamp = helpers.strepochtime()
         self.video_path = None
@@ -61,10 +61,10 @@ class Download:
             self.video_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.mp4'.format(helpers.strdatetime_compat(), self.download_user,
                                                         self.livestream_object_init.get('broadcast_id'), self.timestamp))
 
-            self.segments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live_downloads'.format(helpers.strdatetime_compat(), self.download_user,
+            self.segments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live'.format(helpers.strdatetime_compat(), self.download_user,
                                                         self.livestream_object_init.get('broadcast_id'), self.timestamp))
 
-            self.data_comments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live_comments.log'.format(helpers.strdatetime_compat(), self.download_user,
+            self.data_save_comments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.log'.format(helpers.strdatetime_compat(), self.download_user,
                                                         self.livestream_object_init.get('broadcast_id'), self.timestamp))
 
             self.data_json_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.json'.format(helpers.strdatetime_compat(), self.download_user,

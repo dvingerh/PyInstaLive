@@ -7,6 +7,7 @@ import logging
 from . import globals
 from . import logger
 from . import helpers
+from . import assembler
 from .constants import Constants
 from .session import Session
 from .download import Download
@@ -35,7 +36,7 @@ def validate_settings():
                 logger.separator(pre_config=True)
                 validate_succeeded = False
 
-        elif not globals.args.clean and not globals.args.info and not globals.args.assemble_path and not globals.args.download_following and not globals.args.organize:
+        elif not globals.args.clean and not globals.args.info and not globals.args.save_video_path and not globals.args.save_comments_path and not globals.args.download_following and not globals.args.organize:
             logger.error("Please specify a download method.", pre_config=True)
             logger.separator(pre_config=True)
             validate_succeeded = False
@@ -87,7 +88,8 @@ def run():
     parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Cleans the current download path of all leftover files.")
     parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Path to a configuration file.")
     parser.add_argument('-dp', '--download-path', dest='download_path', type=str, required=False, help="Path to a folder to download livestreams to.")
-    parser.add_argument('-as', '--assemble-path', dest='assemble_path', type=str, required=False, help="Path to livestream data JSON file or path to livestream data folder.")
+    parser.add_argument('-sc', '--save-comments', dest='save_comments_path', type=str, required=False, help="Path to livestream data JSON file.")
+    parser.add_argument('-sv', '--save-video', dest='save_video_path', type=str, required=False, help="Path to livestream data JSON file or path to livestream data folder.")
     parser.add_argument('-df', '--download-following', dest='download_following', action='store_true',help="Check for available livestreams by users the authenticated account is following.")
     parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream data files.")
     parser.add_argument('-o', '--organize', action='store_true', help="Move downloaded livestream videos and data files into their own folder, sorted by username.")
@@ -103,20 +105,28 @@ def run():
     if globals.config.log_to_file:
         logger._log_to_file(None, pre_config=True)
 
+    
     if validate_success:
-        
-        globals.session = Session(username=globals.config.username, password=globals.config.password)
-        login_success = False
+        if globals.args.download or globals.args.download_following:
+            globals.session = Session(username=globals.config.username, password=globals.config.password)
+            login_success = False
 
-        if not globals.args.username and not globals.args.password:
-            login_success = globals.session.authenticate()
-        elif (globals.args.username and not globals.args.password) or (globals.args.password and not globals.args.username):
-            logger.warn("Missing --username or --password argument.")
-            logger.warn("Falling back to the configuration file values.")
+            if not globals.args.username and not globals.args.password:
+                login_success = globals.session.authenticate()
+            elif (globals.args.username and not globals.args.password) or (globals.args.password and not globals.args.username):
+                logger.warn("Missing --username or --password argument.")
+                logger.warn("Falling back to the configuration file values.")
+                logger.separator()
+                login_success = globals.session.authenticate()
+            elif globals.args.username and globals.args.password:
+                login_success = globals.session.authenticate(username=globals.args.username, password=globals.args.password)
+
+            if login_success:
+                globals.download.start()
+
+        elif globals.args.save_video_path:
+            assembler.assemble()
             logger.separator()
-            login_success = globals.session.authenticate()
-        elif globals.args.username and globals.args.password:
-            login_success = globals.session.authenticate(username=globals.args.username, password=globals.args.password)
-
-        if login_success:
-            globals.download.start()
+        elif globals.args.save_comments_path:
+            Comments().generate_log()
+            logger.separator()

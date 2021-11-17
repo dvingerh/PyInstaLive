@@ -8,7 +8,7 @@ import json
 from . import globals
 from . import logger
 from . import helpers
-
+from .download import Download
 """
 The content of this file was originally written by https://github.com/taengstagram
 The code has been edited for use in PyInstaLive.
@@ -27,6 +27,12 @@ def assemble(retry_with_zero_m4v=False):
     try:
         logger.info('Assembling segments into video file.')
         livestream_info = {}
+        if globals.args.save_video_path:
+            globals.download = Download()
+            globals.download.segments_path = globals.args.save_video_path if not globals.args.save_video_path.endswith(".json") else globals.args.save_video_path.replace(".json", "")
+            globals.download.data_json_path = globals.args.save_video_path if globals.args.save_video_path.endswith(".json") else globals.args.save_video_path + ".json"
+            globals.download.video_path = globals.download.segments_path + ".mp4"
+
         if not os.path.isdir(globals.download.segments_path):
             logger.separator()
             logger.error("Could not assemble segments: The segment directory does not exist.")
