@@ -184,7 +184,7 @@ def print_heartbeat(from_thread=False):
 def command_exists(command):
     try:
         fnull = open(os.devnull, 'w')
-        subprocess.call([command], stdout=fnull, stderr=subprocess.STDOUT)
+        subprocess.call([command], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return True
     except OSError:
         return False
@@ -193,7 +193,7 @@ def command_exists(command):
 def run_command(command):
     try:
         fnull = open(os.devnull, 'w')
-        subprocess.Popen(shlex.split(command), stdout=fnull, stderr=sys.stdout)
+        subprocess.Popen(shlex.split(command), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return False
     except Exception as e:
         return str(e)
