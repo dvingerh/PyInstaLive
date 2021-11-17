@@ -44,7 +44,7 @@ def info(log_str, force_plain=False, pre_config=False):
         global PRECONFIG_STR
         PRECONFIG_STR += "[I] {:s}".format(log_str) + "\n"
     print(to_print)
-    if globals.config.log_to_file:
+    if globals.config.log_to_file and not pre_config:
         _log_to_file(log_str)
 
 
@@ -58,7 +58,7 @@ def binfo(log_str, force_plain=False, pre_config=False):
         PRECONFIG_STR += "[I] {:s}".format(log_str) + "\n"
     print(to_print)
 
-    if globals.config.log_to_file:
+    if globals.config.log_to_file and not pre_config:
         _log_to_file(log_str)
 
 
@@ -71,7 +71,7 @@ def warn(log_str, force_plain=False, pre_config=False):
         global PRECONFIG_STR
         PRECONFIG_STR += "[W] {:s}".format(log_str) + "\n"
     print(to_print)
-    if globals.config.log_to_file:
+    if globals.config.log_to_file and not pre_config:
         _log_to_file(log_str)
 
 
@@ -84,7 +84,7 @@ def error(log_str, force_plain=False, pre_config=False):
         global PRECONFIG_STR
         PRECONFIG_STR += "[E] {:s}".format(log_str) + "\n"
     print(to_print)
-    if globals.config.log_to_file:
+    if globals.config.log_to_file and not pre_config:
         _log_to_file(log_str)
 
 
@@ -105,11 +105,14 @@ def separator(pre_config=False):
     if pre_config:
         global PRECONFIG_STR
         PRECONFIG_STR += PRINT_SEP + "\n"
-    if globals.config.log_to_file:
+    if globals.config.log_to_file and not pre_config:
         _log_to_file(PRINT_SEP)
 
 
-def banner(log_only=False, no_log=False):
+def banner(log_only=False, no_log=False, pre_config=True):
+    if pre_config:
+        global PRECONFIG_STR
+        PRECONFIG_STR += PRINT_SEP + "\n" + "[I] {:s}".format(PRINT_TITLE) + "\n" + PRINT_SEP + "\n"
     if no_log:
         print(PRINT_SEP)
         if SUPP_COLOR:
@@ -141,7 +144,9 @@ def _log_to_file(log_str, pre_config=False):
             except AttributeError:
                 pass
             with open("pyinstalive.{:s}.log".format(suffix), "a+") as f:
-                f.write(log_str + '\n')
+                f.write(log_str)
+                if not pre_config:
+                    f.write('\n')
                 f.close()
         except Exception as e:
             print(e)

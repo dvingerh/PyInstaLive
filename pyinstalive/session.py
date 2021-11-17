@@ -125,6 +125,6 @@ class Session:
             return False
         except KeyboardInterrupt:
             logger.separator()
-            logger.binfo('The login process was aborted by the user.')
+            logger.binfo('The process was aborted by the user.')
             logger.separator()
             return False

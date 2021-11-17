@@ -14,6 +14,8 @@ from .comments import Comments
 
 def validate_settings():
     try:
+        validate_succeeded = True
+
         if globals.args.config_path:
             if os.path.isfile(globals.args.config_path):
                 globals.config.config_path = globals.args.config_path
@@ -24,43 +26,41 @@ def validate_settings():
                 logger.warn("Falling back to default path: {:s}".format(globals.config.config_path), pre_config=True)
                 logger.separator(pre_config=True)
         elif not os.path.isfile(globals.config.config_path):
-            logger.banner()
             helpers.new_config()
-            return False
+            validate_succeeded = False
 
         if globals.args.download:
             if globals.args.download_following:
-                logger.banner(no_log=True)
                 logger.warn("Only one download method at a time is permitted.", pre_config=True)
                 logger.separator(pre_config=True)
-                return False
-            else:
-                logger.banner(log_only=True)
+                validate_succeeded = False
+
         elif not globals.args.clean and not globals.args.info and not globals.args.assemble_path and not globals.args.download_following and not globals.args.organize:
-            logger.banner(log_only=True)
-            logger.error("Please specify a download method.")
-            logger.separator()
-            return False
+            logger.error("Please specify a download method.", pre_config=True)
+            logger.separator(pre_config=True)
+            validate_succeeded = False
 
-        globals.config.config_path = os.path.realpath(globals.config.config_path)
-        globals.config.parser_object.read(globals.config.config_path)
-        globals.config.username = globals.config.parser_object.get("pyinstalive", "username")
-        globals.config.password = globals.config.parser_object.get("pyinstalive", "password")
-        globals.config.log_to_file = globals.config.parser_object.getboolean("pyinstalive", "log_to_file")
-        globals.config.download_comments = globals.config.parser_object.getboolean("pyinstalive", "download_comments")
-        globals.config.show_session_expires = globals.config.parser_object.getboolean("pyinstalive", "show_session_expires")
-        globals.config.clear_temp_files = globals.config.parser_object.getboolean("pyinstalive", "clear_temp_files")
-        globals.config.no_assemble = globals.config.parser_object.getboolean("pyinstalive", "no_assemble")
-        globals.config.use_locks = globals.config.parser_object.getboolean("pyinstalive", "use_locks")
-        globals.config.cmd_on_started = globals.config.parser_object.get("pyinstalive", "cmd_on_started")
-        globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
-        globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")
+        if validate_succeeded:
+            globals.config.config_path = os.path.realpath(globals.config.config_path)
+            globals.config.parser_object.read(globals.config.config_path)
+            globals.config.username = globals.config.parser_object.get("pyinstalive", "username")
+            globals.config.password = globals.config.parser_object.get("pyinstalive", "password")
+            globals.config.log_to_file = globals.config.parser_object.getboolean("pyinstalive", "log_to_file")
+            globals.config.download_comments = globals.config.parser_object.getboolean("pyinstalive", "download_comments")
+            globals.config.show_session_expires = globals.config.parser_object.getboolean("pyinstalive", "show_session_expires")
+            globals.config.clear_temp_files = globals.config.parser_object.getboolean("pyinstalive", "clear_temp_files")
+            globals.config.no_assemble = globals.config.parser_object.getboolean("pyinstalive", "no_assemble")
+            globals.config.use_locks = globals.config.parser_object.getboolean("pyinstalive", "use_locks")
+            globals.config.cmd_on_started = globals.config.parser_object.get("pyinstalive", "cmd_on_started")
+            globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
+            globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")
 
-        if (globals.config.log_to_file):
-            logger._log_to_file(None, pre_config=True)
+            if globals.args.download:
+                globals.download = Download(globals.args.download)
+                if globals.config.download_comments:
+                    globals.comments = Comments()
 
-        return True
-
+        return validate_succeeded
     except Exception as e:
         logger.error("Could not process the configuration file: {:s}".format(str(e)))
         logger.error("Ensure the configuration file and given arguments are valid and try again.")
@@ -76,7 +76,7 @@ def run():
     globals.init()
     globals.config.parser_object = configparser.ConfigParser()
 
-    logger.banner(no_log=True)
+    logger.banner(no_log=True, pre_config=True)
 
     parser = argparse.ArgumentParser(description="Running PyInstaLive {:s} using Python {:s}".format(Constants.SCRIPT_VERSION, Constants.PYTHON_VERSION))
 
@@ -95,11 +95,16 @@ def run():
     globals.args, unknown_args = parser.parse_known_args()  # Parse arguments
     
     if unknown_args:
-        logger.warn("The following unknown argument(s) were provided and will be ignored.")
-        logger.warn('    ' + ' '.join(unknown_args))
-        logger.separator()
+        logger.warn("The following unknown argument(s) were provided and will be ignored.", pre_config=True)
+        logger.warn('    ' + ' '.join(unknown_args), pre_config=True)
+        logger.separator(pre_config=True)
+
+    validate_success = validate_settings()
+    if globals.config.log_to_file:
+        logger._log_to_file(None, pre_config=True)
+
+    if validate_success:
         
-    if validate_settings():
         globals.session = Session(username=globals.config.username, password=globals.config.password)
         login_success = False
 
@@ -114,8 +119,4 @@ def run():
             login_success = globals.session.authenticate(username=globals.args.username, password=globals.args.password)
 
         if login_success:
-            if globals.args.download:
-                globals.download = Download(globals.args.download)
-                if globals.config.download_comments:
-                    globals.comments = Comments()
-                globals.download.start()
+            globals.download.start()

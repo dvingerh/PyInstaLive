@@ -12,6 +12,6 @@ class Config:
     cmd_on_started = None
     cmd_on_ended = None
     ffmpeg_path = None
-    log_to_file = False
+    log_to_file = True
     no_assemble = False
     use_locks = True
