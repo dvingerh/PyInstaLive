@@ -18,9 +18,9 @@ class Comments:
         for i, comment in enumerate(new_comments):
             elapsed = int(time.time()) - int(globals.download.timestamp)
             new_comments[i].update({"total_elapsed": elapsed})
-        self.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else int(time.time()))
+        self.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else int(time.time() - 5))
         current_comments.extend(new_comments)
-        after_count = len(self.comments)
+        after_count = len(current_comments)
         if after_count > before_count:
             globals.download.livestream_object['comments'] = current_comments
         self.comments = current_comments
@@ -66,12 +66,6 @@ class Comments:
 
                 with codecs.open(globals.download.data_comments_path, 'w', 'utf-8-sig') as log_outfile:
                     log_outfile.write(''.join(comments))
-                if len(self.comments) == 1:
-                    logger.info("Successfully saved 1 comment to text file.")
-                elif len(self.comments) > 1:
-                    if comment_errors:
-                        logger.warn("Successfully saved {:s} comments to text file with {:s} errors.".format(str(total_comments), str(comment_errors)))
-                    else:
-                        logger.info("Successfully saved {:s} comments to text file.".format(str(total_comments)))
+                logger.info("Successfully saved text file: {}".format(globals.download.data_comments_path))
         except Exception as e:
             logger.error("Could not save comments: {:s}".format(str(e)))

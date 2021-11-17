@@ -91,9 +91,6 @@ def write_data_json():
     if not globals.download.download_stop:
         try:
             globals.download.livestream_object['segments'] = globals.download.downloader_object.segment_meta
-
-            if globals.config.download_comments:
-                globals.comments.retrieve_comments()
             try:
                 with open(globals.download.data_json_path, 'w') as json_file:
                     json.dump(globals.download.livestream_object, json_file, indent=2)
@@ -171,6 +168,9 @@ def print_heartbeat(from_thread=False):
         else:
             previous_state = globals.download.livestream_object.get("broadcast_status")
         globals.download.livestream_object = api.get_heartbeat()
+        if globals.config.download_comments:
+            globals.comments.retrieve_comments()
+        write_data_json()
         if from_thread:
             check_if_guesting()
         if not from_thread or (previous_state != globals.download.livestream_object.get("broadcast_status")):
@@ -199,15 +199,7 @@ def run_command(command):
         return str(e)
 
 
-def handle_data_json():
-    while True:
-        write_data_json()
-        if globals.download.download_stop:
-            break
-        else:
-            time.sleep(2.5)
-
-def handle_heartbeat():
+def handle_tasks_worker():
     while True:
         print_heartbeat(True)
         if globals.download.download_stop:

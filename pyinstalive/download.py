@@ -23,8 +23,7 @@ class Download:
         self.downloader_object = None
         self.livestream_guest = None
         self.livestream_owner = None
-        self.json_thread_worker = None
-        self.heartbeat_thread_worker = None
+        self.tasks_worker = None
         self.download_stop = False
 
     def start(self):
@@ -97,24 +96,22 @@ class Download:
             helpers.print_durations()
             helpers.print_heartbeat()
             logger.separator()
-            logger.info('Downloading livestream, press [CTRL+C] to abort.')
-
-            self.heartbeat_thread_worker = threading.Thread(target=helpers.handle_heartbeat)
-            self.heartbeat_thread_worker.daemon = True
-            self.heartbeat_thread_worker.start()
-
-            self.json_thread_worker = threading.Thread(target=helpers.handle_data_json)
-            self.json_thread_worker.daemon = True
-            self.json_thread_worker.start()
-
             if globals.config.cmd_on_started:
                 try:
                     thread = threading.Thread(target=helpers.run_command, args=(globals.config.cmd_on_started,))
                     thread.daemon = True
                     thread.start()
                     logger.binfo("Executed start command: {:s}".format(globals.config.cmd_on_started))
+                    logger.separator()
                 except Exception as e:
                     logger.warn('Could not execute start command: {:s}'.format(str(e)))
+                    logger.separator()
+            logger.info('Downloading livestream, press [CTRL+C] to abort.')
+
+            self.tasks_worker = threading.Thread(target=helpers.handle_tasks_worker)
+            self.tasks_worker.daemon = True
+            self.tasks_worker.start()
+
             self.downloader_object.run()
             logger.separator()
             logger.info("The livestream has been ended by the host.")
@@ -145,19 +142,15 @@ class Download:
                     logger.warn('Could not execute end command: {:s}'.format(str(e)))
                     logger.separator()
                     
-            logger.info("Waiting for background threads to finish.")
+            logger.info("Waiting for background worker to finish.")
             logger.separator()
-            if self.json_thread_worker and self.heartbeat_thread_worker:
+            if self.tasks_worker:
                 self.download_stop = True
-                self.json_thread_worker.join()
-                self.heartbeat_thread_worker.join()
+                self.tasks_worker.join()
 
 
             if globals.config.download_comments:
-                logger.separator()
                 globals.comments.generate_log()
-                logger.separator()
-            else:
                 logger.separator()
 
             if not globals.config.no_assemble:
