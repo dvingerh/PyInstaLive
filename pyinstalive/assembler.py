@@ -4,17 +4,10 @@ import re
 import glob
 import subprocess
 import json
-import sys
-try:
-    import pil
-    import logger
-    import helpers
-    from constants import Constants
-except ImportError:
-    from . import pil
-    from . import logger
-    from . import helpers
-    from .constants import Constants
+
+from . import globals
+from . import logger
+from . import helpers
 
 """
 The content of this file was originally written by https://github.com/taengstagram
@@ -30,50 +23,47 @@ def _get_file_index(filename):
     return -1
 
 
-def assemble(user_called=True, retry_with_zero_m4v=False):
+def assemble(retry_with_zero_m4v=False):
     try:
-        ass_json_file = pil.assemble_arg if pil.assemble_arg.endswith(".json") else pil.assemble_arg + ".json"
-        ass_mp4_file = os.path.join(pil.dl_path, os.path.basename(ass_json_file).replace("_downloads", "").replace(".json", ".mp4"))
-        ass_segment_dir = pil.assemble_arg if not pil.assemble_arg.endswith(".json") else pil.assemble_arg.replace(".json", "")
-        
+        logger.info('Assembling segments into video file.')
         livestream_info = {}
-        if not os.path.isdir(ass_segment_dir):
-            logger.error("Could not create video file: The segment directory does not exist.")
+        if not os.path.isdir(globals.download.segments_path):
             logger.separator()
-            return False
-        elif not os.listdir(ass_segment_dir):
-            logger.error("Could not create video file: The segment directory does not contain any files.")
+            logger.error("Could not assemble segments: The segment directory does not exist.")
+            return
+        elif not os.listdir(globals.download.segments_path):
             logger.separator()
-            return False
+            logger.error("Could not assemble segments: The segment directory does not contain any files.")
+            return
         
-        if not os.path.isfile(ass_json_file):
+        if not os.path.isfile(globals.download.data_json_path):
             logger.warn("No matching JSON file found for the segment directory, trying to continue without it.")
-            ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
-            livestream_info["broadcast_dict"]['id'] = ass_stream_id
-            livestream_info["broadcast_dict"]['broadcast_status'] = "active"
+            ass_stream_id = os.listdir(globals.download.segments_path)[0].split('-')[0]
+            livestream_info['id'] = ass_stream_id
+            livestream_info['broadcast_status'] = "active"
             livestream_info['segments'] = {}
         else:
-            with open(ass_json_file) as info_file:
+            with open(globals.download.data_json_path) as info_file:
                 try:
                     livestream_info = json.load(info_file)
                 except Exception as e:
-                    logger.warn("Could not decode JSON file, trying to continue without it.")
-                    ass_stream_id = os.listdir(ass_segment_dir)[0].split('-')[0]
-                    livestream_info["broadcast_dict"]['id'] = ass_stream_id
-                    livestream_info["broadcast_dict"]['broadcast_status'] = "active"
+                    logger.warn("Could not load JSON file, trying to continue without it.")
+                    ass_stream_id = os.listdir(globals.download.segments_path)[0].split('-')[0]
+                    livestream_info['id'] = ass_stream_id
+                    livestream_info['broadcast_status'] = "active"
                     livestream_info['segments'] = {}
 
-        stream_id = str(livestream_info["broadcast_dict"]['id'])
+        stream_id = str(livestream_info['id'])
 
         segment_meta = livestream_info.get('segments', {})
         if segment_meta:
             all_segments = [
-                os.path.join(ass_segment_dir, k)
+                os.path.join(globals.download.segments_path, k)
                 for k in livestream_info['segments'].keys()]
         else:
             all_segments = list(filter(
                 os.path.isfile,
-                glob.glob(os.path.join(ass_segment_dir, '%s-*.m4v' % stream_id))))
+                glob.glob(os.path.join(globals.download.segments_path, '%s-*.m4v' % stream_id))))
 
         all_segments = sorted(all_segments, key=lambda x: _get_file_index(x))
         sources = []
@@ -84,9 +74,8 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
         has_skipped_zero_m4v = False
 
         if not all_segments:
-            logger.error("Could not create video file: The segment directory does not contain any files.")
-            logger.separator()
-            return False
+            logger.error("Could not assemble segments: No files were loaded.")
+            return
 
         for segment in all_segments:
             segment = re.sub('\?.*$', '', segment)
@@ -104,9 +93,9 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                 continue
 
             video_stream = os.path.join(
-                ass_segment_dir, video_stream_format.format(stream_id, len(sources)))
+                globals.download.segments_path, video_stream_format.format(stream_id, len(sources)))
             audio_stream = os.path.join(
-                ass_segment_dir, audio_stream_format.format(stream_id, len(sources)))
+                globals.download.segments_path, audio_stream_format.format(stream_id, len(sources)))
 
 
             file_mode = 'ab'
@@ -126,7 +115,7 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                 ffmpeg_binary, '-loglevel', 'error', '-y',
                 '-i', source['audio'],
                 '-i', source['video'],
-                '-c:v', 'copy', '-c:a', 'copy', ass_mp4_file]
+                '-c:v', 'copy', '-c:a', 'copy', globals.download.video_path]
             #fnull = open(os.devnull, 'w')
             fnull = None
             exit_code = subprocess.call(cmd, stdout=fnull, stderr=subprocess.STDOUT)
@@ -137,15 +126,18 @@ def assemble(user_called=True, retry_with_zero_m4v=False):
                                  "skipping it.")
                     os.remove(source['audio'])
                     os.remove(source['video'])
-                    logger.separator()
-                    return assemble(user_called, retry_with_zero_m4v=True)
+                    assemble(retry_with_zero_m4v=True)
                     
             else:
                 os.remove(source['audio'])
                 os.remove(source['video'])
-            if user_called:
-                logger.info('Created video: %s' % os.path.basename(ass_mp4_file))
-                logger.separator()
-            return True
+                logger.info('Successfully saved video file: %s' % os.path.basename(globals.download.video_path))
+    except ValueError as e:
+        logger.error('Could not assemble segment files: {:s}'.format(str(e)))
+        if os.listdir(globals.download.segments_path):
+            logger.binfo("Segment directory is not empty. Trying to assemble again.")
+            assemble()
+        else:
+            logger.error("Segment directory is empty. There is nothing to assemble.")
     except Exception as e:
-        logger.error("Could not create video file: {:s}".format(str(e)))
+        logger.error('Could not assemble segment files: {:s}'.format(str(e)))

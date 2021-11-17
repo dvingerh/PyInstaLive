@@ -1,210 +1,66 @@
 import argparse
 import configparser
 import os
-import sys
 import logging
-import platform
 
-try:
-    import pil
-    import auth
-    import logger
-    import helpers
-    import downloader
-    import assembler
-    import dlfuncs
-    import organize
-    from constants import Constants
-except ImportError:
-    from . import pil
-    from . import auth
-    from . import logger
-    from . import helpers
-    from . import downloader
-    from . import assembler
-    from . import dlfuncs
-    from . import organize
-    from .constants import Constants
 
-def validate_inputs(config, args, unknown_args):
-    error_arr = []
-    banner_shown = False
+from . import globals
+from . import logger
+from . import helpers
+from .constants import Constants
+from .session import Session
+from .download import Download
+from .comments import Comments
+
+def validate_settings():
     try:
-        if args.configpath:
-            if os.path.isfile(args.configpath):
-                pil.config_path = args.configpath
-                logger.binfo("Overriding configuration file path: {:s}".format(pil.config_path))
-                logger.separator()
+        if globals.args.config_path:
+            if os.path.isfile(globals.args.config_path):
+                globals.config.config_path = globals.args.config_path
+                logger.binfo("The configuration file path has been overridden.", pre_config=True)
+                logger.separator(pre_config=True)
             else:
-                logger.banner()
-                banner_shown = True
-                logger.warn("The specified configuration file path does not exist.")
-                logger.warn("Falling back to default path: {:s}".format(pil.config_path))
-                pil.config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
-                logger.separator()
-
-
-        if not os.path.isfile(pil.config_path):  # Create new config if it doesn't exist
-            if not banner_shown:
-                logger.banner()
+                logger.warn("The specified configuration file path does not exist.", pre_config=True)    
+                logger.warn("Falling back to default path: {:s}".format(globals.config.config_path), pre_config=True)
+                logger.separator(pre_config=True)
+        elif not os.path.isfile(globals.config.config_path):
+            logger.banner()
             helpers.new_config()
             return False
-        pil.config_path = os.path.realpath(pil.config_path)
-        config.read(pil.config_path)
 
-        if args.download:
-            pil.dl_user = args.download
-            if args.downloadfollowing or args.batchfile:
-                logger.banner()
-                logger.warn("Only one download method at a time is permitted.")
-                logger.separator()
+        if globals.args.download:
+            if globals.args.download_following:
+                logger.banner(no_log=True)
+                logger.warn("Only one download method at a time is permitted.", pre_config=True)
+                logger.separator(pre_config=True)
                 return False
-        elif not args.clean and not args.info and not args.assemble and not args.downloadfollowing and not args.batchfile and not args.organize:
-            logger.banner()
+            else:
+                logger.banner(log_only=True)
+        elif not globals.args.clean and not globals.args.info and not globals.args.assemble_path and not globals.args.download_following and not globals.args.organize:
+            logger.banner(log_only=True)
             logger.error("Please specify a download method.")
             logger.separator()
             return False
 
-        if helpers.bool_str_parse(config.get('pyinstalive', 'log_to_file')) == "Invalid":
-            pil.log_to_file = True
-            error_arr.append(['log_to_file', 'True'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'log_to_file')):
-            pil.log_to_file = True
-        else:
-            pil.log_to_file = False
+        globals.config.config_path = os.path.realpath(globals.config.config_path)
+        globals.config.parser_object.read(globals.config.config_path)
+        globals.config.username = globals.config.parser_object.get("pyinstalive", "username")
+        globals.config.password = globals.config.parser_object.get("pyinstalive", "password")
+        globals.config.log_to_file = globals.config.parser_object.getboolean("pyinstalive", "log_to_file")
+        globals.config.download_comments = globals.config.parser_object.getboolean("pyinstalive", "download_comments")
+        globals.config.show_session_expires = globals.config.parser_object.getboolean("pyinstalive", "show_session_expires")
+        globals.config.clear_temp_files = globals.config.parser_object.getboolean("pyinstalive", "clear_temp_files")
+        globals.config.no_assemble = globals.config.parser_object.getboolean("pyinstalive", "no_assemble")
+        globals.config.use_locks = globals.config.parser_object.getboolean("pyinstalive", "use_locks")
+        globals.config.cmd_on_started = globals.config.parser_object.get("pyinstalive", "cmd_on_started")
+        globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
+        globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")
 
-        logger.banner()
-
-        if args.batchfile:
-            if os.path.isfile(args.batchfile):
-                pil.dl_batchusers = [user.rstrip('\n') for user in open(args.batchfile)]
-                if not pil.dl_batchusers:
-                    logger.error("The specified file is empty.")
-                    logger.separator()
-                    return False
-                else:
-                    logger.info("Downloading {:d} users from batch file.".format(len(pil.dl_batchusers)))
-                    logger.separator()
-            else:
-                logger.error('The specified file does not exist.')
-                logger.separator()
-                return False
-
-        if unknown_args:
-            pil.uargs = unknown_args
-            logger.warn("The following unknown argument(s) were provided and will be ignored.")
-            logger.warn('    ' + ' '.join(unknown_args))
-            logger.separator()
-
-
-        pil.ig_user = config.get('pyinstalive', 'username')
-        pil.ig_pass = config.get('pyinstalive', 'password')
-        pil.dl_path = config.get('pyinstalive', 'download_path')
-        pil.cmd_on_started = config.get('pyinstalive', 'cmd_on_started')
-        pil.cmd_on_ended = config.get('pyinstalive', 'cmd_on_ended')
-        pil.ffmpeg_path = config.get('pyinstalive', 'ffmpeg_path')
-        pil.skip_assemble = config.get('pyinstalive', 'skip_assemble')
-        pil.args = args
-        pil.config = config
-
-        if args.dlpath:
-            pil.dl_path = args.dlpath
-
-        if helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')) == "Invalid":
-            pil.dl_comments = False
-            error_arr.append(['download_comments', 'True'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'download_comments')):
-            pil.dl_comments = True
-        else:
-            pil.dl_comments = False
-
-        if helpers.bool_str_parse(config.get('pyinstalive', 'show_session_expires')) == "Invalid":
-            pil.show_session_expires = False
-            error_arr.append(['show_session_expires', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'show_session_expires')):
-            pil.show_session_expires = True
-        else:
-            pil.show_session_expires = False
-
-        if helpers.bool_str_parse(config.get('pyinstalive', 'skip_assemble')) == "Invalid":
-            pil.skip_assemble = False
-            error_arr.append(['skip_assemble', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'skip_assemble')):
-            pil.skip_assemble = True
-        else:
-            pil.skip_assemble = False
-
-        if helpers.bool_str_parse(config.get('pyinstalive', 'use_locks')) == "Invalid":
-            pil.use_locks = False
-            error_arr.append(['use_locks', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'use_locks')):
-            pil.use_locks = True
-        else:
-            pil.use_locks = False
-
-        if helpers.bool_str_parse(config.get('pyinstalive', 'clear_temp_files')) == "Invalid":
-            pil.clear_temp_files = False
-            error_arr.append(['clear_temp_files', 'False'])
-        elif helpers.bool_str_parse(config.get('pyinstalive', 'clear_temp_files')):
-            pil.clear_temp_files = True
-        else:
-            pil.clear_temp_files = False
-
-        if args.skip_assemble:
-            pil.skip_assemble = True
-
-        if pil.ffmpeg_path:
-            if not os.path.isfile(pil.ffmpeg_path):
-                pil.ffmpeg_path = None
-                cmd = "where" if platform.system() == "Windows" else "which"
-                logger.warn("The specified FFmpeg file path does not exist.")
-                logger.warn("Falling back to the environment variables.")
-            else:
-                logger.binfo("Overriding FFmpeg binary path: {:s}".format(pil.ffmpeg_path))
-        else:
-            if not helpers.command_exists('ffmpeg') and not args.info:
-                logger.error("Could not find the FFmpeg framework.")
-                logger.separator()
-                return False
-
-        if not pil.ig_user or not len(pil.ig_user):
-            raise Exception("Invalid value for 'username'. This value is required.")
-
-        if not pil.ig_pass or not len(pil.ig_pass):
-            raise Exception("Invalid value for 'password'. This value is required.")
-
-        if not pil.dl_path.endswith('/'):
-            pil.dl_path = pil.dl_path + '/'
-        if not pil.dl_path or not os.path.exists(pil.dl_path):
-            pil.dl_path = os.getcwd() + "/"
-            if not args.dlpath:
-                error_arr.append(['download_path', os.getcwd() + "/"])
-            else:
-                logger.warn("The specified download path does not exist.")
-                logger.warn("Falling back to default path: {:s}".format(pil.dl_path))
-                logger.separator()
-
-        if error_arr:
-            for error in error_arr:
-                logger.warn("Invalid value for entry: {:s}".format(error[0]))
-                logger.warn("Falling back to default value: {:s}".format(error[1]))
-                logger.separator()
-
-        if args.info:
-            helpers.show_info()
-            return False
-        elif args.clean:
-            helpers.clean_download_dir()
-            return False
-        elif args.assemble:
-            pil.assemble_arg = args.assemble
-            assembler.assemble()
-            return False
-        elif args.organize:
-            organize.organize_files()
-            return False
+        if (globals.config.log_to_file):
+            logger._log_to_file(None, pre_config=True)
 
         return True
+
     except Exception as e:
         logger.error("Could not process the configuration file: {:s}".format(str(e)))
         logger.error("Ensure the configuration file and given arguments are valid and try again.")
@@ -216,69 +72,50 @@ def validate_inputs(config, args, unknown_args):
         return False
 
 def run():
-    pil.initialize()
-    logging.disable(logging.CRITICAL)
-    config = configparser.ConfigParser()
-    parser = argparse.ArgumentParser(
-        description="You are running PyInstaLive {:s} using Python {:s}".format(Constants.SCRIPT_VER,
-                                                                                Constants.PYTHON_VER))
+    logging.disable()
+    globals.init()
+    globals.config.parser_object = configparser.ConfigParser()
 
-    parser.add_argument('-u', '--username', dest='username', type=str, required=False,
-                        help="Instagram username to login with.")
-    parser.add_argument('-p', '--password', dest='password', type=str, required=False,
-                        help="Instagram password to login with.")
-    parser.add_argument('-d', '--download', dest='download', type=str, required=False,
-                        help="The username of the user whose livestream you want to save.")
-    parser.add_argument('-b,', '--batch-file', dest='batchfile', type=str, required=False,
-                        help="Read a text file of usernames to download livestreams from.")
-    parser.add_argument('-i', '--info', dest='info', action='store_true', help="View information about PyInstaLive.")
-    parser.add_argument('-cl', '--clean', dest='clean', action='store_true',
-                        help="PyInstaLive will clean the current download folder of all leftover files.")
-    parser.add_argument('-cp', '--config-path', dest='configpath', type=str, required=False,
-                        help="Path to a PyInstaLive configuration file.")
-    parser.add_argument('-dp', '--download-path', dest='dlpath', type=str, required=False,
-                        help="Path to folder where PyInstaLive should save livestreams.")
-    parser.add_argument('-as', '--assemble', dest='assemble', type=str, required=False,
-                        help="Path to json file required by the assembler to generate a video file from the segments.")
-    parser.add_argument('-df', '--download-following', dest='downloadfollowing', action='store_true',
-                        help="PyInstaLive will check for available livestreams from users the account "
-                             "used to login follows.")
-    parser.add_argument('-sm', '--skip-assemble', dest='skip_assemble', action='store_true', help="PyInstaLive will not assemble the downloaded livestream files.")
-    parser.add_argument('-o', '--organize', action='store_true', help="Create a folder for each user whose livestream(s) you have downloaded. The names of the folders will be their usernames. Then move the video(s) of each user into their associated folder.")
+    logger.banner(no_log=True)
 
-    # Workaround to 'disable' argument abbreviations
-    parser.add_argument('--usernamx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--passworx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--infx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--cleax', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--downloadfollowinx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--configpatx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--confix', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('--organizx', help=argparse.SUPPRESS, metavar='IGNORE')
+    parser = argparse.ArgumentParser(description="Running PyInstaLive {:s} using Python {:s}".format(Constants.SCRIPT_VERSION, Constants.PYTHON_VERSION))
 
-    parser.add_argument('-cx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('-nx', help=argparse.SUPPRESS, metavar='IGNORE')
-    parser.add_argument('-dx', help=argparse.SUPPRESS, metavar='IGNORE')
+    parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
+    parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
+    parser.add_argument('-d', '--download', dest='download', type=str, required=False, help="Instagram username of the user to download a livestream from.")
+    parser.add_argument('-i', '--info', dest='info', action='store_true', help="Shows information about PyInstaLive.")
+    parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Cleans the current download path of all leftover files.")
+    parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Path to a configuration file.")
+    parser.add_argument('-dp', '--download-path', dest='download_path', type=str, required=False, help="Path to a folder to download livestreams to.")
+    parser.add_argument('-as', '--assemble-path', dest='assemble_path', type=str, required=False, help="Path to livestream data JSON file or path to livestream data folder.")
+    parser.add_argument('-df', '--download-following', dest='download_following', action='store_true',help="Check for available livestreams by users the authenticated account is following.")
+    parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream data files.")
+    parser.add_argument('-o', '--organize', action='store_true', help="Move downloaded livestream videos and data files into their own folder, sorted by username.")
 
-    args, unknown_args = parser.parse_known_args()  # Parse arguments
+    globals.args, unknown_args = parser.parse_known_args()  # Parse arguments
+    
+    if unknown_args:
+        logger.warn("The following unknown argument(s) were provided and will be ignored.")
+        logger.warn('    ' + ' '.join(unknown_args))
+        logger.separator()
+        
+    if validate_settings():
+        globals.session = Session(username=globals.config.username, password=globals.config.password)
+        login_success = False
 
-    if validate_inputs(config, args, unknown_args):
-        if not args.username and not args.password:
-            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
-        elif (args.username and not args.password) or (args.password and not args.username):
+        if not globals.args.username and not globals.args.password:
+            login_success = globals.session.authenticate()
+        elif (globals.args.username and not globals.args.password) or (globals.args.password and not globals.args.username):
             logger.warn("Missing --username or --password argument.")
             logger.warn("Falling back to the configuration file values.")
             logger.separator()
-            pil.ig_api = auth.authenticate(username=pil.ig_user, password=pil.ig_pass)
-        elif args.username and args.password:
-            pil.ig_api = auth.authenticate(username=args.username, password=args.password, force_use_login_args=True)
+            login_success = globals.session.authenticate()
+        elif globals.args.username and globals.args.password:
+            login_success = globals.session.authenticate(username=globals.args.username, password=globals.args.password)
 
-        if pil.ig_api:
-            if pil.dl_user or pil.args.downloadfollowing:
-                downloader.start()
-            elif pil.dl_batchusers:
-                if not helpers.command_exists("pyinstalive") and not pil.winbuild_path:
-                    logger.error("PyInstaLive must be installed to use the -b argument.")
-                    logger.separator()
-                else:
-                    dlfuncs.iterate_users(pil.dl_batchusers)
+        if login_success:
+            if globals.args.download:
+                globals.download = Download(globals.args.download)
+                if globals.config.download_comments:
+                    globals.comments = Comments()
+                globals.download.start()

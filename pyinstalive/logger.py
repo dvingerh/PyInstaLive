@@ -1,22 +1,16 @@
 import os
 import sys
 
-try:
-    import pil
-    import helpers
-    from constants import Constants
-except ImportError:
-    from . import pil
-    from . import helpers
-    from .constants import Constants
+from . import globals
+from . import helpers
+from .constants import Constants
 
 
 def supports_color():
     try:
         """
         from https://github.com/django/django/blob/master/django/core/management/color.py
-        Return True if the running system's terminal supports color,
-        and False otherwise.
+        Return True if the running system's terminal supports color and False otherwise.
         """
 
         plat = sys.platform
@@ -36,79 +30,118 @@ PREFIX_INFO = '\x1B[1;32;49m[I]\x1B[0m'
 PREFIX_WARN = '\x1B[1;33;49m[W]\x1B[0m'
 PREFIX_BINFO = '\x1B[1;34;49m[I]\x1B[0m'
 PRINT_SEP = '-' * 75
+PRINT_TITLE = "PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}".format(Constants.SCRIPT_VERSION, Constants.PYTHON_VERSION, helpers.strdatetime())
 SUPP_COLOR = supports_color()
+PRECONFIG_STR = ""
 
 
-def info(log_str, force_plain=False):
+def info(log_str, force_plain=False, pre_config=False):
     if SUPP_COLOR and not force_plain:
         to_print = "{:s} {:s}".format(PREFIX_INFO, log_str)
     else:
         to_print = "[I] {:s}".format(log_str)
+    if pre_config:
+        global PRECONFIG_STR
+        PRECONFIG_STR += "[I] {:s}".format(log_str) + "\n"
     print(to_print)
-    if pil.log_to_file:
+    if globals.config.log_to_file:
         _log_to_file(log_str)
 
 
-def binfo(log_str, force_plain=False):
+def binfo(log_str, force_plain=False, pre_config=False):
     if SUPP_COLOR and not force_plain:
         to_print = "{:s} {:s}".format(PREFIX_BINFO, log_str)
     else:
         to_print = "[I] {:s}".format(log_str)
+    if pre_config:
+        global PRECONFIG_STR
+        PRECONFIG_STR += "[I] {:s}".format(log_str) + "\n"
     print(to_print)
-    if pil.log_to_file:
+
+    if globals.config.log_to_file:
         _log_to_file(log_str)
 
 
-def warn(log_str, force_plain=False):
+def warn(log_str, force_plain=False, pre_config=False):
     if SUPP_COLOR and not force_plain:
         to_print = "{:s} {:s}".format(PREFIX_WARN, log_str)
     else:
         to_print = "[W] {:s}".format(log_str)
+    if pre_config:
+        global PRECONFIG_STR
+        PRECONFIG_STR += "[W] {:s}".format(log_str) + "\n"
     print(to_print)
-    if pil.log_to_file:
+    if globals.config.log_to_file:
         _log_to_file(log_str)
 
 
-def error(log_str, force_plain=False):
+def error(log_str, force_plain=False, pre_config=False):
     if SUPP_COLOR and not force_plain:
         to_print = "{:s} {:s}".format(PREFIX_ERROR, log_str)
     else:
         to_print = "[E] {:s}".format(log_str)
+    if pre_config:
+        global PRECONFIG_STR
+        PRECONFIG_STR += "[E] {:s}".format(log_str) + "\n"
     print(to_print)
-    if pil.log_to_file:
+    if globals.config.log_to_file:
         _log_to_file(log_str)
 
 
 def plain(log_str):
     print("{:s}".format(log_str))
-    if pil.log_to_file:
+    if globals.config.log_to_file:
         _log_to_file("{:s}".format(log_str))
 
 
 def whiteline():
     print("")
-    if pil.log_to_file:
+    if globals.config.log_to_file:
         _log_to_file("")
 
 
-def separator():
+def separator(pre_config=False):
     print(PRINT_SEP)
-    if pil.log_to_file:
+    if pre_config:
+        global PRECONFIG_STR
+        PRECONFIG_STR += PRINT_SEP + "\n"
+    if globals.config.log_to_file:
         _log_to_file(PRINT_SEP)
 
 
-def banner():
-    separator()
-    binfo("PYINSTALIVE (SCRIPT V{:s} - PYTHON V{:s}) - {:s}".format(Constants.SCRIPT_VER, Constants.PYTHON_VER,
-                                                                    helpers.strdatetime()))
-    separator()
+def banner(log_only=False, no_log=False):
+    if no_log:
+        print(PRINT_SEP)
+        if SUPP_COLOR:
+            to_print = "{:s} {:s}".format(PREFIX_BINFO, PRINT_TITLE)
+        else:
+            to_print = "[I] {:s}".format(PRINT_TITLE)
+        print(to_print)
+        print(PRINT_SEP)
+    elif log_only:
+        _log_to_file(PRINT_SEP)
+        _log_to_file(PRINT_TITLE)
+        _log_to_file(PRINT_SEP)
+    else:
+        separator()
+        binfo(PRINT_TITLE)
+        separator()
 
 
-def _log_to_file(log_str):
-    try:
-        with open("pyinstalive{:s}.log".format(
-                "_" + pil.dl_user if len(pil.dl_user) > 0 else ".default"), "a+") as f:
-            f.write(log_str + '\n')
-            f.close()
-    except Exception:
-        pass
+def _log_to_file(log_str, pre_config=False):
+    if globals.config.log_to_file:
+        if pre_config:
+            global PRECONFIG_STR
+            log_str = PRECONFIG_STR
+        try:
+            suffix = "default"
+            try:
+                if globals.download.download_user:
+                    suffix = globals.download.download_user
+            except AttributeError:
+                pass
+            with open("pyinstalive.{:s}.log".format(suffix), "a+") as f:
+                f.write(log_str + '\n')
+                f.close()
+        except Exception as e:
+            print(e)
