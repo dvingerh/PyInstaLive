@@ -75,15 +75,19 @@ def get_shared_data(html):
 def lock_exists():
     return os.path.isfile(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'))
 
-def lock_create():
+def lock_create(lock_type="user"):
     try:
-        open(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'), 'a').close()
+        if lock_type == "user":
+            open(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'), 'a').close()
+        elif lock_type == "folder":
+            open(os.path.join(globals.download.segments_path, globals.download.download_user + ".lock"), 'a').close()
     except Exception:
         logger.warn("Could not create lock file.")
 
 def lock_remove():
     try:
         os.remove(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'))
+        os.remove(os.path.join(globals.download.segments_path, globals.download.download_user + ".lock"))
     except Exception:
         pass
 
@@ -145,41 +149,6 @@ def print_durations(download_ended=False):
             logger.info('Downloaded   : {}'.format(get_stream_duration("download")))
             logger.info('Missing      : {}'.format(get_stream_duration("missing")))
 
-def check_if_guesting():
-    try:
-        livestream_guest = globals.download.livestream_object.get('cobroadcasters', {})[0].get('username')
-    except Exception:
-        livestream_guest = None
-    if livestream_guest and not globals.download.livestream_guest:
-        logger.separator()
-        globals.download.livestream_guest = livestream_guest
-        logger.binfo('The livestream host has started guesting with user: {}'.format(globals.download.livestream_guest))
-    if not livestream_guest and globals.download.livestream_guest:
-        logger.separator()
-        logger.binfo('The livestream host has stopped guesting with user: {}'.format(globals.download.livestream_guest))
-        if globals.download.livestream_guest == globals.download.download_user:
-            globals.download.downloader_object.stop()
-        globals.download.livestream_guest = None
-
-def update_stream_data(from_thread=False):
-    if not globals.download.download_stop:
-        if not globals.download.livestream_object:
-            previous_state = globals.download.livestream_object_init.get("broadcast_dict").get("broadcast_status")
-        else:
-            previous_state = globals.download.livestream_object.get("broadcast_status")
-        globals.download.livestream_object = api.get_stream_data()
-        if globals.config.download_comments:
-            globals.comments.retrieve_comments()
-        write_data_json()
-        if from_thread:
-            check_if_guesting()
-        if not from_thread or (previous_state != globals.download.livestream_object.get("broadcast_status")):
-            if from_thread:
-                logger.separator()
-                print_durations()
-            logger.info('Status       : {}'.format(globals.download.livestream_object.get("broadcast_status").capitalize()))
-            logger.info('Viewers      : {}'.format( int(globals.download.livestream_object.get("viewer_count"))))
-        return globals.download.livestream_object.get('broadcast_status') not in ['available', 'interrupted']
 
 def command_exists(command):
     try:
@@ -201,9 +170,10 @@ def run_command(command):
 
 def handle_tasks_worker():
     while True:
-        update_stream_data(from_thread=True)
+        globals.download.update_stream_data(from_thread=True)
         if not globals.config.no_heartbeat:
             api.no_heartbeat()
+        lock_create(lock_type="folder")
         if globals.download.download_stop:
             break
         else:
@@ -305,4 +275,3 @@ def show_info():
         logger.error("Configuration file:         Not found")
     logger.whiteline()
     logger.info("End of PyInstaLive information screen.")
-    logger.separator()

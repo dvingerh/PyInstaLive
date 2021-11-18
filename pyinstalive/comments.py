@@ -11,7 +11,7 @@ from .download import Download
 class Comments:
     def __init__(self):
         self.comments = []
-        self.comments_last_ts = 0
+        self.comments_last_ts = int(globals.download.timestamp)
 
     def retrieve_comments(self):
         current_comments = self.comments
@@ -21,7 +21,7 @@ class Comments:
         for i, comment in enumerate(new_comments):
             elapsed = int(time.time()) - int(globals.download.timestamp)
             new_comments[i].update({"total_elapsed": elapsed})
-        self.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else int(time.time() - 5))
+        self.comments_last_ts = (new_comments[0]['created_at_utc'] if new_comments else self.comments_last_ts)
         current_comments.extend(new_comments)
         after_count = len(current_comments)
         if after_count > before_count:

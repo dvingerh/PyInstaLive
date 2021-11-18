@@ -32,7 +32,7 @@ class Download:
             logger.warn("Login with a different account to download your own livestreams.")
             return
         if not helpers.lock_exists():
-            helpers.lock_create()
+            helpers.lock_create(lock_type="user")
             logger.info('Getting livestream information for user: {:s}'.format(self.download_user))
 
             self.livestream_object_init = self.get_livestreams_info()
@@ -47,7 +47,6 @@ class Download:
             elif not self.livestream_object_init:
                 pass
 
-            helpers.lock_remove()
             logger.separator()
         else:
             logger.warn("Lock file is already present for this user, there is probably another download ongoing.")
@@ -77,7 +76,7 @@ class Download:
                 duplicate_etag_retry=30,
                 mpd_download_timeout=3,
                 download_timeout=3,
-                callback_check=helpers.update_stream_data,
+                callback_check=self.update_stream_data,
                 ffmpeg_binary=globals.config.ffmpeg_path)
 
             self.livestream_owner = self.livestream_object_init.get('broadcast_dict', {}).get('broadcast_owner').get("username")
@@ -94,7 +93,7 @@ class Download:
                 logger.binfo('This livestream is a duo-live. The current guest is: {}'.format(self.livestream_guest))
             logger.separator()
             helpers.print_durations()
-            helpers.update_stream_data()
+            self.update_stream_data()
             logger.separator()
             if globals.config.cmd_on_started:
                 try:
@@ -119,6 +118,9 @@ class Download:
             helpers.print_durations(True)
             logger.separator()
             self.finish_download()
+        except Exception as e:
+            logger.separator()
+            logger.error("Could not complete the livestream download: " + str(e))
         except KeyboardInterrupt:
             logger.separator()
             logger.binfo('The process was aborted by the user.')
@@ -142,11 +144,11 @@ class Download:
                     logger.warn('Could not execute end command: {:s}'.format(str(e)))
                     logger.separator()
                     
-            logger.info("Waiting for background worker to finish.")
-            logger.separator()
+            logger.info("Waiting for background tasks to finish.")
             if self.tasks_worker:
                 self.download_stop = True
                 self.tasks_worker.join()
+            logger.separator()
 
 
             if globals.config.download_comments:
@@ -160,10 +162,8 @@ class Download:
             else:
                 logger.binfo("Assembling of collected segment files has been disabled.")
                 logger.binfo("Use --assemble command to manually assemble downloaded segment files.")
-            helpers.lock_remove()
         except KeyboardInterrupt:
             logger.binfo('The process was aborted by the user.')
-            helpers.lock_remove()
 
     def get_livestreams_info(self):
         try:
@@ -197,3 +197,39 @@ class Download:
             logger.binfo('The process was aborted by the user.')
             logger.separator()
             return None
+
+    def check_if_guesting(self):
+        try:
+            livestream_guest = globals.download.livestream_object.get('cobroadcasters', {})[0].get('username')
+        except Exception:
+            livestream_guest = None
+        if livestream_guest and not globals.download.livestream_guest:
+            logger.separator()
+            globals.download.livestream_guest = livestream_guest
+            logger.binfo('The livestream host has started guesting with user: {}'.format(globals.download.livestream_guest))
+        if not livestream_guest and globals.download.livestream_guest:
+            logger.separator()
+            logger.binfo('The livestream host has stopped guesting with user: {}'.format(globals.download.livestream_guest))
+            if globals.download.livestream_guest == globals.download.download_user:
+                globals.download.downloader_object.stop()
+            globals.download.livestream_guest = None
+
+    def update_stream_data(self, from_thread=False):
+        if not globals.download.download_stop:
+            if not globals.download.livestream_object:
+                previous_state = globals.download.livestream_object_init.get("broadcast_dict").get("broadcast_status")
+            else:
+                previous_state = globals.download.livestream_object.get("broadcast_status")
+            globals.download.livestream_object = api.get_stream_data()
+            if globals.config.download_comments:
+                globals.comments.retrieve_comments()
+            helpers.write_data_json()
+            if from_thread:
+                self.check_if_guesting()
+            if not from_thread or (previous_state != globals.download.livestream_object.get("broadcast_status")):
+                if from_thread:
+                    logger.separator()
+                    helpers.print_durations()
+                logger.info('Status       : {}'.format(globals.download.livestream_object.get("broadcast_status").capitalize()))
+                logger.info('Viewers      : {}'.format( int(globals.download.livestream_object.get("viewer_count"))))
+            return globals.download.livestream_object.get('broadcast_status') not in ['available', 'interrupted']

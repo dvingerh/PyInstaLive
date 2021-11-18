@@ -4,11 +4,9 @@ def init():
     global download
     global comments
     global session
-    global config_path
     global args
     config = Config
     download = None
     comments = None
     session = None
-    config_path = None
     args = None

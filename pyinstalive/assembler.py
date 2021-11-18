@@ -41,7 +41,6 @@ def assemble(retry_with_zero_m4v=False):
             logger.separator()
             logger.error("Could not assemble segments: The segment directory does not contain any files.")
             return
-        
         if not os.path.isfile(globals.download.data_json_path):
             logger.warn("No matching JSON file found for the segment directory, trying to continue without it.")
             ass_stream_id = os.listdir(globals.download.segments_path)[0].split('-')[0]
@@ -116,7 +115,7 @@ def assemble(retry_with_zero_m4v=False):
             sources.append({'video': video_stream, 'audio': audio_stream})
 
         for n, source in enumerate(sources):
-            ffmpeg_binary = os.getenv('FFMPEG_BINARY', 'ffmpeg')
+            ffmpeg_binary = globals.config.ffmpeg_path
             cmd = [
                 ffmpeg_binary, '-loglevel', 'error', '-y',
                 '-i', source['audio'],
@@ -139,6 +138,7 @@ def assemble(retry_with_zero_m4v=False):
                 os.remove(source['video'])
                 logger.info('Successfully saved video file: %s' % os.path.basename(globals.download.video_path))
     except ValueError as e:
+        logger.separator()
         logger.error('Could not assemble segment files: {:s}'.format(str(e)))
         if os.listdir(globals.download.segments_path):
             logger.binfo("Segment directory is not empty. Trying to assemble again.")
@@ -146,4 +146,5 @@ def assemble(retry_with_zero_m4v=False):
         else:
             logger.error("Segment directory is empty. There is nothing to assemble.")
     except Exception as e:
+        logger.separator()
         logger.error('Could not assemble segment files: {:s}'.format(str(e)))

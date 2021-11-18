@@ -36,7 +36,7 @@ def validate_settings():
                 logger.separator(pre_config=True)
                 validate_succeeded = False
 
-        elif not globals.args.clean and not globals.args.info and not globals.args.generate_video_path and not globals.args.generate_comments_path and not globals.args.download_following and not globals.args.organize:
+        elif not globals.args.clean and not globals.args.info and not globals.args.generate_video_path and not globals.args.generate_comments_path and not globals.args.download_following:
             logger.error("No download method was specified.", pre_config=True)
             logger.separator(pre_config=True)
             validate_succeeded = False
@@ -46,6 +46,7 @@ def validate_settings():
             globals.config.parser_object.read(globals.config.config_path)
             globals.config.username = globals.config.parser_object.get("pyinstalive", "username")
             globals.config.password = globals.config.parser_object.get("pyinstalive", "password")
+            globals.config.download_path = globals.config.parser_object.get("pyinstalive", "download_path")
             globals.config.log_to_file = globals.config.parser_object.getboolean("pyinstalive", "log_to_file")
             globals.config.download_comments = globals.config.parser_object.getboolean("pyinstalive", "download_comments")
             globals.config.show_session_expires = globals.config.parser_object.getboolean("pyinstalive", "show_session_expires")
@@ -56,6 +57,28 @@ def validate_settings():
             globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
             globals.config.no_heartbeat = globals.config.parser_object.get("pyinstalive", "no_heartbeat")
             globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")
+
+            if globals.args.download_path:
+                globals.config.download_path = globals.args.download_path
+                logger.binfo("The download path has been overridden.", pre_config=True)
+                logger.separator()
+            if not os.path.exists(globals.config.download_path):
+                globals.config.download_path = os.getcwd()
+                logger.warn("The specified download path does not exist.")
+                logger.warn("Falling back to default path: {:s}".format(globals.config.download_path))
+                logger.separator()
+
+            if globals.config.ffmpeg_path and not os.path.exists(globals.config.ffmpeg_path):
+                logger.warn("The specified path to the FFmpeg framework does not exist.")
+                globals.config.ffmpeg_path = os.getenv('FFMPEG_BINARY', 'ffmpeg')
+                if helpers.command_exists(globals.config.ffmpeg_path):
+                    logger.warn("Falling back to environment variable.")
+                else:
+                    logger.separator()
+                    logger.error("Could not find the required FFmpeg framework.")
+                    validate_succeeded = False
+                logger.separator()
+                
 
             if globals.args.download:
                 globals.download = Download(globals.args.download)
@@ -131,6 +154,7 @@ def run():
 
             if login_success:
                 globals.download.start()
+                helpers.lock_remove()
 
         elif globals.args.generate_video_path:
             assembler.assemble()
@@ -138,5 +162,9 @@ def run():
         elif globals.args.generate_comments_path:
             Comments().generate_log()
             logger.separator()
+        elif globals.args.clean:
+            helpers.clean_download_dir()
+            logger.separator()
         elif globals.args.info:
             helpers.show_info()
+            logger.separator()

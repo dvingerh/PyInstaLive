@@ -69,7 +69,6 @@ class Session:
             else:
                 logger.info("An existing login session file was found: {}".format(os.path.basename(self.session_file)))
                 logger.info("Checking the validity of the saved login session.")
-                logger.separator()
 
                 self.session = self._load_session()
 
@@ -83,7 +82,6 @@ class Session:
 
                     logger.warn("The login session file has expired and has been deleted.")
                     logger.warn("A new login attempt will be made in a few moments.")
-                    logger.separator()
 
                     time.sleep(2.5)
                     self.authenticate(username, password)
@@ -92,6 +90,7 @@ class Session:
                     login_state = api.get_login_state()
                     if login_state.get("entry_data").get("FeedPage", None) == None:
                         if login_state.get("entry_data").get("Challenge", None) != None:
+                            logger.separator()
                             logger.error("The login session file is no longer valid.")
                             logger.error("The session was flagged as suspicious by Instagram.")
                             logger.error("Complete the security checkpoint on another device and try again.")
