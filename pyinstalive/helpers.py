@@ -1,10 +1,10 @@
 import time
 import os
-import sys
 import json
 import re
 import subprocess
 import shlex
+import shutil
 
 from . import globals
 from . import logger
@@ -52,7 +52,7 @@ def new_config():
                 return
             except Exception as e:
                 logger.error("Could not create default configuration file: {:s}".format(str(e)))
-                logger.warn("Please manually create one using the following template: ")
+                logger.warn("Manually create one using the following template: ")
                 logger.whiteline()
                 for line in Constants.CONFIG_TEMPLATE.strip().splitlines():
                     logger.plain("    {}".format(line.rstrip()))
@@ -161,13 +161,13 @@ def check_if_guesting():
             globals.download.downloader_object.stop()
         globals.download.livestream_guest = None
 
-def print_heartbeat(from_thread=False):
+def update_stream_data(from_thread=False):
     if not globals.download.download_stop:
         if not globals.download.livestream_object:
             previous_state = globals.download.livestream_object_init.get("broadcast_dict").get("broadcast_status")
         else:
             previous_state = globals.download.livestream_object.get("broadcast_status")
-        globals.download.livestream_object = api.get_heartbeat()
+        globals.download.livestream_object = api.get_stream_data()
         if globals.config.download_comments:
             globals.comments.retrieve_comments()
         write_data_json()
@@ -201,8 +201,108 @@ def run_command(command):
 
 def handle_tasks_worker():
     while True:
-        print_heartbeat(True)
+        update_stream_data(from_thread=True)
+        if not globals.config.no_heartbeat:
+            api.no_heartbeat()
         if globals.download.download_stop:
             break
         else:
             time.sleep(5)
+
+def clean_download_dir():
+    dir_delcount = 0
+    file_delcount = 0
+    error_count = 0
+    lock_count = 0
+    try:
+        logger.info('Cleaning up temporary files and folders.')
+        directories = os.walk(globals.config.download_path).__next__()[1]
+        files = os.walk(globals.config.download_path).__next__()[2]
+
+        for directory in directories:
+            if directory.endswith('_live'):
+                if not any(filename.endswith('.lock')  for filename in
+                           os.listdir(os.path.join(globals.config.download_path, directory))):
+                    try:
+                        shutil.rmtree(os.path.join(globals.config.download_path, directory))
+                        dir_delcount += 1
+                    except Exception as e:
+                        logger.error("Could not remove folder: {:s}".format(str(e)))
+                        error_count += 1
+                else:
+                    lock_count += 1
+        logger.separator()
+        for file in files:
+            if file.endswith('_live.json'):
+                if not any(filename.endswith('.lock') for filename in
+                           os.listdir(os.path.join(globals.config.download_path))):
+                    try:
+                        os.remove(os.path.join(globals.config.download_path, file))
+                        file_delcount += 1
+                    except Exception as e:
+                        logger.error("Could not remove file: {:s}".format(str(e)))
+                        error_count += 1
+                else:
+                    lock_count += 1
+        if dir_delcount == 0 and file_delcount == 0 and error_count == 0 and lock_count == 0:
+            logger.info('The cleanup has finished. No items were removed.')
+            return
+        logger.info('The cleanup has finished.')
+        logger.info('Folders removed:     {:d}'.format(dir_delcount))
+        logger.info('Files removed:       {:d}'.format(file_delcount))
+        logger.info('Locked items:        {:d}'.format(lock_count))
+        logger.info('Errors:              {:d}'.format(error_count))
+    except KeyboardInterrupt as e:
+        logger.separator()
+        logger.warn("The process was aborted by the user.")
+        if dir_delcount == 0 and file_delcount == 0 and error_count == 0 and lock_count == 0:
+            logger.info('No items were removed.')
+            return
+        logger.info('Folders removed:     {:d}'.format(dir_delcount))
+        logger.info('Files removed:       {:d}'.format(file_delcount))
+        logger.info('Locked items:        {:d}'.format(lock_count))
+        logger.info('Errors:              {:d}'.format(error_count))
+
+def show_info():
+    session_files = []
+    session_from_config = ''
+    try:
+        for file in os.listdir(os.getcwd()):
+            if file.endswith(".dat"):
+                session_files.append(file)
+            if globals.config.username == file.replace(".dat", ''):
+                session_from_config = file
+    except Exception as e:
+        logger.warn("Could not check for login session files: {:s}".format(str(e)))
+        logger.whiteline()
+    logger.info("To see all the available arguments, use the -h argument.")
+    logger.whiteline()
+    logger.info("PyInstaLive version:        {:s}".format(Constants.SCRIPT_VERSION))
+    logger.info("Python version:             {:s}".format(Constants.PYTHON_VERSION))
+    if not command_exists("ffmpeg"):
+        logger.error("FFmpeg framework:           Not found")
+    else:
+        logger.info("FFmpeg framework:           Available")
+
+    if len(session_from_config) > 0:
+        logger.info("Login session files:        {:s} ({:s} matches configuration username)".format(str(len(session_files)),
+                                                                                         session_from_config))
+    elif len(session_files) > 0:
+        logger.info("Login session files:               {:s}".format(str(len(session_files))))
+    else:
+        logger.warn("Login session files:               None found")
+
+    logger.info("CLI supports color:         {:s}".format("No" if not logger.supports_color() else "Yes"))
+
+    if os.path.exists(globals.config.config_path):
+        logger.whiteline()
+        logger.info("Configuration file contents:")
+        logger.whiteline()
+        with open(globals.config.config_path) as f:
+            for line in f:
+                logger.plain("    {:s}".format(line.rstrip()))
+    else:
+        logger.error("Configuration file:         Not found")
+    logger.whiteline()
+    logger.info("End of PyInstaLive information screen.")
+    logger.separator()

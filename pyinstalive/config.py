@@ -1,5 +1,4 @@
 import os
-
 class Config:
     parser_object = None
     config_path = os.path.join(os.getcwd(), "pyinstalive.ini")
@@ -11,6 +10,7 @@ class Config:
     clear_temp_files = False
     cmd_on_started = None
     cmd_on_ended = None
+    no_heartbeat = True
     ffmpeg_path = None
     log_to_file = True
     no_assemble = False

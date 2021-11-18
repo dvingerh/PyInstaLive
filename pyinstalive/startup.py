@@ -36,8 +36,8 @@ def validate_settings():
                 logger.separator(pre_config=True)
                 validate_succeeded = False
 
-        elif not globals.args.clean and not globals.args.info and not globals.args.save_video_path and not globals.args.save_comments_path and not globals.args.download_following and not globals.args.organize:
-            logger.error("Please specify a download method.", pre_config=True)
+        elif not globals.args.clean and not globals.args.info and not globals.args.generate_video_path and not globals.args.generate_comments_path and not globals.args.download_following and not globals.args.organize:
+            logger.error("No download method was specified.", pre_config=True)
             logger.separator(pre_config=True)
             validate_succeeded = False
 
@@ -54,12 +54,19 @@ def validate_settings():
             globals.config.use_locks = globals.config.parser_object.getboolean("pyinstalive", "use_locks")
             globals.config.cmd_on_started = globals.config.parser_object.get("pyinstalive", "cmd_on_started")
             globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
+            globals.config.no_heartbeat = globals.config.parser_object.get("pyinstalive", "no_heartbeat")
             globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")
 
             if globals.args.download:
                 globals.download = Download(globals.args.download)
                 if globals.config.download_comments:
                     globals.comments = Comments()
+
+            if globals.args.no_heartbeat:
+                globals.config.no_heartbeat = True
+
+            if globals.args.no_assemble:
+                globals.config.no_assemble = True
 
         return validate_succeeded
     except Exception as e:
@@ -84,15 +91,16 @@ def run():
     parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
     parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
     parser.add_argument('-d', '--download', dest='download', type=str, required=False, help="Instagram username of the user to download a livestream from.")
+    parser.add_argument('-df', '--download-following', dest='download_following', action='store_true',help="Check for available livestreams by users the authenticated account is following.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="Shows information about PyInstaLive.")
     parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Cleans the current download path of all leftover files.")
     parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Path to a configuration file.")
     parser.add_argument('-dp', '--download-path', dest='download_path', type=str, required=False, help="Path to a folder to download livestreams to.")
-    parser.add_argument('-sc', '--save-comments', dest='save_comments_path', type=str, required=False, help="Path to livestream data JSON file.")
-    parser.add_argument('-sv', '--save-video', dest='save_video_path', type=str, required=False, help="Path to livestream data JSON file or path to livestream data folder.")
-    parser.add_argument('-df', '--download-following', dest='download_following', action='store_true',help="Check for available livestreams by users the authenticated account is following.")
+    parser.add_argument('-dc', '--download-comments', dest='download_comments', type=str, required=False, help="Path to livestream data JSON file.")
+    parser.add_argument('-gc', '--generate-comments', dest='generate_comments_path', type=str, required=False, help="Path to livestream data JSON file.")
+    parser.add_argument('-gv', '--generate-video', dest='generate_video_path', type=str, required=False, help="Path to livestream data JSON file or path to livestream data folder.")
     parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream data files.")
-    parser.add_argument('-o', '--organize', action='store_true', help="Move downloaded livestream videos and data files into their own folder, sorted by username.")
+    parser.add_argument('-nhb', '--no-heartbeat', dest='no_heartbeat', action='store_true', help="Disable heartbeat check for livestreams.")
 
     globals.args, unknown_args = parser.parse_known_args()  # Parse arguments
     
@@ -124,9 +132,11 @@ def run():
             if login_success:
                 globals.download.start()
 
-        elif globals.args.save_video_path:
+        elif globals.args.generate_video_path:
             assembler.assemble()
             logger.separator()
-        elif globals.args.save_comments_path:
+        elif globals.args.generate_comments_path:
             Comments().generate_log()
             logger.separator()
+        elif globals.args.info:
+            helpers.show_info()

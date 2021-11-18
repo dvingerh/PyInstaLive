@@ -37,7 +37,7 @@ class Session:
                 self.password = password
                 logger.binfo("The default login credentials have been overridden.")
                 logger.separator()
-
+            
             self.session_file = os.path.join(os.path.dirname(globals.config.config_path), "{}.dat".format(self.username))
 
             if not os.path.isfile(self.session_file):
@@ -61,7 +61,7 @@ class Session:
                     logger.separator()
                     if (login_result.get("message") == "checkpoint_required"):
                         logger.error("Could not login: The action was flagged as suspicious by Instagram.")
-                        logger.error("Please complete the security checkpoint and try again.")
+                        logger.error("Complete the security checkpoint on another device and try again.")
                     else:
                         logger.error("Could not login: Ensure your credentials are correct and try again.")
                     logger.separator()
@@ -69,6 +69,7 @@ class Session:
             else:
                 logger.info("An existing login session file was found: {}".format(os.path.basename(self.session_file)))
                 logger.info("Checking the validity of the saved login session.")
+                logger.separator()
 
                 self.session = self._load_session()
 
@@ -80,7 +81,6 @@ class Session:
                     os.remove(self.session_file)
                     self.session_file = None
 
-                    logger.separator()
                     logger.warn("The login session file has expired and has been deleted.")
                     logger.warn("A new login attempt will be made in a few moments.")
                     logger.separator()
@@ -94,12 +94,12 @@ class Session:
                         if login_state.get("entry_data").get("Challenge", None) != None:
                             logger.error("The login session file is no longer valid.")
                             logger.error("The session was flagged as suspicious by Instagram.")
-                            logger.error("Please complete the security checkpoint and try again.")
+                            logger.error("Complete the security checkpoint on another device and try again.")
                             logger.separator()
                             login_success = False
                         else:
                             logger.error("The login session file is no longer valid.")
-                            logger.error("Unspecified error. Please delete the login session file and try again.")
+                            logger.error("Unspecified error. Delete the login session file and try again.")
                             logger.separator()
                             login_success = False
                     else:

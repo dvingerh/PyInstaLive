@@ -34,8 +34,10 @@ def get_comments():
     comments_json = json.loads(comments_response.text)
     return comments_json
 
-def get_heartbeat():
-    heartbeat_response = globals.session.session.get(Constants.LIVE_INFO.format(globals.download.livestream_object_init.get('broadcast_id')))
-    globals.session.session.post(Constants.LIVE_HEARTBEAT.format(globals.download.livestream_object_init.get('broadcast_id')))
-    response_json = json.loads(heartbeat_response.text)
+def get_stream_data():
+    response = globals.session.session.get(Constants.LIVE_INFO.format(globals.download.livestream_object_init.get('broadcast_id')))
+    response_json = json.loads(response.text)
     return response_json
+
+def no_heartbeat():
+    globals.session.session.post(Constants.LIVE_HEARTBEAT.format(globals.download.livestream_object_init.get('broadcast_id')))

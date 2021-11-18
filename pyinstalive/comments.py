@@ -30,11 +30,11 @@ class Comments:
 
     def generate_log(self):
         try:
-            if globals.args.save_comments_path:
-                if os.path.isfile(globals.args.save_comments_path):
-                    self.comments = json.load(open(globals.args.save_comments_path, "r", encoding="utf-8")).get("comments", [])
+            if globals.args.generate_comments_path:
+                if os.path.isfile(globals.args.generate_comments_path):
+                    self.comments = json.load(open(globals.args.generate_comments_path, "r", encoding="utf-8")).get("comments", [])
                     globals.download = Download()
-                    globals.download.data_save_comments_path = globals.args.save_comments_path.replace(".json", ".log")
+                    globals.download.data_generate_comments_path = globals.args.generate_comments_path.replace(".json", ".log")
 
                 else:
                     logger.error("Could not save comments: The JSON file does not exist.")
@@ -42,7 +42,7 @@ class Comments:
             if self.comments:
                 logger.info("Saving {} comment{} to text file.".format(len(self.comments), "s" if len(self.comments) > 1 else ""))
             else:
-                logger.warn("There are no available comments to save.")
+                logger.binfo("There are no available comments to save.")
                 return
             comments_timeline = {}
             for c in self.comments:
@@ -76,8 +76,8 @@ class Comments:
                         total_comments += 1
                     comments.append(comments_log)
 
-                with codecs.open(globals.download.data_save_comments_path, 'w', 'utf-8-sig') as log_outfile:
+                with codecs.open(globals.download.data_generate_comments_path, 'w', 'utf-8-sig') as log_outfile:
                     log_outfile.write(''.join(comments))
-                logger.info("Successfully saved text file: {}".format(globals.download.data_save_comments_path))
+                logger.info("Successfully saved text file: {}".format(os.path.basename(globals.download.data_generate_comments_path)))
         except Exception as e:
             logger.error("Could not save comments: {:s}".format(str(e)))

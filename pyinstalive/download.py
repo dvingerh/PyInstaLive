@@ -64,7 +64,7 @@ class Download:
             self.segments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live'.format(helpers.strdatetime_compat(), self.download_user,
                                                         self.livestream_object_init.get('broadcast_id'), self.timestamp))
 
-            self.data_save_comments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.log'.format(helpers.strdatetime_compat(), self.download_user,
+            self.data_generate_comments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.log'.format(helpers.strdatetime_compat(), self.download_user,
                                                         self.livestream_object_init.get('broadcast_id'), self.timestamp))
 
             self.data_json_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.json'.format(helpers.strdatetime_compat(), self.download_user,
@@ -77,7 +77,7 @@ class Download:
                 duplicate_etag_retry=30,
                 mpd_download_timeout=3,
                 download_timeout=3,
-                callback_check=helpers.print_heartbeat,
+                callback_check=helpers.update_stream_data,
                 ffmpeg_binary=globals.config.ffmpeg_path)
 
             self.livestream_owner = self.livestream_object_init.get('broadcast_dict', {}).get('broadcast_owner').get("username")
@@ -94,7 +94,7 @@ class Download:
                 logger.binfo('This livestream is a duo-live. The current guest is: {}'.format(self.livestream_guest))
             logger.separator()
             helpers.print_durations()
-            helpers.print_heartbeat()
+            helpers.update_stream_data()
             logger.separator()
             if globals.config.cmd_on_started:
                 try:
