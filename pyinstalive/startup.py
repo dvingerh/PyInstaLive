@@ -68,16 +68,25 @@ def validate_settings():
                 logger.warn("Falling back to default path: {:s}".format(globals.config.download_path))
                 logger.separator()
 
-            if globals.config.ffmpeg_path and not os.path.exists(globals.config.ffmpeg_path):
-                logger.warn("The specified path to the FFmpeg framework does not exist.")
+            if globals.config.ffmpeg_path:
+                if not os.path.isfile(globals.config.ffmpeg_path):
+                    logger.warn("The specified path to the FFmpeg framework does not exist.")
+                    globals.config.ffmpeg_path = os.getenv('FFMPEG_BINARY', 'ffmpeg')
+                    if helpers.command_exists(globals.config.ffmpeg_path):
+                        logger.warn("Falling back to environment variable.")
+                        logger.separator()
+                    else:
+                        logger.separator()
+                        logger.error("Could not find the required FFmpeg framework.")
+                        validate_succeeded = False
+                        logger.separator()
+            else:
                 globals.config.ffmpeg_path = os.getenv('FFMPEG_BINARY', 'ffmpeg')
-                if helpers.command_exists(globals.config.ffmpeg_path):
-                    logger.warn("Falling back to environment variable.")
-                else:
-                    logger.separator()
+                if not helpers.command_exists(globals.config.ffmpeg_path):
                     logger.error("Could not find the required FFmpeg framework.")
                     validate_succeeded = False
-                logger.separator()
+                    logger.separator()
+        
                 
 
             if globals.args.download:

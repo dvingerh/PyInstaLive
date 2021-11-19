@@ -66,9 +66,7 @@ def assemble(retry_with_zero_m4v=False):
                 os.path.join(globals.download.segments_path, k)
                 for k in livestream_info['segments'].keys()]
         else:
-            all_segments = list(filter(
-                os.path.isfile,
-                glob.glob(os.path.join(globals.download.segments_path, '%s-*.m4v' % stream_id))))
+            all_segments = list(filter(os.path.isfile,glob.glob(os.path.join(globals.download.segments_path, '%s*.m4v' % stream_id))))
 
         all_segments = sorted(all_segments, key=lambda x: _get_file_index(x))
         sources = []
@@ -79,7 +77,8 @@ def assemble(retry_with_zero_m4v=False):
         has_skipped_zero_m4v = False
 
         if not all_segments:
-            logger.error("Could not assemble segments: No files were loaded.")
+            logger.separator()
+            logger.error("Could not assemble segments: No segment files were loaded.")
             return
 
         for segment in all_segments:

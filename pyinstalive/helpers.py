@@ -106,28 +106,34 @@ def write_data_json():
 def get_stream_duration(duration_type="airtime"):
     try:
         livestream_object = globals.download.livestream_object_init
+        buffer = int(globals.download.downloader_object.initial_buffered_duration)
+        if buffer == 0:
+            buffer = 8
         is_init = True
         if globals.download.livestream_object:
             livestream_object = globals.download.livestream_object
             is_init = False
-        
         if duration_type == "airtime":
             if is_init:
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("broadcast_dict").get("published_time")), 60)
+                stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("broadcast_dict").get("published_time") + buffer), 60)
             else:
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("published_time")), 60)
+                stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("published_time") + buffer), 60)
 
         elif duration_type == "download":
             stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(globals.download.timestamp)), 60)
 
         elif duration_type == "missing":
-            if (int(globals.download.timestamp) - livestream_object.get("published_time")) <= 0:
+            if is_init:
+                sum = (int(globals.download.timestamp) - livestream_object.get("broadcast_dict").get("published_time") + buffer)
+            else:
+                sum = (int(globals.download.timestamp) - livestream_object.get("published_time") + buffer)
+            if sum <= 0:
                 stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
             else:
                 if is_init:
-                    stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("broadcast_dict").get("published_time")), 60)
+                    stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("broadcast_dict").get("published_time") + buffer), 60)
                 else:
-                    stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("published_time")), 60)
+                    stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("published_time") + buffer), 60)
         else:
             stream_started_mins, stream_started_secs = 0, 0 
 
@@ -140,8 +146,9 @@ def get_stream_duration(duration_type="airtime"):
         if stream_started_secs:
             stream_duration_str += ' and {} seconds'.format(stream_started_secs)
         return stream_duration_str
-    except Exception:
-        return "Not available"
+    except Exception as e:
+        print(str(e))
+        return "Unknown"
 
 def print_durations(download_ended=False):
         logger.info('Airing time  : {}'.format(get_stream_duration("airtime")))

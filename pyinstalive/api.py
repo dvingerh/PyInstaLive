@@ -1,10 +1,8 @@
 from datetime import datetime
 import json
-from json.decoder import JSONDecodeError
 
 from . import helpers
 from . import globals
-from . import logger
 from .constants import Constants
 
 def get_csrf_token():
@@ -24,10 +22,19 @@ def get_login_state():
     result = helpers.get_shared_data(login_response.text)
     return result
 
-def get_broadcasts_tray():
+def get_reels_tray():
     response = globals.session.session.get(Constants.REELS_TRAY)
+    print(response.text)
     response_json = json.loads(response.text)
     return response_json
+
+def get_single_live():
+    response = globals.session.session.get(Constants.LIVE_STATE_USER.format(globals.download.download_user))
+    try:
+        response_json = json.loads(response.text)
+        return response_json
+    except:
+        return None
 
 def get_comments():
     comments_response = globals.session.session.get(Constants.LIVE_COMMENT.format(globals.download.livestream_object_init.get('broadcast_id'), str(globals.comments.comments_last_ts)))

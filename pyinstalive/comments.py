@@ -11,9 +11,11 @@ from .download import Download
 class Comments:
     def __init__(self):
         self.comments = []
-        self.comments_last_ts = int(globals.download.timestamp)
+        self.comments_last_ts = 0
 
     def retrieve_comments(self):
+        if self.comments_last_ts == 0:
+            self.comments_last_ts = int(globals.download.timestamp)
         current_comments = self.comments
         before_count = len(self.comments)
         comments_response = api.get_comments()
