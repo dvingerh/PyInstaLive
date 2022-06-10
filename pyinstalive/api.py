@@ -7,44 +7,43 @@ from .constants import Constants
 
 def get_csrf_token():
     response = globals.session.session.get(Constants.LOGIN_PAGE)
-    result = helpers.get_shared_data(response.text)["config"]["csrf_token"]
-    return result
+    return helpers.get_shared_data(response.text).get("csrf_token", None)
 
 def do_login():
     now_epoch = int(datetime.now().timestamp())
-    login_data = {"username": globals.session.username, "enc_password": f"#PWD_INSTAGRAM_BROWSER:0:{now_epoch}:{globals.session.password}", "queryParams": {}, "optIntoOneTap": "false"}
-    login_response = globals.session.session.post(Constants.LOGIN_AJAX, data=login_data)
-    result = json.loads(login_response.text)
-    return result
+    login_data = {
+    "username": globals.session.username,
+    "enc_password": f"#PWD_INSTAGRAM_BROWSER:0:{now_epoch}:{globals.session.password}",
+    "queryParams": {},
+    "optIntoOneTap": "false"
+    }
+    response = globals.session.session.post(Constants.LOGIN_AJAX, data=login_data)
+    return json.loads(response.text)
 
 def get_login_state():
-    login_response = globals.session.session.get(Constants.BASE_WEB)
-    result = helpers.get_shared_data(login_response.text)
-    return result
+    response = globals.session.session.get(Constants.BASE_WEB)
+    return helpers.get_shared_data(response.text)
+
+def get_user_info():
+    response = globals.session.session.get(Constants.USER_INFO.format(globals.download.download_user))
+    return json.loads(response.text)
 
 def get_reels_tray():
     response = globals.session.session.get(Constants.REELS_TRAY)
-    print(response.text)
-    response_json = json.loads(response.text)
-    return response_json
+    return json.loads(response.text)
 
 def get_single_live():
-    response = globals.session.session.get(Constants.LIVE_STATE_USER.format(globals.download.download_user))
-    try:
-        response_json = json.loads(response.text)
-        return response_json
-    except:
-        return None
+    response = globals.session.session.get(Constants.LIVE_STATE_USER.format(globals.download.download_user_id))
+    return json.loads(response.text)
 
 def get_comments():
-    comments_response = globals.session.session.get(Constants.LIVE_COMMENT.format(globals.download.livestream_object_init.get('broadcast_id'), str(globals.comments.comments_last_ts)))
-    comments_json = json.loads(comments_response.text)
-    return comments_json
+    response = globals.session.session.get(Constants.LIVE_COMMENT.format(globals.download.livestream_object_init.get('id'), str(globals.comments.comments_last_ts)))
+    return json.loads(response.text)
 
 def get_stream_data():
-    response = globals.session.session.get(Constants.LIVE_INFO.format(globals.download.livestream_object_init.get('broadcast_id')))
-    response_json = json.loads(response.text)
-    return response_json
+    response = globals.session.session.get(Constants.LIVE_STATE_USER.format(globals.download.download_user_id))
+    return json.loads(response.text)
 
-def no_heartbeat():
-    globals.session.session.post(Constants.LIVE_HEARTBEAT.format(globals.download.livestream_object_init.get('broadcast_id')))
+def do_heartbeat():
+    response = globals.session.session.post(Constants.LIVE_HEARTBEAT.format(globals.download.livestream_object_init.get('id')))
+    return json.loads(response.text)

@@ -5,12 +5,10 @@ class Config:
     username = None
     password = None
     download_path = os.getcwd()
-    show_session_expires = True
     download_comments = True
     clear_temp_files = False
     cmd_on_started = None
     cmd_on_ended = None
-    no_heartbeat = True
     ffmpeg_path = None
     log_to_file = True
     no_assemble = False

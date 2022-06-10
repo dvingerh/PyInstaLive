@@ -30,13 +30,7 @@ def validate_settings():
             helpers.new_config()
             validate_succeeded = False
 
-        if globals.args.download:
-            if globals.args.download_following:
-                logger.warn("Only one download method at a time is permitted.", pre_config=True)
-                logger.separator(pre_config=True)
-                validate_succeeded = False
-
-        elif not globals.args.clean and not globals.args.info and not globals.args.generate_video_path and not globals.args.generate_comments_path and not globals.args.download_following:
+        elif not globals.args.clean and not globals.args.info and not globals.args.generate_video_path and not globals.args.generate_comments_path and not globals.args.download:
             logger.error("No download method was specified.", pre_config=True)
             logger.separator(pre_config=True)
             validate_succeeded = False
@@ -49,13 +43,11 @@ def validate_settings():
             globals.config.download_path = globals.config.parser_object.get("pyinstalive", "download_path")
             globals.config.log_to_file = globals.config.parser_object.getboolean("pyinstalive", "log_to_file")
             globals.config.download_comments = globals.config.parser_object.getboolean("pyinstalive", "download_comments")
-            globals.config.show_session_expires = globals.config.parser_object.getboolean("pyinstalive", "show_session_expires")
             globals.config.clear_temp_files = globals.config.parser_object.getboolean("pyinstalive", "clear_temp_files")
             globals.config.no_assemble = globals.config.parser_object.getboolean("pyinstalive", "no_assemble")
             globals.config.use_locks = globals.config.parser_object.getboolean("pyinstalive", "use_locks")
             globals.config.cmd_on_started = globals.config.parser_object.get("pyinstalive", "cmd_on_started")
             globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
-            globals.config.no_heartbeat = globals.config.parser_object.get("pyinstalive", "no_heartbeat")
             globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")
 
             if globals.args.download_path:
@@ -87,15 +79,11 @@ def validate_settings():
                     validate_succeeded = False
                     logger.separator()
         
-                
 
             if globals.args.download:
                 globals.download = Download(globals.args.download)
                 if globals.config.download_comments:
                     globals.comments = Comments()
-
-            if globals.args.no_heartbeat:
-                globals.config.no_heartbeat = True
 
             if globals.args.no_assemble:
                 globals.config.no_assemble = True
@@ -123,16 +111,14 @@ def run():
     parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
     parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
     parser.add_argument('-d', '--download', dest='download', type=str, required=False, help="Instagram username of the user to download a livestream from.")
-    parser.add_argument('-df', '--download-following', dest='download_following', action='store_true',help="Check for available livestreams by users the authenticated account is following.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="Shows information about PyInstaLive.")
-    parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Cleans the current download path of all leftover files.")
-    parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Path to a configuration file.")
-    parser.add_argument('-dp', '--download-path', dest='download_path', type=str, required=False, help="Path to a folder to download livestreams to.")
-    parser.add_argument('-dc', '--download-comments', dest='download_comments', type=str, required=False, help="Path to livestream data JSON file.")
-    parser.add_argument('-gc', '--generate-comments', dest='generate_comments_path', type=str, required=False, help="Path to livestream data JSON file.")
-    parser.add_argument('-gv', '--generate-video', dest='generate_video_path', type=str, required=False, help="Path to livestream data JSON file or path to livestream data folder.")
-    parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream data files.")
-    parser.add_argument('-nhb', '--no-heartbeat', dest='no_heartbeat', action='store_true', help="Disable heartbeat check for livestreams.")
+    parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Clean the current download path of all leftover files.")
+    parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Override the default configuration file path.")
+    parser.add_argument('-dp', '--download-path', dest='download_path', type=str, required=False, help="Override the default download path.")
+    parser.add_argument('-dc', '--download-comments', dest='download_comments', type=str, required=False, help="Download livestream comments. Overrides the configuration file setting.")
+    parser.add_argument('-gc', '--generate-comments', dest='generate_comments_path', type=str, required=False, help="Generate a comments log file. Requires a ivestream data file.")
+    parser.add_argument('-gv', '--generate-video', dest='generate_video_path', type=str, required=False, help="Generate a comments log file. Requires a livestream data file or folder.")
+    parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream data files. Overrides the configuration file setting.")
 
     globals.args, unknown_args = parser.parse_known_args()  # Parse arguments
     
@@ -147,7 +133,7 @@ def run():
 
     
     if validate_success:
-        if globals.args.download or globals.args.download_following:
+        if globals.args.download:
             globals.session = Session(username=globals.config.username, password=globals.config.password)
             login_success = False
 

@@ -68,9 +68,23 @@ def new_config():
         logger.warn("Save it as 'pyinstalive.ini' and run this script again.")
         logger.separator()
 
-def get_shared_data(html):
-    match = re.search(r"window._sharedData = ({[^\n]*});", html)
-    return json.loads(match.group(1))
+def string_escape(s, encoding='utf-8'):
+    return (s.encode('latin1')
+             .decode('unicode-escape')
+             .encode('latin1')
+             .decode(encoding))
+
+def get_shared_data(data):
+    match = re.search(r"window._sharedData = ({[^\n]*});", data)
+    match_str = None
+    if match:
+        match_str = match.group(1)
+        return json.loads(match_str).get("config")
+    else:
+        match = re.search(r"\"raw\":\"({[^\n]*\\\"})", data)
+        if match:
+            match_str = string_escape(match.group(1))
+            return json.loads(match_str)
 
 def lock_exists():
     return os.path.isfile(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'))
@@ -95,6 +109,8 @@ def write_data_json():
     if not globals.download.download_stop:
         try:
             globals.download.livestream_object['segments'] = globals.download.downloader_object.segment_meta
+            if globals.comments:
+                globals.download.livestream_object['comments'] = globals.comments.comments
             try:
                 with open(globals.download.data_json_path, 'w') as json_file:
                     json.dump(globals.download.livestream_object, json_file, indent=2)
@@ -107,33 +123,18 @@ def get_stream_duration(duration_type="airtime"):
     try:
         livestream_object = globals.download.livestream_object_init
         buffer = int(globals.download.downloader_object.initial_buffered_duration)
-        if buffer == 0:
-            buffer = 8
-        is_init = True
-        if globals.download.livestream_object:
-            livestream_object = globals.download.livestream_object
-            is_init = False
         if duration_type == "airtime":
-            if is_init:
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("broadcast_dict").get("published_time") + buffer), 60)
-            else:
-                stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("published_time") + buffer), 60)
+            stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("published_time") + buffer), 60)
 
         elif duration_type == "download":
             stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(globals.download.timestamp)), 60)
 
         elif duration_type == "missing":
-            if is_init:
-                sum = (int(globals.download.timestamp) - livestream_object.get("broadcast_dict").get("published_time") + buffer)
-            else:
-                sum = (int(globals.download.timestamp) - livestream_object.get("published_time") + buffer)
+            sum = (int(globals.download.timestamp) - livestream_object.get("published_time") + buffer)
             if sum <= 0:
-                stream_started_mins, stream_started_secs = 0, 0 # Download started 'earlier' than actual broadcast, assume started at the same time instead
+                stream_started_mins, stream_started_secs = 0, 0 
             else:
-                if is_init:
-                    stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("broadcast_dict").get("published_time") + buffer), 60)
-                else:
-                    stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("published_time") + buffer), 60)
+                stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("published_time") + buffer), 60)
         else:
             stream_started_mins, stream_started_secs = 0, 0 
 
@@ -148,7 +149,7 @@ def get_stream_duration(duration_type="airtime"):
         return stream_duration_str
     except Exception as e:
         print(str(e))
-        return "Unknown"
+        return "?"
 
 def print_durations(download_ended=False):
         logger.info('Airing time  : {}'.format(get_stream_duration("airtime")))
@@ -178,13 +179,11 @@ def run_command(command):
 def handle_tasks_worker():
     while True:
         globals.download.update_stream_data(from_thread=True)
-        if not globals.config.no_heartbeat:
-            api.no_heartbeat()
         lock_create(lock_type="folder")
         if globals.download.download_stop:
             break
         else:
-            time.sleep(5)
+            time.sleep(3)
 
 def clean_download_dir():
     dir_delcount = 0

@@ -1,3 +1,2 @@
 argparse>=1.4.0
 configparser>=4.0.2
-instagram-private-api-extensions>=0.3.9

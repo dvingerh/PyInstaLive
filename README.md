@@ -3,7 +3,7 @@ Active development for this script has ended. Issues will no longer be looked in
 
 
 # PyInstaLive
-![Version 3.3.0](https://img.shields.io/badge/Version-3.3.0-orange.svg)
+![Version 4.0.0](https://img.shields.io/badge/Version-3.3.0-orange.svg)
 ![Python 3.6+](https://img.shields.io/badge/Python-3.6%2B-3776ab.svg)
 
 
@@ -16,7 +16,6 @@ This Python script enables you to download ongoing Instagram livestreams as a vi
 - [Quickstart](https://github.com/dvingerh/PyInstaLive#quickstart)
 - [Installation](https://github.com/dvingerh/PyInstaLive#installation)
 - [Usage](https://github.com/dvingerh/PyInstaLive#usage)
-- [Help](https://github.com/dvingerh/PyInstaLive#help)
 
 ![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
@@ -25,7 +24,7 @@ This Python script enables you to download ongoing Instagram livestreams as a vi
 - Install the prerequisites and then PyInstaLive.
 - Run `pyinstalive` to generate a default configuration file.
 - Edit the configuration file using any text editor.
-- Run `pyinstalive -d "<live-username>"` to start downloading a livestream or replay.
+- Run `pyinstalive -d "<live-username>"` to start downloading a livestream.
 
 ![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
@@ -42,34 +41,12 @@ Make sure all tools are accessible via command line (added to your PATH if on Wi
 
 ## Installation
 
-*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command (e.g. **@3.3.0**).*
-
-#### Installing
+*Tip — To install PyInstaLive with the latest commit changes, remove the version tag from the install command.*
 
 Run the following command in your command line (might need to be run as administrator on Windows):
 ```bash
-pip install git+https://github.com/dvingerh/PyInstaLive.git@3.3.0
+pip install git+https://github.com/dvingerh/PyInstaLive.git@4.0.0
 ```
-
-#### Updating
-
-To update PyInstaLive to the latest version (currently **3.3.0**) run the following command:
-
-```bash
-pip install git+https://github.com/dvingerh/PyInstaLive.git@3.3.0 --upgrade
-```
-
-#### Specific versions
-
-If you want to install a specific version of PyInstaLive when for example the newest version contains a bug, you can specify a different version tag in the install command:
-
-```bash
-pip install git+https://github.com/dvingerh/PyInstaLive.git@2.2.0
-```
-
-Use the version number you want after the **@** symbol (e.g **@2.2.0**).
-
-![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
 
 ## Usage
 
@@ -81,25 +58,20 @@ Here is an example of a valid configuration file:
 ```ini
 [pyinstalive]
 username = johndoe
-password = grapefruits
+password = grapefruit
 download_path = 
-show_cookie_expiry = True
-log_to_file = True
 ffmpeg_path = 
+download_comments = True    
 cmd_on_started =
 cmd_on_ended =
-use_locks = True
 clear_temp_files = False
-proxy = 
-skip_assemble = False
+use_locks = True
+no_assemble = False
+log_to_file = True
 ```
 
 #### Example
 
-```bash
-pyinstalive -u "johndoe" -p "grapefruits" -d "janedoe"
-```
-You can omit the `username` and `password` arguments if you have specified these in the configuration file:
 ```bash
 pyinstalive -d "janedoe"
 ```
@@ -110,50 +82,36 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 > pyinstalive -d "janedoe"
 
 ---------------------------------------------------------------------------
-[I] PYINSTALIVE (SCRIPT V3.3.0 - PYTHON V3.8.10) - 08-12-2021 02:23:37 PM
+[I] PYINSTALIVE (SCRIPT V4.0.0 - PYTHON V3.8.10) - 06-10-2022 05:02:02 PM
 ---------------------------------------------------------------------------
-[I] An existing login session file was found: johndoe.dat
-[I] Checking the validity of the saved login session.
+An existing login session file was found: johndoe.dat
+Checking the validity of the saved login session.
 ---------------------------------------------------------------------------
-[I] Successfully logged in using account: johndoe
-[I] The login session file will expire on: 08-12-2022 at 03:06:53 AM
+Successfully logged in using account: johndoe
+The login session file will expire on: 06-09-2023 at 12:41:55 PM
 ---------------------------------------------------------------------------
-[I] Successfully logged into account: johndoe
+Getting livestream information for user: janedoe
 ---------------------------------------------------------------------------
-[I] Getting livestream info for user: janedoe
+Livestream available, starting download.
 ---------------------------------------------------------------------------
-[I] Livestream available, starting download.
+Downloading livestream, press [CTRL+C] to abort.
 ---------------------------------------------------------------------------
-[I] Airing time  : 2 minutes and 38 seconds
-[I] Status       : Active
-[I] Viewers      : 492
+Airing time  : 4 minutes and 45 seconds
+Status       : Active
+Viewers      : 75
 ---------------------------------------------------------------------------
-[I] Downloading livestream, press [CTRL+C] to abort.
+The livestream has been ended.
 ---------------------------------------------------------------------------
-[I] The livestream has been ended by the user.
+Airing time  : 6 minutes and 25 seconds
+Downloaded   : 1 minutes and 21 seconds
+Missing      : 5 minutes and 4 seconds
 ---------------------------------------------------------------------------
-[I] Airing time  : 8 minutes and 46 seconds
-[I] Downloaded   : 6 minutes and 8 seconds
-[I] Missing      : 2 minutes and 38 seconds
+Waiting for background tasks to finish.
 ---------------------------------------------------------------------------
-[I] Waiting for background threads to finish.
+Saving 12 comments to text file.
+Successfully saved text file: 20220610_janedoe_17905387649602356_1654873322_live.log
 ---------------------------------------------------------------------------
-[I] Saving comments to text file.
----------------------------------------------------------------------------
-[I] Successfully saved 59 comments.
----------------------------------------------------------------------------
-[I] Assembling downloaded files into video.
----------------------------------------------------------------------------
-[I] Created video: 20210812_janedoe_17931255316652921_1628771017_live.mp4
+Assembling segments into video file.
+Successfully saved video file: 20220610_janedoe_17905387649602356_1654873322_live.mp4
 ---------------------------------------------------------------------------
 ```
-
-![](https://raw.githubusercontent.com/dvingerh/PyInstaLive/5907fc866446d5f426389a5198560075848d770e/.github/spacer.png)
-
-
-## Help
-You can find a list of frequently asked questions [here](https://github.com/dvingerh/PyInstaLive/blob/master/FAQ.md).
-
-You can find a list of available commands and an explanation of the configuration file [here](https://github.com/dvingerh/PyInstaLive/blob/master/MOREHELP.md).
-
-If you would like to report a bug or ask a question please [open an issue](https://github.com/dvingerh/PyInstaLive/issues/new).

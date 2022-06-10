@@ -71,7 +71,6 @@ class Session:
                 logger.info("Checking the validity of the saved login session.")
 
                 self.session = self._load_session()
-
                 for cookie in list(self.session.cookies):
                     if cookie.name == "csrftoken":
                         self.expires_epoch = cookie.expires
@@ -88,7 +87,7 @@ class Session:
                     return
                 else:
                     login_state = api.get_login_state()
-                    if login_state.get("entry_data").get("FeedPage", None) == None:
+                    if login_state.get("entry_data", {}) != {}:
                         if login_state.get("entry_data").get("Challenge", None) != None:
                             logger.separator()
                             logger.error("The login session file is no longer valid.")
@@ -110,9 +109,8 @@ class Session:
                 logger.separator()
                 logger.info('Successfully logged in using account: {:s}'.format(str(self.username)))
 
-                if globals.config.show_session_expires:
-                    expiry_date = datetime.fromtimestamp(self.expires_epoch).strftime('%m-%d-%Y at %I:%M:%S %p')
-                    logger.info("The login session file will expire on: {:s}".format(expiry_date))
+                expiry_date = datetime.fromtimestamp(self.expires_epoch).strftime('%m-%d-%Y at %I:%M:%S %p')
+                logger.info("The login session file will expire on: {:s}".format(expiry_date))
 
                 logger.separator()
                 return True

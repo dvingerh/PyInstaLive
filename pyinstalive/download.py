@@ -3,17 +3,16 @@ from . import logger
 from . import globals
 from . import api
 from . import assembler
+from . import live
 from .constants import Constants
-
-from instagram_private_api_extensions import live
 
 import threading
 import os
-import json
 
 class Download:
     def __init__(self, download_user=""):
         self.download_user = download_user
+        self.download_user_id = None
         self.timestamp = helpers.strepochtime()
         self.video_path = None
         self.segments_path = None
@@ -30,12 +29,20 @@ class Download:
         checking_self = self.download_user == globals.session.username
         if checking_self:
             logger.warn("Login with a different account to download your own livestreams.")
+            logger.separator()
             return
         if globals.args.download:
             if not helpers.lock_exists():
                 helpers.lock_create(lock_type="user")
                 logger.info('Getting livestream information for user: {:s}'.format(self.download_user))
-
+                user_info = api.get_user_info().get("data").get("user")
+                if user_info:
+                    self.download_user_id = user_info.get("id", None)
+                if not self.download_user_id:
+                    logger.separator()
+                    logger.warn("The specified user does not exist.")
+                    logger.separator()
+                    return
                 self.livestream_object_init = self.get_single_livestream()
                 logger.separator()
                 if self.livestream_object_init:
@@ -51,24 +58,22 @@ class Download:
                 logger.warn("Lock file is already present for this user, there is probably another download ongoing.")
                 logger.warn("If this is not the case, manually delete the file '{:s}' and try again.".format(self.download_user + '.lock'))
                 logger.separator()
-        elif globals.args.download_following:
-            logger.binfo("Pass")
 
     def download_livestream(self):
         try:
-            mpd_url = self.livestream_object_init.get('broadcast_dict').get('dash_abr_playback_url')
+            mpd_url = self.livestream_object_init.get('dash_abr_playback_url')
 
             self.video_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.mp4'.format(helpers.strdatetime_compat(), self.download_user,
-                                                        self.livestream_object_init.get('broadcast_id'), self.timestamp))
+                                                        self.livestream_object_init.get('id'), self.timestamp))
 
             self.segments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live'.format(helpers.strdatetime_compat(), self.download_user,
-                                                        self.livestream_object_init.get('broadcast_id'), self.timestamp))
+                                                        self.livestream_object_init.get('id'), self.timestamp))
 
             self.data_generate_comments_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.log'.format(helpers.strdatetime_compat(), self.download_user,
-                                                        self.livestream_object_init.get('broadcast_id'), self.timestamp))
+                                                        self.livestream_object_init.get('id'), self.timestamp))
 
             self.data_json_path = os.path.join(globals.config.download_path, '{}_{}_{}_{}_live.json'.format(helpers.strdatetime_compat(), self.download_user,
-                                                        self.livestream_object_init.get('broadcast_id'), self.timestamp))
+                                                        self.livestream_object_init.get('id'), self.timestamp))
                                                        
             self.downloader_object = live.Downloader(
                 mpd=mpd_url,
@@ -77,12 +82,12 @@ class Download:
                 duplicate_etag_retry=30,
                 mpd_download_timeout=3,
                 download_timeout=3,
-                callback_check=self.update_stream_data,
+                callback_check=api.do_heartbeat,
                 ffmpeg_binary=globals.config.ffmpeg_path)
 
-            self.livestream_owner = self.livestream_object_init.get('broadcast_dict', {}).get('broadcast_owner').get("username")
+            self.livestream_owner = self.livestream_object_init.get('broadcast_owner').get("username")
             try:
-                self.livestream_guest = self.livestream_object_init.get('broadcast_dict', {}).get('cobroadcasters')[0].get("username")
+                self.livestream_guest = self.livestream_object_init.get('cobroadcasters')[0].get("username")
             except Exception:
                 self.livestream_guest = None
             if self.livestream_owner != self.download_user:
@@ -165,42 +170,12 @@ class Download:
         except KeyboardInterrupt:
             logger.binfo('The process was aborted by the user.')
 
-    def get_following_livestreams(self):
-        try:
-            livestream_list = api.get_reels_tray()
-            final_livestream_username = None
-            if livestream_list.get("broadcasts", None):
-                for livestream in livestream_list.get("broadcasts", None):
-                    owner_username = livestream.get("broadcast_owner", None).get("username", None)
-                    try:
-                        guest_username = livestream.get("cobroadcasters", None)[0].get("username", None)
-                    except:
-                        guest_username = None
-                    if (self.download_user == owner_username) or (self.download_user == guest_username):
-                        final_livestream_username = owner_username
-            else:
-                return False
-            if final_livestream_username != None:
-                response = globals.session.session.get(Constants.LIVE_STATE_USER.format(final_livestream_username))
-                initial_livestream_obj = json.loads(response.text)
-                if initial_livestream_obj.get("broadcast_id", None):
-                    return initial_livestream_obj
-                else:
-                    return False
-            else:
-                return False
-        except Exception as e:
-            logger.error("Could not get livestream information: {:s}".format(str(e)))
-            logger.separator()
-            return None
-        except KeyboardInterrupt:
-            logger.binfo('The process was aborted by the user.')
-            logger.separator()
-            return None
-
     def get_single_livestream(self):
         try:
             initial_livestream_obj = api.get_single_live()
+            if initial_livestream_obj.get("message", None) != None:
+                if initial_livestream_obj.get("message") == "User is not live":
+                    initial_livestream_obj = None
             if initial_livestream_obj:
                 return initial_livestream_obj
             else:
@@ -214,48 +189,50 @@ class Download:
             logger.separator()
             return None
 
-    def check_if_guesting(self):
-        try:
-            livestream_guest = self.livestream_object.get('cobroadcasters', {})[0].get('username')
-        except Exception:
-            livestream_guest = None
-        if livestream_guest and not self.livestream_guest:
-            logger.separator()
-            self.livestream_guest = livestream_guest
-            logger.binfo('The livestream host has started guesting with user: {}'.format(self.livestream_guest))
-        if not livestream_guest and self.livestream_guest:
-            logger.separator()
-            logger.binfo('The livestream host has stopped guesting with user: {}'.format(self.livestream_guest))
-            if self.livestream_guest == self.download_user:
-                self.downloader_object.stop()
-            self.livestream_guest = None
+    def get_guest_status(self):
+        guests = api.get_stream_data().get("cobroadcasters", {})
+        for guest in guests:
+            try:
+                livestream_guest = guest.get('username')
+            except Exception:
+                livestream_guest = None
+            if livestream_guest and not self.livestream_guest:
+                logger.separator()
+                self.livestream_guest = livestream_guest
+                logger.binfo('The livestream host has started guesting with user: {}'.format(self.livestream_guest))
+            if not livestream_guest and self.livestream_guest:
+                logger.separator()
+                logger.binfo('The livestream host has stopped guesting with user: {}'.format(self.livestream_guest))
+                if self.livestream_guest == self.download_user:
+                    self.downloader_object.stop()
+                self.livestream_guest = None
 
     def update_stream_data(self, from_thread=False):
         if not self.download_stop:
             if not self.livestream_object:
-                previous_state = self.livestream_object_init.get("broadcast_dict").get("broadcast_status")
-            else:
-                previous_state = self.livestream_object.get("broadcast_status")
-            
-            new_livestream_object = api.get_stream_data()
-            if new_livestream_object.get("status") == "fail":
+               self.livestream_object = api.get_stream_data()
+
+            last_stream_status = self.livestream_object.get("broadcast_status")
+            stream_heartbeat = api.do_heartbeat()
+            stream_status = stream_heartbeat.get("broadcast_status")
+            if stream_heartbeat.get("status") == "fail":
                 logger.separator()
-                logger.error('The connection between Instagram and the host has failed.')
+                logger.error('The livestream host has lost connection with Instagram.')
                 self.download_stop = True
                 self.downloader_object.stop()
                 return False
-            else:
-                self.livestream_object = new_livestream_object
-                
+
+            self.livestream_object["broadcast_status"] = stream_status
+            self.livestream_object["viewer_count"] = stream_heartbeat.get("viewer_count")
             if globals.config.download_comments:
                 globals.comments.retrieve_comments()
             helpers.write_data_json()
-            if from_thread:
-                self.check_if_guesting()
-            if not from_thread or (previous_state != self.livestream_object.get("broadcast_status")):
+            if from_thread and len(stream_heartbeat.get("cobroadcasters")) > 0:
+                self.get_guest_status()
+            if not from_thread or (last_stream_status != stream_status):
                 if from_thread:
                     logger.separator()
                     helpers.print_durations()
-                logger.info('Status       : {}'.format(self.livestream_object.get("broadcast_status", "Unknown").capitalize()))
-                logger.info('Viewers      : {}'.format( int(self.livestream_object.get("viewer_count", "Unknown"))))
-            return self.livestream_object.get('broadcast_status') not in ['available', 'interrupted']
+                logger.info('Status       : {}'.format(self.livestream_object.get("broadcast_status", "?").capitalize()))
+                logger.info('Viewers      : {}'.format( int(self.livestream_object.get("viewer_count", "?"))))
+            return self.livestream_object.get('broadcast_status') not in ['active', 'interrupted']
