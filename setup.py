@@ -2,9 +2,8 @@ from setuptools import setup
 
 __author__ = 'dvingerh'
 __email__ = 'dirk.ving@gmail.com'
-__version__ = '3.3.0'
+__version__ = '4.0.0'
 
-_api_extensions_version = '0.3.9'
 
 long_description = 'This Python script enables you to download ongoing Instagram livestreams as a video file.'
 
@@ -21,7 +20,6 @@ setup(
         ]
     },
     install_requires=[
-        'instagram_private_api_extensions @ https://github.com/ping/instagram_private_api_extensions/archive/%(api)s.tar.gz#egg=instagram_private_api_extensions-%(api)s' % {'api': _api_extensions_version},
         'argparse',
         'configparser'
     ],

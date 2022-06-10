@@ -3,7 +3,7 @@ Active development for this script has ended. Issues will no longer be looked in
 
 
 # PyInstaLive
-![Version 4.0.0](https://img.shields.io/badge/Version-3.3.0-orange.svg)
+![Version 4.0.0](https://img.shields.io/badge/Version-4.0.0-orange.svg)
 ![Python 3.6+](https://img.shields.io/badge/Python-3.6%2B-3776ab.svg)
 
 

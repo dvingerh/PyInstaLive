@@ -227,7 +227,7 @@ class Download:
             if globals.config.download_comments:
                 globals.comments.retrieve_comments()
             helpers.write_data_json()
-            if from_thread and len(stream_heartbeat.get("cobroadcasters")) > 0:
+            if from_thread and len(stream_heartbeat.get("cobroadcasters", [])) > 0:
                 self.get_guest_status()
             if not from_thread or (last_stream_status != stream_status):
                 if from_thread:
