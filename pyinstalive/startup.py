@@ -109,22 +109,26 @@ def run():
 
     logger.banner(no_log=True, pre_config=True)
 
-    parser = argparse.ArgumentParser(description="Running PyInstaLive {:s} using Python {:s}".format(Constants.SCRIPT_VERSION, Constants.PYTHON_VERSION))
+    class ArgHelpFormatting(argparse.HelpFormatter):
+        def __init__(self, prog):
+            super(ArgHelpFormatting, self).__init__(prog, max_help_position=100)
 
-    parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
-    parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
-    parser.add_argument('-d', '--download', dest='download', type=str, required=False, help="Instagram username of the user to download a livestream from.")
+    parser = argparse.ArgumentParser(formatter_class=ArgHelpFormatting, description="PyInstaLive {:s} using Python {:s}".format(Constants.SCRIPT_VERSION, Constants.PYTHON_VERSION))
+
+    parser.add_argument('-u', '--username', dest='username', metavar='', type=str, required=False, help="Instagram username to login with.")
+    parser.add_argument('-p', '--password', dest='password', metavar='', type=str, required=False, help="Instagram password to login with.")
+    parser.add_argument('-d', '--download', dest='download', metavar='', type=str, required=False, help="Instagram username whose livestream you want to download.")
     parser.add_argument('-df', '--download-following', dest='download_following', action="store_true", required=False, help="Check for available livestreams from people you're following.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="Shows information about PyInstaLive.")
-    parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Clean the current download path of all leftover files.")
-    parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Override the default configuration file path.")
-    parser.add_argument('-dp', '--download-path', dest='download_path', type=str, required=False, help="Override the default download path.")
-    parser.add_argument('-dc', '--download-comments', dest='download_comments', type=str, required=False, help="Download livestream comments. Overrides the configuration file setting.")
-    parser.add_argument('-gc', '--generate-comments', dest='generate_comments_path', type=str, required=False, help="Generate a comments log file. Requires a ivestream data file.")
-    parser.add_argument('-gv', '--generate-video', dest='generate_video_path', type=str, required=False, help="Generate a comments log file. Requires a livestream data file or folder.")
-    parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream data files. Overrides the configuration file setting.")
+    parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Clean the current download path of all temporary files.")
+    parser.add_argument('-cp', '--config-path', dest='config_path', metavar='', type=str, required=False, help="Override the default configuration file path.")
+    parser.add_argument('-dp', '--download-path', dest='download_path', metavar='', type=str, required=False, help="Override the default download path.")
+    parser.add_argument('-dc', '--download-comments', dest='download_comments', action="store_true", required=False, help="Download livestream comments. Overrides the configuration file setting.")
+    parser.add_argument('-gc', '--generate-comments', dest='generate_comments_path', metavar='', type=str, required=False, help="Generate a comments log file. Requires a livestream JSON file.")
+    parser.add_argument('-gv', '--generate-video', dest='generate_video_path', metavar='', type=str, required=False, help="Assemble downloaded livestream segments into a video file. Requires a livestream segments folder.")
+    parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream segments into a video file. Overrides the configuration file setting.")
 
-    globals.args, unknown_args = parser.parse_known_args()  # Parse arguments
+    globals.args, unknown_args = parser.parse_known_args()
     
     if unknown_args:
         logger.warn("The following unknown argument(s) were provided and will be ignored.", pre_config=True)
