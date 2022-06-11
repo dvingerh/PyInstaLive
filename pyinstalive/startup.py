@@ -30,11 +30,6 @@ def validate_settings():
             helpers.new_config()
             validate_succeeded = False
 
-        elif not globals.args.clean and not globals.args.info and not globals.args.generate_video_path and not globals.args.generate_comments_path and not globals.args.download:
-            logger.error("No download method was specified.", pre_config=True)
-            logger.separator(pre_config=True)
-            validate_succeeded = False
-
         if validate_succeeded:
             globals.config.config_path = os.path.realpath(globals.config.config_path)
             globals.config.parser_object.read(globals.config.config_path)
@@ -79,12 +74,14 @@ def validate_settings():
                     validate_succeeded = False
                     logger.separator()
         
+            if globals.args.no_assemble:
+                globals.config.no_assemble = True
 
             if globals.args.download:
                 globals.download = Download(globals.args.download)
                 if globals.config.download_comments:
                     globals.comments = Comments()
-
+            
             if globals.args.download_following:
                 if not helpers.command_exists("pyinstalive"):
                     logger.error("Could not find the 'pyinstalive' command required to use the -df argument.")
@@ -96,7 +93,7 @@ def validate_settings():
 
         return validate_succeeded
     except Exception as e:
-        logger.error("Could not process the configuration file: {:s}".format(str(e)))
+        logger.error("Could not validate the configuration file: {:s}".format(str(e)))
         logger.error("Ensure the configuration file and given arguments are valid and try again.")
         logger.separator()
         return False
@@ -134,6 +131,11 @@ def run():
         logger.warn('    ' + ' '.join(unknown_args), pre_config=True)
         logger.separator(pre_config=True)
 
+    if not any(vars(globals.args).values()):
+        logger.error("No known arguments were provided.", pre_config=True)
+        logger.separator(pre_config=True)
+        return
+
     validate_success = validate_settings()
     if globals.config.log_to_file:
         logger._log_to_file(None, pre_config=True)
@@ -146,7 +148,7 @@ def run():
 
             if not globals.args.username and not globals.args.password:
                 login_success = globals.session.authenticate()
-            elif (globals.args.username and not globals.args.password) or (globals.args.password and not globals.args.username):
+            elif not globals.args.username or not globals.args.password:
                 logger.warn("Missing --username or --password argument.")
                 logger.warn("Falling back to the configuration file values.")
                 logger.separator()
@@ -157,16 +159,13 @@ def run():
             if login_success:
                 globals.download.start()
                 helpers.lock_remove()
-
-        elif globals.args.generate_video_path:
-            assembler.assemble()
-            logger.separator()
-        elif globals.args.generate_comments_path:
-            Comments().generate_log()
-            logger.separator()
-        elif globals.args.clean:
-            helpers.clean_download_dir()
-            logger.separator()
-        elif globals.args.info:
-            helpers.show_info()
+        else:
+            if globals.args.generate_video_path:
+                assembler.assemble()
+            elif globals.args.generate_comments_path:
+                Comments().generate_log()
+            elif globals.args.clean:
+                helpers.clean_download_dir()
+            elif globals.args.info:
+                helpers.show_info()
             logger.separator()
