@@ -85,8 +85,14 @@ def validate_settings():
                 if globals.config.download_comments:
                     globals.comments = Comments()
 
-            if globals.args.no_assemble:
-                globals.config.no_assemble = True
+            if globals.args.download_following:
+                if not helpers.command_exists("pyinstalive"):
+                    logger.error("Could not find the 'pyinstalive' command required to use the -df argument.")
+                    logger.error("Ensure PyInstaLive is directly accessible from the command line and try again.")
+                    validate_succeeded = False
+                    logger.separator()
+                else:
+                    globals.download = Download(None)
 
         return validate_succeeded
     except Exception as e:
@@ -111,6 +117,7 @@ def run():
     parser.add_argument('-u', '--username', dest='username', type=str, required=False, help="Instagram username to login with.")
     parser.add_argument('-p', '--password', dest='password', type=str, required=False, help="Instagram password to login with.")
     parser.add_argument('-d', '--download', dest='download', type=str, required=False, help="Instagram username of the user to download a livestream from.")
+    parser.add_argument('-df', '--download-following', dest='download_following', action="store_true", required=False, help="Check for available livestreams from people you're following.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="Shows information about PyInstaLive.")
     parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Clean the current download path of all leftover files.")
     parser.add_argument('-cp', '--config-path', dest='config_path', type=str, required=False, help="Override the default configuration file path.")
@@ -133,7 +140,7 @@ def run():
 
     
     if validate_success:
-        if globals.args.download:
+        if globals.args.download or globals.args.download_following:
             globals.session = Session(username=globals.config.username, password=globals.config.password)
             login_success = False
 

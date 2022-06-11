@@ -8,9 +8,10 @@ from .constants import Constants
 
 import threading
 import os
+import time
 
 class Download:
-    def __init__(self, download_user=""):
+    def __init__(self, download_user=None):
         self.download_user = download_user
         self.download_user_id = None
         self.timestamp = helpers.strepochtime()
@@ -26,12 +27,12 @@ class Download:
         self.download_stop = False
 
     def start(self):
-        checking_self = self.download_user == globals.session.username
-        if checking_self:
-            logger.warn("Login with a different account to download your own livestreams.")
-            logger.separator()
-            return
         if globals.args.download:
+            checking_self = self.download_user == globals.session.username
+            if checking_self:
+                logger.warn("Login with a different account to download your own livestreams.")
+                logger.separator()
+                return
             if not helpers.lock_exists():
                 helpers.lock_create(lock_type="user")
                 logger.info('Getting livestream information for user: {:s}'.format(self.download_user))
@@ -58,6 +59,65 @@ class Download:
                 logger.warn("Lock file is already present for this user, there is probably another download ongoing.")
                 logger.warn("If this is not the case, manually delete the file '{:s}' and try again.".format(self.download_user + '.lock'))
                 logger.separator()
+        elif globals.args.download_following:
+            self.get_following_livestreams()
+
+    def get_following_livestreams(self):
+        try:
+            livestream_list = api.get_reels_tray()
+            usernames_available_livestreams = []
+            if livestream_list.get("broadcasts", None):
+                for livestream in livestream_list.get("broadcasts", None):
+                    owner_username = livestream.get("broadcast_owner", None).get("username", None)
+                    try:
+                        guest_username = livestream.get("cobroadcasters", None)[0].get("username", None)
+                    except:
+                        guest_username = None
+                    if guest_username:
+                        usernames_available_livestreams.append(guest_username)
+                    else:
+                        usernames_available_livestreams.append(owner_username)
+                if usernames_available_livestreams:
+                    logger.info("The following users have available livestreams:")
+                    logger.info(', '.join(usernames_available_livestreams))
+                    logger.separator()
+                    self.iterate_users(usernames_available_livestreams)
+                else:
+                    logger.info("There are currently no available livestreams.")
+                    logger.separator()
+            else:
+                return False
+        except Exception as e:
+            logger.error("Could not get livestream information: {:s}".format(str(e)))
+            logger.separator()
+            return None
+        except KeyboardInterrupt:
+            logger.binfo('The process was aborted by the user.')
+            logger.separator()
+            return None
+
+    def iterate_users(self, user_list):
+        for index, user in enumerate(user_list):
+            try:
+                if os.path.isfile(os.path.join(globals.config.download_path, user + '.lock')):
+                    logger.warn("Lock file is already present for '{:s}', there is probably another download ongoing.".format(user))
+                    logger.warn("If this is not the case, manually delete the file '{:s}' and try again.".format(user + '.lock'))
+                else:
+                    logger.info("Starting download for '{:s}'.".format(user))
+                    start_result = helpers.run_command("pyinstalive -d {:s}".format(user))
+                    if start_result:
+                        logger.warn("Could not start download: {:s}".format(str(start_result)))
+                    else:
+                        logger.info("Successfully started download.")
+                logger.separator()
+                if index != len(user_list) - 1:
+                    time.sleep(2)
+            except Exception as e:
+                logger.warn("Could not start download: {:s}".format(str(e)))
+            except KeyboardInterrupt:
+                logger.binfo('The process has been aborted by the user.')
+                logger.separator()
+                break
 
     def download_livestream(self):
         try:
