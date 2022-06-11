@@ -41,25 +41,27 @@ class Session:
             self.session_file = os.path.join(os.path.dirname(globals.config.config_path), "{}.dat".format(self.username))
 
             if not os.path.isfile(self.session_file):
-                logger.warn("Could not find existing login session file: {}".format(os.path.basename(self.session_file)))
-                logger.separator()
-                logger.info("A new login session file will be created upon successful login.")
-            
+                logger.warn("Could not find an existing login session file: {:s}".format(os.path.basename(self.session_file)))
+                logger.warn("A new login session file will be created upon successful login.")
+
                 self.session = requests.Session()
                 self.session.headers = Constants.BASE_HEADERS
                 self.session.headers.update({"x-csrftoken": api.get_csrf_token()})
 
                 login_result = api.do_login()
-                if login_result.get("authenticated") == True:
+                if login_result.get("authenticated", None):
                     self._save_session()
-                    logger.info("Successfully created a new login session file.")
+                    logger.separator()
+                    logger.info("Successfully created a new login session file: {:s}".format(os.path.basename(self.session_file)))
                     for cookie in list(self.session.cookies):
                         if cookie.name == "csrftoken":
                             self.expires_epoch = cookie.expires
                     login_success = True
                 else:
                     logger.separator()
-                    if (login_result.get("message") == "checkpoint_required"):
+                    if login_result.get("user") == False:
+                        logger.error("Could not login: The account does not exist.")
+                    elif login_result.get("message", '') == "checkpoint_required":
                         logger.error("Could not login: The action was flagged as suspicious by Instagram.")
                         logger.error("Complete the security checkpoint on another device and try again.")
                     else:
@@ -80,17 +82,16 @@ class Session:
                     self.session_file = None
 
                     logger.warn("The login session file has expired and has been deleted.")
-                    logger.warn("A new login attempt will be made in a few moments.")
+                    logger.warn("A new login session file will be created upon successful login.")
 
-                    time.sleep(2.5)
+                    time.sleep(1)
                     self.authenticate(username, password)
                     return
                 else:
                     login_state = api.get_login_state()
                     if login_state.get("entry_data", {}) != {}:
-                        if login_state.get("entry_data").get("Challenge", None) != None:
+                        if login_state.get("entry_data", {}).get("Challenge", None) != None:
                             logger.separator()
-                            logger.error("The login session file is no longer valid.")
                             logger.error("The session was flagged as suspicious by Instagram.")
                             logger.error("Complete the security checkpoint on another device and try again.")
                             logger.separator()
