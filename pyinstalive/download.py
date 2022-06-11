@@ -35,7 +35,7 @@ class Download:
             if not helpers.lock_exists():
                 helpers.lock_create(lock_type="user")
                 logger.info('Getting livestream information for user: {:s}'.format(self.download_user))
-                user_info = api.get_user_info().get("data").get("user")
+                user_info = api.get_user_info().get("data", {}).get("user", None)
                 if user_info:
                     self.download_user_id = user_info.get("id", None)
                 if not self.download_user_id:

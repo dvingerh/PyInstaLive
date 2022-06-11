@@ -26,7 +26,7 @@ def get_login_state():
 
 def get_user_info():
     response = globals.session.session.get(Constants.USER_INFO.format(globals.download.download_user))
-    return json.loads(response.text)
+    return json.loads(response.text) if response.status_code == 200 else {}
 
 def get_reels_tray():
     response = globals.session.session.get(Constants.REELS_TRAY)
