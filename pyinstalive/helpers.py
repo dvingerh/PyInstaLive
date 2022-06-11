@@ -121,20 +121,20 @@ def write_data_json():
 
 def get_stream_duration(duration_type="airtime"):
     try:
-        livestream_object = globals.download.livestream_object_init
+        livestream_object = globals.download.livestream_object
         buffer = int(globals.download.downloader_object.initial_buffered_duration)
         if duration_type == "airtime":
-            stream_started_mins, stream_started_secs = divmod((int(time.time()) - livestream_object.get("published_time") + buffer), 60)
+            stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(livestream_object.get("published_time"))), 60)
 
         elif duration_type == "download":
             stream_started_mins, stream_started_secs = divmod((int(time.time()) - int(globals.download.timestamp)), 60)
 
         elif duration_type == "missing":
-            sum = (int(globals.download.timestamp) - livestream_object.get("published_time") + buffer)
+            sum = (livestream_object.get("delay") - buffer)
             if sum <= 0:
                 stream_started_mins, stream_started_secs = 0, 0 
             else:
-                stream_started_mins, stream_started_secs = divmod((int(globals.download.timestamp) - livestream_object.get("published_time") + buffer), 60)
+                stream_started_mins, stream_started_secs = divmod(sum, 60)
         else:
             stream_started_mins, stream_started_secs = 0, 0 
 
@@ -143,7 +143,7 @@ def get_stream_duration(duration_type="airtime"):
         if stream_started_secs < 0:
             stream_started_secs = 0
 
-        stream_duration_str = '{} minutes'.format(stream_started_mins)
+        stream_duration_str = '{} minute{}'.format(stream_started_mins, 's' if stream_started_mins > 1 else '')
         if stream_started_secs:
             stream_duration_str += ' and {} seconds'.format(stream_started_secs)
         return stream_duration_str
@@ -264,9 +264,9 @@ def show_info():
         logger.info("Login session files:        {:s} ({:s} matches configuration username)".format(str(len(session_files)),
                                                                                          session_from_config))
     elif len(session_files) > 0:
-        logger.info("Login session files:               {:s}".format(str(len(session_files))))
+        logger.info("Login session files:        {:s}".format(str(len(session_files))))
     else:
-        logger.warn("Login session files:               None found")
+        logger.warn("Login session files:        None found")
 
     logger.info("CLI supports color:         {:s}".format("No" if not logger.supports_color() else "Yes"))
 

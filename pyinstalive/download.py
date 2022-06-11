@@ -170,8 +170,8 @@ class Download:
                     logger.separator()
             logger.info('Downloading livestream, press [CTRL+C] to abort.')
             logger.separator()
-            helpers.print_durations()
             self.update_stream_data()
+            helpers.print_durations()
             self.tasks_worker = threading.Thread(target=helpers.handle_tasks_worker)
             self.tasks_worker.daemon = True
             self.tasks_worker.start()
@@ -198,6 +198,7 @@ class Download:
 
     def finish_download(self):
         try:
+            self.livestream_object['initial_buffered_duration'] = self.downloader_object.initial_buffered_duration
             if globals.config.cmd_on_ended:
                 try:
                     thread = threading.Thread(target=helpers.run_command, args=(globals.config.cmd_on_ended,))
@@ -271,6 +272,8 @@ class Download:
         if not self.download_stop:
             if not self.livestream_object:
                self.livestream_object = api.get_stream_data()
+               self.livestream_object['initial_buffered_duration'] = self.downloader_object.initial_buffered_duration
+               self.livestream_object["delay"] = int(globals.download.timestamp) - int(self.livestream_object.get("published_time"))
 
             last_stream_status = self.livestream_object.get("broadcast_status")
             stream_heartbeat = api.do_heartbeat()
