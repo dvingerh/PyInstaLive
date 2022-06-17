@@ -25,7 +25,8 @@ def _get_file_index(filename):
 
 def assemble(retry_with_zero_m4v=False):
     try:
-        logger.info('Assembling segments into video file.')
+        logger.binfo('Assembling segments into video file.')
+        logger.separator()
         livestream_info = {}
         if globals.args.generate_video_path:
             globals.download = Download()
@@ -34,11 +35,9 @@ def assemble(retry_with_zero_m4v=False):
             globals.download.video_path = globals.download.segments_path + ".mp4"
 
         if not os.path.isdir(globals.download.segments_path):
-            logger.separator()
             logger.error("Could not assemble segments: The segment directory does not exist.")
             return
         elif not os.listdir(globals.download.segments_path):
-            logger.separator()
             logger.error("Could not assemble segments: The segment directory does not contain any files.")
             return
         if not os.path.isfile(globals.download.data_json_path):
@@ -75,16 +74,17 @@ def assemble(retry_with_zero_m4v=False):
         video_stream = ''
         audio_stream = ''
         has_skipped_zero_m4v = False
+        has_missing_segments = False
 
         if not all_segments:
-            logger.separator()
-            logger.error("Could not assemble segments: No segment files were loaded.")
+            logger.error("Could not assemble segments: The segment directory does not contain any files.")
             return
 
         for segment in all_segments:
             segment = re.sub('\?.*$', '', segment)
-            if not os.path.isfile(segment.replace('.m4v', '.m4a')):
-                logger.warn('Audio segment not found: {0!s}'.format(segment.replace('.m4v', '.m4a')))
+            if not os.path.isfile(segment) or not os.path.isfile(segment.replace('.m4v', '.m4a')):
+                logger.warn('Stream segment not found: {0!s}'.format(os.path.basename(segment)))
+                has_missing_segments = True
                 continue
 
             if segment.endswith('-init.m4v'):
@@ -135,10 +135,14 @@ def assemble(retry_with_zero_m4v=False):
             else:
                 os.remove(source['audio'])
                 os.remove(source['video'])
+                if has_missing_segments:
+                    logger.separator()
+                    logger.warn("One or more segments were missing. The video file may be malformed.")
+                    logger.separator()
                 logger.info('Successfully saved video file: %s' % os.path.basename(globals.download.video_path))
     except ValueError as e:
         logger.separator()
-        logger.error('Could not assemble segment files: {:s}'.format(str(e)))
+        logger.error('Could not assemble segments: {:s}'.format(str(e)))
         if os.listdir(globals.download.segments_path):
             logger.binfo("Segment directory is not empty. Trying to assemble again.")
             assemble()
@@ -146,4 +150,4 @@ def assemble(retry_with_zero_m4v=False):
             logger.error("Segment directory is empty. There is nothing to assemble.")
     except Exception as e:
         logger.separator()
-        logger.error('Could not assemble segment files: {:s}'.format(str(e)))
+        logger.error('Could not assemble segments: {:s}'.format(str(e)))

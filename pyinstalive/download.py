@@ -227,7 +227,6 @@ class Download:
                     helpers.remove_temp_folder()
             else:
                 logger.binfo("Assembling of collected segment files has been disabled.")
-                logger.binfo("Use --assemble command to manually assemble downloaded segment files.")
         except KeyboardInterrupt:
             logger.binfo('The process was aborted by the user.')
 
