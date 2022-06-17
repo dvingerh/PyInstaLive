@@ -5,6 +5,11 @@ import re
 import subprocess
 import shlex
 import shutil
+import requests
+
+from urllib.parse import urlparse
+
+from requests import request
 
 from . import globals
 from . import logger
@@ -143,19 +148,16 @@ def get_stream_duration(duration_type="airtime"):
         if stream_started_secs < 0:
             stream_started_secs = 0
 
-        stream_duration_str = '{} minute{}'.format(stream_started_mins, 's' if stream_started_mins > 1 else '')
-        if stream_started_secs:
-            stream_duration_str += ' and {} seconds'.format(stream_started_secs)
+        stream_duration_str = '{} minute{}'.format(stream_started_mins, 's' if stream_started_mins != 0 else '') + ' and {} second{}'.format(stream_started_secs, 's' if stream_started_secs != 0 else '')
         return stream_duration_str
     except Exception as e:
         print(str(e))
         return "?"
 
-def print_durations(download_ended=False):
+def print_durations():
         logger.info('Airing time  : {}'.format(get_stream_duration("airtime")))
-        if download_ended:
-            logger.info('Downloaded   : {}'.format(get_stream_duration("download")))
-            logger.info('Missing      : {}'.format(get_stream_duration("missing")))
+        logger.info('Downloaded   : {}'.format(get_stream_duration("download")))
+        logger.info('Missing      : {}'.format(get_stream_duration("missing")))
 
 
 def command_exists(command):
@@ -272,7 +274,7 @@ def show_info():
 
     if os.path.exists(globals.config.config_path):
         logger.whiteline()
-        logger.info("Configuration file contents:")
+        logger.info("Configuration file:")
         logger.whiteline()
         with open(globals.config.config_path) as f:
             for line in f:
@@ -281,3 +283,13 @@ def show_info():
         logger.error("Configuration file:         Not found")
     logger.whiteline()
     logger.info("End of PyInstaLive information screen.")
+
+def test_proxy():
+    parsed_url = urlparse(globals.config.proxy)
+    if parsed_url.netloc and parsed_url.scheme:
+        proxy = {"https": '{0!s}'.format(parsed_url.netloc)}
+        try:
+            response = requests.get(Constants.BASE_WEB, headers=Constants.BASE_HEADERS, proxies=proxy, timeout=10)
+            return proxy if response.status_code == 200 else None
+        except Exception as e:
+            return None

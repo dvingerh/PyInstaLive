@@ -6,6 +6,9 @@ import os
 import pickle
 
 from datetime import datetime
+from urllib.parse import urlparse
+
+from pyinstalive import helpers
 
 from . import logger
 from . import globals
@@ -28,9 +31,19 @@ class Session:
         self.session = None
         self.cookies = None
         self.expires_epoch = None
+        self.proxy = None
 
     def authenticate(self, username=None, password=None):
         try:
+            if globals.config.proxy and not self.proxy:
+                logger.binfo("Checking if the proxy is working.")
+                self.proxy = helpers.test_proxy()
+                if self.proxy:
+                    logger.info("The proxy is working properly.")
+                else:
+                    logger.warn("The proxy check failed, falling back to default connection.")
+                logger.separator()
+
             login_success = False
             if username and password:
                 self.username = username
@@ -46,6 +59,10 @@ class Session:
 
                 self.session = requests.Session()
                 self.session.headers = Constants.BASE_HEADERS
+
+                if globals.config.proxy and self.proxy:
+                    self.session.proxies = self.proxy
+
                 self.session.headers.update({"x-csrftoken": api.get_csrf_token()})
 
                 login_result = api.do_login()
@@ -69,10 +86,12 @@ class Session:
                     logger.separator()
                     login_success = False
             else:
+                self.session = self._load_session()
+                if globals.config.proxy and self.proxy:
+                    self.session.proxies = self.proxy
                 logger.info("An existing login session file was found: {}".format(os.path.basename(self.session_file)))
                 logger.info("Checking the validity of the saved login session.")
 
-                self.session = self._load_session()
                 for cookie in list(self.session.cookies):
                     if cookie.name == "csrftoken":
                         self.expires_epoch = cookie.expires

@@ -41,6 +41,8 @@ def validate_settings():
             globals.config.clear_temp_files = globals.config.parser_object.getboolean("pyinstalive", "clear_temp_files")
             globals.config.no_assemble = globals.config.parser_object.getboolean("pyinstalive", "no_assemble")
             globals.config.use_locks = globals.config.parser_object.getboolean("pyinstalive", "use_locks")
+            globals.config.send_heartbeat = globals.config.parser_object.getboolean("pyinstalive", "send_heartbeat")
+            globals.config.proxy = globals.config.parser_object.get("pyinstalive", "proxy")
             globals.config.cmd_on_started = globals.config.parser_object.get("pyinstalive", "cmd_on_started")
             globals.config.cmd_on_ended = globals.config.parser_object.get("pyinstalive", "cmd_on_ended")
             globals.config.ffmpeg_path = globals.config.parser_object.get("pyinstalive", "ffmpeg_path")

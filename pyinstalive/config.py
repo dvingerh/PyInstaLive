@@ -13,3 +13,5 @@ class Config:
     log_to_file = True
     no_assemble = False
     use_locks = True
+    send_heartbeat = True
+    proxy = None

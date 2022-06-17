@@ -6,6 +6,7 @@ from . import assembler
 from . import live
 from .constants import Constants
 
+import json
 import threading
 import os
 import time
@@ -141,8 +142,8 @@ class Download:
                 max_connection_error_retry=3,
                 duplicate_etag_retry=30,
                 mpd_download_timeout=3,
+                callback_check=self.update_stream_data,
                 download_timeout=3,
-                callback_check=api.do_heartbeat,
                 ffmpeg_binary=globals.config.ffmpeg_path)
 
             self.livestream_owner = self.livestream_object_init.get('broadcast_owner').get("username")
@@ -171,7 +172,6 @@ class Download:
             logger.info('Downloading livestream, press [CTRL+C] to abort.')
             logger.separator()
             self.update_stream_data()
-            helpers.print_durations()
             self.tasks_worker = threading.Thread(target=helpers.handle_tasks_worker)
             self.tasks_worker.daemon = True
             self.tasks_worker.start()
@@ -180,7 +180,7 @@ class Download:
             logger.separator()
             logger.binfo("The livestream has been ended.")
             logger.separator()
-            helpers.print_durations(download_ended=True)
+            helpers.print_durations()
             logger.separator()
             self.finish_download()
         except Exception as e:
@@ -190,7 +190,7 @@ class Download:
             logger.separator()
             logger.binfo('The process was aborted by the user.')
             logger.separator()
-            helpers.print_durations(download_ended=True)
+            helpers.print_durations()
             logger.separator()
             if not self.downloader_object.is_aborted:
                 self.downloader_object.stop()
@@ -270,12 +270,13 @@ class Download:
     def update_stream_data(self, from_thread=False):
         if not self.download_stop:
             if not self.livestream_object:
-               self.livestream_object = api.get_stream_data()
-               self.livestream_object['initial_buffered_duration'] = self.downloader_object.initial_buffered_duration
-               self.livestream_object["delay"] = int(globals.download.timestamp) - int(self.livestream_object.get("published_time"))
+                self.livestream_object = api.get_stream_data()
+                if not self.livestream_object.get("initial_buffered_duration", None):
+                    self.livestream_object['initial_buffered_duration'] = self.downloader_object.initial_buffered_duration
+                self.livestream_object["delay"] = int(globals.download.timestamp) - int(self.livestream_object.get("published_time"))
 
             last_stream_status = self.livestream_object.get("broadcast_status")
-            stream_heartbeat = api.do_heartbeat()
+            stream_heartbeat = api.do_heartbeat() if globals.config.send_heartbeat else api.get_stream_data()
             stream_status = stream_heartbeat.get("broadcast_status")
             if stream_heartbeat.get("status") == "fail":
                 logger.separator()
@@ -294,7 +295,7 @@ class Download:
             if not from_thread or (last_stream_status != stream_status):
                 if from_thread:
                     logger.separator()
-                    helpers.print_durations()
+                logger.info('Airing time  : {}'.format(helpers.get_stream_duration("airtime")))
                 logger.info('Status       : {}'.format(self.livestream_object.get("broadcast_status", "?").capitalize()))
                 logger.info('Viewers      : {}'.format( int(self.livestream_object.get("viewer_count", "?"))))
             return self.livestream_object.get('broadcast_status') not in ['active', 'interrupted']
