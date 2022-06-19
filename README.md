@@ -3,7 +3,7 @@ Active development for this script has ended. Issues will no longer be looked in
 
 
 # PyInstaLive
-![Version 4.0.0](https://img.shields.io/badge/Version-4.0.0-orange.svg)
+![Version 4.0.1](https://img.shields.io/badge/Version-4.0.1-orange.svg)
 ![Python 3.6+](https://img.shields.io/badge/Python-3.6%2B-3776ab.svg)
 
 
@@ -45,7 +45,7 @@ Make sure all tools are accessible via command line (added to your PATH if on Wi
 
 Run the following command in your command line (might need to be run as administrator on Windows):
 ```bash
-pip install git+https://github.com/dvingerh/PyInstaLive.git@4.0.0
+pip install git+https://github.com/dvingerh/PyInstaLive.git@4.0.1
 ```
 
 ## Usage
@@ -82,7 +82,7 @@ Below is an example of PyInstaLive's output after downloading a livestream:
 > pyinstalive -d "janedoe"
 
 ---------------------------------------------------------------------------
-[I] PYINSTALIVE (SCRIPT V4.0.0 - PYTHON V3.8.10) - 06-10-2022 05:02:02 PM
+[I] PYINSTALIVE (SCRIPT V4.0.1 - PYTHON V3.8.10) - 06-10-2022 05:02:02 PM
 ---------------------------------------------------------------------------
 An existing login session file was found: johndoe.dat
 Checking the validity of the saved login session.
