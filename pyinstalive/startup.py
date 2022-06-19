@@ -2,7 +2,7 @@ import argparse
 import configparser
 import os
 import logging
-
+import sys
 
 from . import globals
 from . import logger
@@ -27,8 +27,9 @@ def validate_settings():
                 logger.warn("Falling back to default path: {:s}".format(globals.config.config_path), pre_config=True)
                 logger.separator(pre_config=True)
         elif not os.path.isfile(globals.config.config_path):
+            logger.banner(log_only=True)
             helpers.new_config()
-            validate_succeeded = False
+            sys.exit(0)
 
         if validate_succeeded:
             globals.config.config_path = os.path.realpath(globals.config.config_path)
@@ -131,21 +132,20 @@ def run():
     parser.add_argument('-na', '--no-assemble', dest='no_assemble', action='store_true', help="Do not assemble the downloaded livestream segments into a video file. Overrides the configuration file setting.")
 
     globals.args, unknown_args = parser.parse_known_args()
+    validate_success = validate_settings()
     
     if unknown_args:
         logger.warn("The following unknown argument(s) were provided and will be ignored.", pre_config=True)
-        logger.warn('    ' + ' '.join(unknown_args), pre_config=True)
+        logger.warn('    ' + ' '.join(unknown_args))
         logger.separator(pre_config=True)
 
     if not any(vars(globals.args).values()):
         logger.error("No known arguments were provided.", pre_config=True)
         logger.separator(pre_config=True)
-        return
+        validate_success = False
 
-    validate_success = validate_settings()
     if globals.config.log_to_file:
         logger._log_to_file(None, pre_config=True)
-
     
     if validate_success:
         if globals.args.download or globals.args.download_following:
@@ -175,3 +175,4 @@ def run():
             elif globals.args.info:
                 helpers.show_info()
             logger.separator()
+            

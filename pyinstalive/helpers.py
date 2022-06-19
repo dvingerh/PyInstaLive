@@ -52,7 +52,7 @@ def new_config():
                 config_file = open(globals.config.config_path, "w")
                 config_file.write(Constants.CONFIG_TEMPLATE.format(os.getcwd()).strip())
                 config_file.close()
-                logger.info("A new configuration file has been created.")
+                logger.info("A new configuration file has successfully been created.")
                 logger.separator()
                 return
             except Exception as e:
@@ -66,7 +66,7 @@ def new_config():
                 logger.separator()
     except Exception as e:
         logger.error("An error occurred: {}".format(str(e)))
-        logger.warn("If configuration file exists, manually create one using the following template:")
+        logger.warn("If no configuration file exists, manually create one using the following template:")
         logger.whiteline()
         logger.plain(Constants.CONFIG_TEMPLATE)
         logger.whiteline()

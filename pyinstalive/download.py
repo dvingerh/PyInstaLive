@@ -280,7 +280,7 @@ class Download:
             stream_status = stream_heartbeat.get("broadcast_status")
             if stream_heartbeat.get("status") == "fail":
                 logger.separator()
-                logger.error('The livestream host has lost connection with Instagram.')
+                logger.error('The livestream host has possibly lost connection with Instagram.')
                 self.download_stop = True
                 self.downloader_object.stop()
                 return False
