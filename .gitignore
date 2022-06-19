@@ -71,3 +71,5 @@ venv/
 *_downloads\
 
 *.txt
+
+*_live/

@@ -293,3 +293,9 @@ def test_proxy():
             return proxy if response.status_code == 200 else None
         except Exception as e:
             return None
+
+def remove_temp_folder():
+    try:
+        shutil.rmtree(globals.download.segments_path)
+    except Exception as e:
+        logger.error("Could not remove segment folder: {:s}".format(str(e)))
