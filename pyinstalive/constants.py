@@ -9,14 +9,16 @@ class Constants:
 username = johndoe
 password = grapefruits
 download_path = {:s}
-ffmpeg_path = 
-download_comments = True    
+download_comments = True
+clear_temp_files = True
 cmd_on_started =
 cmd_on_ended =
-clear_temp_files = False
-use_locks = True
-no_assemble = False
+ffmpeg_path = 
 log_to_file = True
+no_assemble = False
+use_locks = True
+send_heartbeat = True
+proxy =
     """
 
 

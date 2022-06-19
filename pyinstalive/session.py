@@ -6,7 +6,6 @@ import os
 import pickle
 
 from datetime import datetime
-from urllib.parse import urlparse
 
 from pyinstalive import helpers
 
