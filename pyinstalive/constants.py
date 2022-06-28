@@ -2,7 +2,7 @@ import sys
 
 
 class Constants:
-    SCRIPT_VERSION = "4.0.1"
+    SCRIPT_VERSION = "4.0.2"
     PYTHON_VERSION = sys.version.split(" ")[0]
     CONFIG_TEMPLATE = """
 [pyinstalive]
