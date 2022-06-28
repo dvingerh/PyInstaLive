@@ -8,6 +8,7 @@ from . import globals
 from . import logger
 from . import helpers
 from . import assembler
+from . import organize
 from .constants import Constants
 from .session import Session
 from .download import Download
@@ -124,6 +125,7 @@ def run():
     parser.add_argument('-df', '--download-following', dest='download_following', action="store_true", required=False, help="Check for available livestreams from people you're following.")
     parser.add_argument('-i', '--info', dest='info', action='store_true', help="Shows information about PyInstaLive.")
     parser.add_argument('-cl', '--clean', dest='clean', action='store_true', help="Clean the current download path of all temporary files.")
+    parser.add_argument('-o', '--organize', dest='organize', action='store_true', help="Organize downloaded files and folders into separate directories with more readable names.")
     parser.add_argument('-cp', '--config-path', dest='config_path', metavar='', type=str, required=False, help="Override the default configuration file path.")
     parser.add_argument('-dp', '--download-path', dest='download_path', metavar='', type=str, required=False, help="Override the default download path.")
     parser.add_argument('-dc', '--download-comments', dest='download_comments', action="store_true", required=False, help="Download livestream comments. Overrides the configuration file setting.")
@@ -174,5 +176,7 @@ def run():
                 helpers.clean_download_dir()
             elif globals.args.info:
                 helpers.show_info()
+            elif globals.args.organize:
+                organize.organize_files()
             logger.separator()
             
