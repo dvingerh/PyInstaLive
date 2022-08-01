@@ -20,7 +20,6 @@ setup(
         ]
     },
     install_requires=[
-        'argparse',
         'configparser'
     ],
     include_package_data=True,
