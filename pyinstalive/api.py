@@ -7,7 +7,7 @@ from .constants import Constants
 
 def get_csrf_token():
     response = globals.session.session.get(Constants.LOGIN_PAGE)
-    return helpers.get_shared_data(response.text).get("csrf_token", None)
+    return helpers.get_shared_data(response.text).get("config", None).get("csrf_token", None)
 
 def do_login():
     now_epoch = int(datetime.now().timestamp())
