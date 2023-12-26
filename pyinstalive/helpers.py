@@ -86,10 +86,11 @@ def get_shared_data(data):
         match_str = match.group(1)
         return json.loads(match_str).get("config")
     else:
-        match = re.search(r"\"raw\":\"({[^\n]*\\\"})", data)
-        if match:
-            match_str = string_escape(match.group(1))
-            return json.loads(match_str)
+        csrf_token = re.search(r'"csrf_token":\s*"([^"]+)"', data)
+        if csrf_token:
+            csrf_token_value = csrf_token.group(1)
+            response = {"csrf_token": csrf_token_value}
+            return response
 
 def lock_exists():
     return os.path.isfile(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'))
