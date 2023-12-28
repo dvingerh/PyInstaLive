@@ -70,13 +70,7 @@ class Download:
             if livestream_list.get("broadcasts", None):
                 for livestream in livestream_list.get("broadcasts", None):
                     owner_username = livestream.get("broadcast_owner", None).get("username", None)
-                    try:
-                        guest_username = livestream.get("cobroadcasters", None)[0].get("username", None)
-                    except:
-                        guest_username = None
-                    if guest_username:
-                        usernames_available_livestreams.append(guest_username)
-                    else:
+                    if owner_username:
                         usernames_available_livestreams.append(owner_username)
                 if usernames_available_livestreams:
                     logger.info("The following users have available livestreams:")
