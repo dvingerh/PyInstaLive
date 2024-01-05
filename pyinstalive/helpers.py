@@ -6,6 +6,7 @@ import subprocess
 import shlex
 import shutil
 import requests
+from bs4 import BeautifulSoup
 
 from urllib.parse import urlparse
 
@@ -86,13 +87,23 @@ def get_shared_data(data):
         match_str = match.group(1)
         return json.loads(match_str).get("config")
     else:
-        match = re.search(r"\"raw\":\"({[^\n]*\\\"})", data)
-        if match:
-            match_str = string_escape(match.group(1))
-            csrf_token = re.search(r'"csrf_token":\s*"([^"]+)"', match_str)
-            csrf_token_value = csrf_token.group(1)
-            response = {"csrf_token": csrf_token_value}
-            return response
+        response = {}
+        soup = BeautifulSoup(data, 'html.parser')
+        all_scripts = soup.find_all('script', {"data-content-len":True, "src": False})
+        chnk_len = 100
+        for script in all_scripts:
+            if int(script["data-content-len"]) > 30000:
+                lines = script.text
+                for idx in range(0, len(lines), chnk_len):
+                    csrf_token_match = re.findall(r"csrf_token", lines[idx : idx + chnk_len])
+                    if csrf_token_match:
+                        matches = re.findall(r'\{([^}]+)\}', lines[idx : idx + chnk_len])
+                        if len(matches)>0:
+                            dict_value = "{" + matches[0] + "}"
+                            response = json.loads(dict_value)
+                            break
+        return response
+
 
 def lock_exists():
     return os.path.isfile(os.path.join(globals.config.download_path, globals.download.download_user + '.lock'))
